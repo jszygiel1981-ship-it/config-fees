@@ -337,24 +337,24 @@
     .chip { display:inline-flex; align-items:center; padding:0 4px; border-radius:999px; font-family:Roboto,sans-serif; font-size:12px; font-weight:400; line-height:12px; cursor:default; white-space:nowrap; -webkit-user-select:none; user-select:none; }
     .chip-sm { height:24px; }
     .chip .chip-label { padding:0 8px; font-size:inherit; font-weight:inherit; line-height:inherit; }
-    .chip-success-outline { background:transparent; color:var(--color-success-main); border:1px solid var(--color-success-main); }
-    .chip-warning-outline { background:transparent; color:var(--color-warning-main); border:1px solid var(--color-warning-main); }
-    .chip-error-outline   { background:transparent; color:var(--color-error-main);   border:1px solid var(--color-error-main); }
+    .chip-success-outline { background:transparent; color:#2e7d32; border:1px solid #2e7d32; }
+    .chip-warning-outline { background:transparent; color:#E17109; border:1px solid #E17109; }
+    .chip-error-outline   { background:transparent; color:#DB4537; border:1px solid #DB4537; }
     /* Modal layout */
     .bulk-modal-body { flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; padding:24px 40px; gap:0; }
     /* Bulk form — design system field sizing */
     #bStep1 .field label { font-size:12px; color:#212121; font-weight:400; }
-    #bStep1 .field { gap:var(--spacing-sm); }
+    #bStep1 .field { gap:8px; }
     #bStep1 input[type=text] { height:36px; padding:0 12px; border:1px solid #9E9E9E; border-radius:4px; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#fff; outline:none; transition:border-color .15s; box-sizing:border-box; width:100%; }
-    #bStep1 input[type=text]:focus { border-color:var(--color-primary-main); border-width:2px; padding:0 11px; }
+    #bStep1 input[type=text]:focus { border-color:#2196F3; border-width:2px; padding:0 11px; }
     #bStep1 .date-wrap input { padding-right:36px; }
-    #bStep1 > div { gap:var(--spacing-lg); }
+    #bStep1 > div { gap:24px; }
     #bStep1 .select-input { height:36px; min-height:36px; padding:0 40px 0 16px; font-size:14px; }
     /* multi-select */
     .multi-sel-wrap { position:relative; }
     .multi-sel-trigger { width:100%; min-height:36px; padding:4px 36px 4px 16px; border:1px solid #9E9E9E; border-radius:4px; display:flex; align-items:center; flex-wrap:wrap; gap:4px; cursor:pointer; background:#fff; position:relative; user-select:none; box-sizing:border-box; transition:border-color .15s; }
     .multi-sel-trigger:hover { border-color:#616161; }
-    .multi-sel-trigger.open { border-color:var(--color-primary-main); border-width:2px; padding:4px 35px 4px 15px; }
+    .multi-sel-trigger.open { border-color:#2196F3; border-width:2px; padding:4px 35px 4px 15px; }
     .multi-sel-arrow { position:absolute !important; right:8px !important; top:50% !important; transform:translateY(-50%) !important; font-size:20px !important; color:#757575; pointer-events:none; transition:transform .2s; }
     .multi-sel-trigger.open .multi-sel-arrow { transform:translateY(-50%) rotate(180deg) !important; }
     .multi-sel-placeholder { color:#9E9E9E; font-size:14px; }
@@ -2115,15 +2115,15 @@ function refreshBulkMultiSel() {
   const hint = document.getElementById('bScopeHint');
   if (disableAgencies) {
     hint.style.background = '#FCF1E0';
-    hint.style.borderColor = 'var(--color-warning-main)';
-    icon.style.color = 'var(--color-warning-main)';
+    hint.style.borderColor = '#E17109';
+    icon.style.color = '#E17109';
     icon.textContent = 'warning_amber';
     txt.style.color = '#212121';
     txt.innerHTML = 'Multiple clients selected — <strong>agencies are limited to one</strong>. Deselect clients to unlock.';
   } else if (disableClients) {
     hint.style.background = '#FCF1E0';
-    hint.style.borderColor = 'var(--color-warning-main)';
-    icon.style.color = 'var(--color-warning-main)';
+    hint.style.borderColor = '#E17109';
+    icon.style.color = '#E17109';
     icon.textContent = 'warning_amber';
     txt.style.color = '#212121';
     txt.innerHTML = 'Multiple agencies selected — <strong>clients are limited to one</strong>. Deselect agencies to unlock.';

@@ -139,6 +139,8 @@
     .add-inst-menu-item { display:flex; align-items:center; gap:8px; padding:0 12px; min-height:36px; font-size:13px; color:#212121; cursor:pointer; user-select:none; }
     .add-inst-menu-item:hover { background:rgba(0,0,0,0.04); }
     .add-inst-menu-item .material-icons { font-size:16px; color:#616161; }
+    .add-inst-menu-item.disabled { color:#BDBDBD; pointer-events:none; }
+    .add-inst-menu-item.disabled .material-icons { color:#BDBDBD; }
     .add-inst-menu-divider { height:1px; background:#E0E0E0; margin:4px 0; }
 
     /* ─── Grid Toolbar (inline filter tabs + pagination) ─── */
@@ -514,7 +516,7 @@
             <div class="add-inst-menu-item" onclick="openBulkModal()">
               <span class="material-icons">playlist_add</span> Bulk Create Instances
             </div>
-            <div class="add-inst-menu-item" onclick="closeAddInstMenu()">
+            <div class="add-inst-menu-item disabled" id="cloneMenuItem">
               <span class="material-icons">content_copy</span> Clone Instances
             </div>
           </div>
@@ -1377,6 +1379,7 @@ document.addEventListener('click', e => {
 });
 function toggleSelectAll(chk) {
   document.querySelectorAll('.row-chk').forEach(c => c.checked = chk.checked);
+  updateSelectAll();
 }
 function updateSelectAll() {
   const all = [...document.querySelectorAll('.row-chk')];
@@ -1385,6 +1388,8 @@ function updateSelectAll() {
   const checked = all.filter(c => c.checked).length;
   chk.checked = checked === all.length && all.length > 0;
   chk.indeterminate = checked > 0 && checked < all.length;
+  const clone = document.getElementById('cloneMenuItem');
+  if (clone) clone.classList.toggle('disabled', checked === 0);
 }
 
 function setFilter(f, el) {

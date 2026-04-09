@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fee Management — TRIO WFS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="../../ahtg-design-system/design-system-shell.css" />
+
+  <style>
+    /* ─── Reset / Base ─── */
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin:0; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#F5F5F5; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+
+    /* ─── Top Bar ─── */
+    .g-nav-top { background:#607D8B; height:48px; display:flex; align-items:center; padding:0 24px; gap:28px; flex-shrink:0; }
+    .g-nav-brand { display:flex; align-items:flex-start; flex-shrink:0; }
+    .g-nav-wordmark { display:flex; align-items:center; gap:4px; height:48px; }
+    .g-nav-wordmark svg { display:block; }
+    .logo-wip-badge { background:#DB4537; color:#fff; font-size:20px; font-weight:500; font-family:Roboto,sans-serif; line-height:24px; padding:2px 10px; border-radius:0 0 4px 4px; align-self:flex-start; flex-shrink:0; }
+    .g-nav-search { display:flex; align-items:center; border:1px solid rgba(255,255,255,0.3); border-radius:4px; height:32px; overflow:hidden; flex-shrink:0; }
+    .g-nav-search input { background:rgba(255,255,255,0.12); border:none; outline:none; color:#fff; font-size:13px; font-family:Roboto,sans-serif; padding:0 10px; height:100%; width:185px; }
+    .g-nav-search input::placeholder { color:rgba(255,255,255,0.5); }
+    .g-nav-search-div { background:rgba(255,255,255,0.25); width:1px; height:100%; flex-shrink:0; }
+    .g-nav-search-cat { background:rgba(255,255,255,0.1); border:none; outline:none; color:rgba(255,255,255,0.85); font-size:12px; font-family:Roboto,sans-serif; padding:0 8px; height:100%; cursor:pointer; flex-shrink:0; }
+    .g-nav-spacer { flex:1; }
+    .g-nav-user { display:flex; align-items:center; gap:6px; flex-shrink:0; cursor:pointer; }
+    .g-nav-avatar { width:32px; height:34px; border-radius:4px; background:#AB47BC; border:2px solid #fff; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:400; flex-shrink:0; }
+    .g-nav-username { color:#fff; font-size:14px; font-weight:500; white-space:nowrap; }
+    .g-nav-chevron { color:#fff; font-size:20px; }
+
+    /* ─── Nav Bar ─── */
+    .g-nav-bar { background:#fff; border-bottom:1px solid #E0E0E0; height:50px; padding:0 16px; display:flex; align-items:stretch; flex-shrink:0; overflow:hidden; }
+    .g-nav-item { display:flex; align-items:center; gap:3px; padding:0 16px; font-size:11px; font-weight:500; color:#212121; cursor:pointer; white-space:nowrap; user-select:none; position:relative; flex-shrink:0; }
+    .g-nav-item:hover { background:rgba(0,0,0,0.04); }
+    .g-nav-item.active { background:#F5F5F5; }
+    .g-nav-item.active::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:#212121; }
+    .g-nav-item .material-icons { font-size:16px; }
+
+    /* ─── Page Canvas + Card ─── */
+    .page-canvas { flex:1; background:#F5F5F5; padding:16px; overflow:hidden; display:flex; flex-direction:column; }
+    .page-card { flex:1; background:#fff; border-radius:4px; border:1px solid #E0E0E0; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
+
+    /* ─── Page Header Bar ─── */
+    .page-header-bar { background:#fff; border-bottom:1px solid #E0E0E0; padding:0 24px; height:52px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .page-title { font-size:16px; font-weight:500; color:#212121; }
+    .btn-add-def { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 14px; background:#FAFAFA; border:1px solid #E0E0E0; border-radius:4px; font-family:Roboto,sans-serif; font-size:13px; color:#424242; cursor:pointer; }
+    .btn-add-def:hover { background:#F5F5F5; }
+    .btn-add-def .material-icons { font-size:16px; }
+
+    /* ─── AP / AR Tabs ─── */
+    .page-tabs { background:#F5F5F5; border-bottom:1px solid #E0E0E0; padding:0 24px; display:flex; align-items:flex-end; flex-shrink:0; }
+    .ptab { position:relative; height:36px; display:inline-flex; align-items:center; padding:0 4px; margin-right:16px; font-size:14px; font-weight:400; color:#757575; cursor:pointer; border-bottom:2px solid transparent; user-select:none; }
+    .ptab.active { color:#2196F3; font-weight:500; border-bottom-color:#2196F3; }
+    .ptab:hover:not(.active) { color:#212121; }
+
+    /* ─── Content Area ─── */
+    .content { flex:1; display:flex; gap:16px; padding:16px; background:#F5F5F5; overflow:hidden; }
+
+    /* ─── Left Panel ─── */
+    .left-panel { width:395px; flex-shrink:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; display:flex; flex-direction:column; overflow:hidden; transition:width .2s ease, opacity .15s ease, border .2s ease, margin .2s ease; }
+    .left-panel.collapsed { width:0; border-width:0; opacity:0; margin-right:0; }
+    .col-feedef { display:none; }
+    .panel-collapsed .col-feedef { display:table-cell; }
+    .lp-header { display:flex; align-items:center; justify-content:space-between; padding:0 12px; height:48px; border-bottom:1px solid #E0E0E0; flex-shrink:0; background:#F5F5F5; }
+    .lp-title { font-size:14px; font-weight:500; color:#212121; }
+    .lp-actions { display:flex; gap:4px; }
+    .iBtn { width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; background:#FAFAFA; border:1px solid #E0E0E0; border-radius:4px; cursor:pointer; color:#616161; }
+    .iBtn:hover { background:#F0F0F0; }
+    .iBtn .material-icons { font-size:16px; }
+
+    .lp-controls { padding:12px 12px 8px; border-bottom:1px solid #E0E0E0; flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
+    .lp-search-row { display:flex; align-items:center; gap:8px; }
+    .lp-search { flex:1; display:flex; align-items:center; gap:6px; border:1px solid #BDBDBD; border-radius:4px; height:32px; padding:0 8px; background:#fff; }
+    .lp-search .material-icons { font-size:15px; color:#757575; }
+    .lp-search input { border:none; outline:none; font-family:Roboto,sans-serif; font-size:13px; color:#212121; width:100%; background:transparent; }
+    .lp-search input::placeholder { color:#9E9E9E; }
+    .toggle-row { display:flex; align-items:center; gap:8px; }
+    .toggle-label { font-size:12px; color:#757575; white-space:nowrap; }
+    .toggle { width:28px; height:16px; background:#fff; border:1px solid rgba(0,0,0,0.3); border-radius:999px; position:relative; cursor:pointer; transition:background .15s, border-color .15s; flex-shrink:0; box-sizing:border-box; }
+    .toggle.on { background:#2196F3; border-color:#2196F3; }
+    .toggle::after { content:''; position:absolute; width:12px; height:12px; background:#9E9E9E; border-radius:50%; top:1px; left:1px; transition:left .15s, background .15s; }
+    .toggle.on::after { left:13px; background:#fff; }
+    /* ─── Modal switch row ─── */
+    .switch-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; width:100%; gap:16px; }
+    .switch-row-label { font-size:12px; font-family:Roboto,sans-serif; color:#212121; flex:1; line-height:18px; }
+    .switch-row-label span { color:rgba(0,0,0,0.6); }
+
+    .lp-groupings { display:flex; align-items:flex-start; gap:8px; flex-wrap:wrap; }
+    .grp-label { font-size:11px; color:#757575; white-space:nowrap; padding-top:4px; }
+    /* ─── Group filter dropdown trigger ─── */
+    .grp-filter-wrap { position:relative; display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:1; }
+    .grp-all-btn { display:inline-flex; align-items:center; gap:2px; height:24px; padding:0 8px; border-radius:999px; font-size:11px; font-weight:500; font-family:Roboto,sans-serif; cursor:pointer; border:1px solid #E0E0E0; background:#fff; color:#616161; user-select:none; white-space:nowrap; flex-shrink:0; }
+    .grp-all-btn:hover { background:#F5F5F5; }
+    .grp-all-btn.has-filter { background:#E3F2FD; border-color:#2196F3; color:#1976D2; }
+    .grp-all-btn .material-icons { font-size:14px; transition:transform .15s; }
+    .grp-all-btn.open .material-icons { transform:rotate(180deg); }
+    .grp-chip-active { display:inline-flex; align-items:center; gap:2px; height:24px; padding:0 4px 0 8px; border-radius:999px; font-size:11px; font-weight:500; font-family:Roboto,sans-serif; background:#E3F2FD; border:1px solid #2196F3; color:#1976D2; white-space:nowrap; }
+    .grp-chip-active .material-icons { font-size:14px; cursor:pointer; opacity:0.7; }
+    .grp-chip-active .material-icons:hover { opacity:1; }
+    .grp-dropdown { display:none; position:absolute; top:calc(100% + 6px); left:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.1); z-index:300; min-width:160px; padding:4px 0; }
+    .grp-dropdown.open { display:block; }
+    .grp-drop-item { display:flex; align-items:center; gap:8px; padding:0 12px; min-height:34px; font-size:13px; color:#212121; cursor:pointer; user-select:none; }
+    .grp-drop-item:hover { background:rgba(0,0,0,0.04); }
+    .grp-drop-item.selected { color:#1565C0; }
+    .grp-drop-check { width:18px; height:18px; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#2196F3; }
+    .grp-drop-check .material-icons { font-size:16px; }
+
+    /* ─── Fee Definition Cards ─── */
+    .lp-cards { flex:1; overflow-y:auto; padding:8px 12px; display:flex; flex-direction:column; gap:6px; }
+    .def-card { border:1px solid #E0E0E0; border-radius:4px; padding:12px; cursor:pointer; background:#fff; transition:border-color .15s, background .15s; }
+    .def-card:hover:not(.selected) { border-color:#BDBDBD; background:#FAFAFA; }
+    .def-card.selected { background:rgba(33,150,243,0.08); border-color:#64B5F6; }
+    .def-card.disabled-card { background:#F0F0F0; cursor:pointer; }
+    .def-card.disabled-card.selected { background:#E8E8E8; border-color:#BDBDBD; }
+    .dc-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+    .dc-name { font-size:14px; font-weight:500; color:#212121; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .def-card.disabled-card .dc-name { color:#9E9E9E; }
+    .dc-group { font-size:11px; font-weight:500; color:#757575; white-space:nowrap; flex-shrink:0; }
+    .dc-desc { font-size:12px; color:#757575; line-height:18px; margin-bottom:8px; }
+    .dc-chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+    .dc-chip { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:999px; font-size:11px; font-weight:400; background:transparent; border:1px solid #E0E0E0; color:#212121; white-space:nowrap; }
+    .def-card.disabled-card .dc-chip { border-color:rgba(0,0,0,0.07); color:#9E9E9E; }
+
+    /* ─── Right Panel ─── */
+    .right-panel { flex:1; background:#fff; border:1px solid #E0E0E0; border-radius:4px; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+    .rp-header { background:#F5F5F5; display:flex; align-items:center; justify-content:space-between; padding:0 12px; height:48px; border-bottom:1px solid #E0E0E0; flex-shrink:0; }
+    .rp-title { font-size:15px; font-weight:500; color:#212121; }
+    .add-inst-wrap { position:relative; display:inline-flex; }
+    .split-btn { display:inline-flex; align-items:stretch; background:#F5F5F5; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden; height:32px; }
+    .split-btn-main { display:flex; align-items:center; padding:0 14px; font-family:Roboto,sans-serif; font-size:13px; color:#616161; cursor:pointer; background:transparent; border:none; white-space:nowrap; }
+    .split-btn-main:hover { background:rgba(0,0,0,0.04); }
+    .split-btn-divider { width:1px; background:#E0E0E0; flex-shrink:0; align-self:stretch; }
+    .split-btn-arrow { display:flex; align-items:center; justify-content:center; width:28px; background:transparent; border:none; cursor:pointer; color:#616161; flex-shrink:0; }
+    .split-btn-arrow:hover { background:rgba(0,0,0,0.04); }
+    .split-btn-arrow .material-icons { font-size:18px; }
+    .add-inst-menu { display:none; position:absolute; top:calc(100% + 4px); right:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.08); z-index:300; min-width:210px; padding:4px 0; }
+    .add-inst-menu.open { display:block; }
+    .add-inst-menu-item { display:flex; align-items:center; gap:8px; padding:0 12px; min-height:36px; font-size:13px; color:#212121; cursor:pointer; user-select:none; }
+    .add-inst-menu-item:hover { background:rgba(0,0,0,0.04); }
+    .add-inst-menu-item .material-icons { font-size:16px; color:#616161; }
+    .add-inst-menu-divider { height:1px; background:#E0E0E0; margin:4px 0; }
+
+    /* ─── Grid Toolbar (inline filter tabs + pagination) ─── */
+    .rp-context { padding:16px 16px 12px; flex-shrink:0; border-bottom:1px solid #E0E0E0; }
+    .rp-context .def-card { cursor:default; }
+    .rp-context .def-card:hover { background:rgba(33,150,243,0.08); border-color:#64B5F6; }
+    .rp-context.hidden { display:none; }
+    .grid-toolbar { background:#F5F5F5; display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:40px; border-bottom:1px solid #E0E0E0; flex-shrink:0; }
+    .gtabs { display:flex; align-items:center; height:100%; gap:0; }
+    .gtab { display:inline-flex; align-items:center; height:100%; padding:0 12px; font-size:14px; font-weight:400; color:#757575; cursor:pointer; position:relative; border-bottom:2px solid transparent; user-select:none; }
+    .gtab:hover { color:#212121; background:rgba(0,0,0,0.02); }
+    .gtab.active { color:#2196F3; font-weight:500; border-bottom-color:#2196F3; }
+    .gtab-sep { color:#BDBDBD; font-size:12px; height:100%; display:flex; align-items:center; user-select:none; }
+    .gpagination { display:flex; align-items:center; gap:4px; font-size:13px; color:#757575; }
+    .gpagination-count { font-variant-numeric:tabular-nums; }
+    .gpagination-actions { display:flex; align-items:stretch; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden; }
+    .gpagination-btn { width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#F5F5F5; border:none; border-left:1px solid #E0E0E0; color:#616161; padding:0; flex-shrink:0; }
+    .gpagination-btn:first-child { border-left:none; }
+    .gpagination-btn:hover { background:#E0E0E0; }
+    .gpagination-btn .material-icons { font-size:16px; }
+
+    /* ─── Table ─── */
+    .grid-wrap { flex:1; overflow:auto; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    thead th { position:sticky; top:0; z-index:1; background:#FAFAFA; border-bottom:1px solid #E0E0E0; padding:0 12px; height:40px; text-align:left; font-size:13px; font-weight:400; color:#757575; white-space:nowrap; user-select:none; cursor:pointer; }
+    thead th .sort-icon { font-size:12px; color:#BDBDBD; vertical-align:middle; margin-left:2px; }
+    tbody tr { border-bottom:1px solid rgba(0,0,0,0.04); }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:nth-child(even) { background:#FAFAFA; }
+    tbody tr:hover { background:#F0F7FF; }
+    tbody td { padding:0 12px; height:40px; vertical-align:middle; }
+    tbody td.muted { color:#757575; }
+    tbody td.mono { font-variant-numeric:tabular-nums; }
+    .row-acts { display:flex; gap:2px; }
+    .act-btn { width:24px; height:24px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; cursor:pointer; border-radius:2px; color:#616161; }
+    .act-btn:hover { background:rgba(0,0,0,0.06); }
+    .act-btn .material-icons { font-size:16px; }
+    .act-btn.danger { color:#DB4537; }
+    .act-btn:disabled { color:#BDBDBD; cursor:default; pointer-events:none; }
+
+    /* ─── Chip (table cell) — outline variant ─── */
+    .cell-chip { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:999px; font-size:11px; font-weight:400; white-space:nowrap; background:transparent; border:1px solid; }
+    .cell-chip-gray   { border-color:#E0E0E0; color:#212121; }
+    .cell-chip-blue   { border-color:#2196F3; color:#2196F3; }
+    .cell-chip-green  { border-color:#4CAF50; color:#4CAF50; }
+    .cell-chip-orange { border-color:#E17109; color:#E17109; }
+    .cell-chip-red    { border-color:#DB4537; color:#DB4537; }
+
+    /* ─── Empty State ─── */
+    .empty-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:48px 24px; gap:8px; text-align:center; }
+    .empty-wrap .material-icons { font-size:36px; color:#BDBDBD; }
+    .empty-title { font-size:15px; font-weight:500; color:#757575; }
+    .empty-sub { font-size:13px; color:#9E9E9E; }
+
+    /* ─── Modal ─── */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:1000; }
+    .modal-overlay.active { display:flex; }
+    .modal-container { background:#fff; border-radius:4px; box-shadow:0 5px 40px rgba(0,0,0,0.18); max-height:90vh; overflow:hidden; display:flex; flex-direction:column; animation:slideUp 200ms ease-out; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .modal-header { padding:24px 40px; background:#2196F3; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+    .modal-header h2 { font-size:20px; font-weight:500; color:#fff; margin:0; }
+    .modal-close { width:32px; height:32px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; cursor:pointer; border-radius:50%; color:rgba(255,255,255,0.8); }
+    .modal-close:hover { background:rgba(255,255,255,0.12); color:#fff; }
+    .modal-close .material-icons { font-size:20px; }
+    .modal-body { padding:24px 40px; display:flex; flex-direction:column; gap:16px; overflow-y:auto; }
+    .modal-footer { display:flex; justify-content:flex-end; gap:8px; align-items:center; padding:12px 40px; border-top:1px solid #E0E0E0; flex-shrink:0; }
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .field label { font-size:14px; font-weight:400; color:#212121; }
+    .field label .req { color:#DB4537; margin-left:2px; }
+    .field input, .field select { border:1px solid #BDBDBD; border-radius:4px; padding:0 12px; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#fff; outline:none; transition:border-color .15s; height:40px; }
+    .field input:focus, .field select:focus { border-color:#2196F3; }
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .date-wrap { position:relative; }
+    .date-wrap input { width:100%; padding-right:36px; }
+    .date-wrap .material-icons { position:absolute; right:8px; top:50%; transform:translateY(-50%); font-size:18px; color:#757575; pointer-events:none; }
+
+    /* ─── Overlap Preview ─── */
+    .overlap-section { display:flex; flex-direction:column; gap:8px; }
+    .info-banner { background:#E3F2FD; border:1px solid #90CAF9; border-radius:4px; padding:10px 12px; font-size:13px; color:#1565C0; display:flex; gap:8px; align-items:flex-start; line-height:1.5; }
+    .info-banner .material-icons { font-size:18px; color:#2196F3; flex-shrink:0; margin-top:1px; }
+    .inst-card { border:1px solid #E0E0E0; border-radius:4px; padding:10px 12px; display:flex; justify-content:space-between; align-items:flex-start; }
+    .inst-card-dates { font-size:13px; font-weight:500; color:#212121; }
+    .inst-card-meta { font-size:12px; color:#757575; margin-top:2px; }
+    .inst-card-seg { font-size:12px; color:#757575; }
+
+    /* ─── Modal buttons ─── */
+    .btn-text { background:transparent; border:none; color:#2196F3; font-family:Roboto,sans-serif; font-size:14px; font-weight:500; cursor:pointer; padding:0 12px; height:32px; border-radius:4px; }
+    .btn-text:hover { background:rgba(33,150,243,0.08); }
+    .btn-primary { background:#2196F3; color:#fff; border:none; border-radius:4px; font-family:Roboto,sans-serif; font-size:14px; font-weight:500; padding:0 16px; height:32px; cursor:pointer; }
+    .btn-primary:hover { background:#1E88E5; }
+
+    /* ─── Footer ─── */
+    .page-footer { background:#fff; border-top:1px solid #E0E0E0; height:36px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; flex-shrink:0; }
+    .footer-copy { font-size:11px; color:#9E9E9E; }
+    .footer-links { display:flex; gap:12px; }
+    .footer-links a { font-size:11px; color:#2196F3; text-decoration:none; }
+    .footer-links a:hover { text-decoration:underline; }
+
+    ::-webkit-scrollbar { width:5px; height:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:#E0E0E0; border-radius:3px; }
+
+    /* ─── Design System Select (from select-showcase.html) ─── */
+    .select-wrapper { display:block; min-width:0; position:relative; }
+    .select-control { position:relative; }
+    .select-input { width:100%; height:40px; padding:0 40px 0 12px; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#fff; border:1px solid #BDBDBD; border-radius:4px; cursor:pointer; transition:all .2s; display:flex; align-items:center; user-select:none; box-sizing:border-box; }
+    .select-input:hover:not(.open) { border-color:#616161; }
+    .select-input.open { border-color:#2196F3; border-width:2px; padding:0 39px 0 11px; }
+    .select-icon { position:absolute; right:8px; top:50%; transform:translateY(-50%); pointer-events:none; color:#757575; transition:transform .2s; font-size:20px !important; }
+    .select-input.open .select-icon { transform:translateY(-50%) rotate(180deg); }
+    .select-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; min-width:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.06); padding:8px 0; z-index:1200; display:none; }
+    .select-menu.open { display:block; }
+    .select-menu-item { min-height:36px; padding:8px 16px; display:flex; align-items:center; font-size:14px; color:#212121; cursor:pointer; user-select:none; transition:background .15s; }
+    .select-menu-item:hover { background:rgba(0,0,0,0.04); }
+    .select-menu-item.selected { background:rgba(33,150,243,0.08); }
+    .select-menu-item.selected:hover { background:rgba(33,150,243,0.12); }
+    .select-placeholder { color:#9E9E9E; }
+    .field-locked input, .field-locked textarea { background:#F5F5F5; color:#757575; cursor:default; pointer-events:none; }
+    .field-locked .select-input { background:#F5F5F5; color:#757575; cursor:default; pointer-events:none; }
+    .field-locked .select-icon { color:#BDBDBD; }
+    .field-locked label { color:#9E9E9E; }
+
+    /* ─── Def-card chip variants — outline ─── */
+    .dc-chip-green  { border-color:#4CAF50; color:#4CAF50; }
+    .dc-chip-muted  { border-color:rgba(0,0,0,0.07); color:#9E9E9E; }
+
+    /* ─── Group Autocomplete ─── */
+    .autocomplete-wrap { position:relative; }
+    .ac-input { width:100%; height:40px; border:1px solid #BDBDBD; border-radius:4px; padding:0 40px 0 12px; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#fff; outline:none; transition:border-color .15s; box-sizing:border-box; }
+    .ac-input:focus { border-color:#2196F3; border-width:2px; padding:0 39px 0 11px; }
+    .ac-arrow { position:absolute; right:8px; top:50%; transform:translateY(-50%); color:#757575; pointer-events:none; font-size:20px !important; }
+    .ac-dropdown { display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.08); z-index:1200; max-height:220px; overflow-y:auto; padding:4px 0; }
+    .ac-dropdown.open { display:block; }
+    .ac-item { display:flex; align-items:center; justify-content:space-between; padding:0 8px 0 16px; min-height:36px; cursor:pointer; font-size:14px; color:#212121; gap:4px; }
+    .ac-item:hover { background:rgba(0,0,0,0.04); }
+    .ac-item.selected { background:rgba(33,150,243,0.08); }
+    .ac-item-text { flex:1; }
+    .ac-remove { width:24px; height:24px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:transparent; border:none; cursor:pointer; border-radius:2px; color:#BDBDBD; padding:0; }
+    .ac-remove:hover { color:#DB4537; background:rgba(219,69,55,0.08); }
+    .ac-remove .material-icons { font-size:16px; }
+    .ac-add-item { display:flex; align-items:center; gap:8px; padding:8px 16px; min-height:36px; cursor:pointer; font-size:14px; color:#2196F3; border-top:1px solid #F0F0F0; margin-top:4px; }
+    .ac-add-item:hover { background:rgba(33,150,243,0.06); }
+    .ac-add-item .material-icons { font-size:16px; }
+    .btn-danger { background:#DB4537; color:#fff; border:none; border-radius:4px; font-family:Roboto,sans-serif; font-size:14px; font-weight:500; padding:0 16px; height:32px; cursor:pointer; }
+    .btn-danger:hover { background:#C62828; }
+    .modal-header-error { background:#DB4537; }
+    /* ─── Inactive instance rows ─── */
+    tr.row-inactive { background:#FAFAFA !important; }
+    tr.row-inactive td { color:#BDBDBD !important; }
+    tr.row-inactive .cell-chip { border-color:rgba(0,0,0,0.1) !important; color:#BDBDBD !important; }
+    .col-check { width:40px; padding:0 0 0 12px !important; flex-shrink:0; }
+    .col-check input[type=checkbox] { accent-color:#2196F3; width:15px; height:15px; cursor:pointer; display:block; margin:0; }
+    tr.row-inactive .act-btn { color:#BDBDBD !important; }
+
+    /* ─── Disabled tabs ─── */
+    .ptab-disabled { color:#BDBDBD !important; cursor:default; pointer-events:none; }
+
+    /* ─── Collapsed panel gap fix ─── */
+    #contentArea.panel-collapsed { gap:0; }
+
+    /* ─── Quick search (in toolbar) ─── */
+    .grid-quick-search { display:flex; align-items:center; gap:6px; border:1px solid #BDBDBD; border-radius:4px; height:28px; padding:0 8px; background:#fff; width:220px; }
+    .grid-quick-search .material-icons { font-size:15px; color:#757575; flex-shrink:0; }
+    .grid-quick-search input { border:none; outline:none; font-family:Roboto,sans-serif; font-size:13px; color:#212121; width:100%; background:transparent; }
+    .grid-quick-search input::placeholder { color:#9E9E9E; }
+    .grid-filter-clear { display:none; align-items:center; gap:2px; background:transparent; border:none; font-family:Roboto,sans-serif; font-size:12px; color:#757575; cursor:pointer; padding:0; white-space:nowrap; }
+    .grid-filter-clear.visible { display:flex; }
+    .grid-filter-clear:hover { color:#424242; }
+    .grid-filter-clear .material-icons { font-size:14px; }
+
+    /* ─── Column filter row ─── */
+    thead tr.col-filter-row th { position:sticky; top:40px; z-index:1; background:#F5F5F5; border-bottom:2px solid #E0E0E0; padding:8px 6px; }
+    .col-filter-input { width:100%; height:24px; border:1px solid #E0E0E0; border-radius:4px; padding:0 6px; font-family:Roboto,sans-serif; font-size:11px; color:#212121; background:#fff; outline:none; transition:border-color .15s; box-sizing:border-box; }
+    .col-filter-input:focus { border-color:#2196F3; }
+    .col-filter-input::placeholder { color:#BDBDBD; }
+
+    /* ─── Bulk Create Modal ─── */
+    /* Stepper — from design system Stepper component (stepper-showcase.html) */
+    .bulk-stepper { display:flex; align-items:center; padding:16px 40px 0; flex-shrink:0; }
+    .step { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .step-circle { width:24px; height:24px; border-radius:999px; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:transparent; }
+    .step-circle.active { background-color:#37636b; }
+    .step-circle .material-icons { font-size:16px; color:#37636b; }
+    .step-number { font-family:Roboto,sans-serif; font-size:12px; font-weight:400; line-height:12px; }
+    .step-number.active { color:#fff; }
+    .step-number.upcoming { color:rgba(0,0,0,0.4); }
+    .step-label { font-family:Roboto,sans-serif; font-size:14px; font-weight:400; line-height:20px; white-space:nowrap; }
+    .step-label.active, .step-label.completed { color:#212121; }
+    .step-label.upcoming { color:rgba(0,0,0,0.4); }
+    .connector { flex:1 0 32px; height:2px; border-radius:999px; margin:0 8px; }
+    .connector.completed { background-color:#37636b; }
+    .connector.upcoming { background-color:#E0E0E0; }
+    /* Chip — from design system Chip component (chip-showcase.html) */
+    .chip { display:inline-flex; align-items:center; padding:0 4px; border-radius:999px; font-family:Roboto,sans-serif; font-size:12px; font-weight:400; line-height:12px; cursor:default; white-space:nowrap; -webkit-user-select:none; user-select:none; }
+    .chip-sm { height:24px; }
+    .chip .chip-label { padding:0 8px; font-size:inherit; font-weight:inherit; line-height:inherit; }
+    .chip-success-outline { background:transparent; color:var(--color-success-main); border:1px solid var(--color-success-main); }
+    .chip-warning-outline { background:transparent; color:var(--color-warning-main); border:1px solid var(--color-warning-main); }
+    .chip-error-outline   { background:transparent; color:var(--color-error-main);   border:1px solid var(--color-error-main); }
+    /* Modal layout */
+    .bulk-modal-body { flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; padding:24px 40px; gap:0; }
+    /* Bulk form — design system field sizing */
+    #bStep1 .field label { font-size:12px; color:#212121; font-weight:400; }
+    #bStep1 .field { gap:var(--spacing-sm); }
+    #bStep1 input[type=text] { height:36px; padding:0 12px; border:1px solid #9E9E9E; border-radius:4px; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#fff; outline:none; transition:border-color .15s; box-sizing:border-box; width:100%; }
+    #bStep1 input[type=text]:focus { border-color:var(--color-primary-main); border-width:2px; padding:0 11px; }
+    #bStep1 .date-wrap input { padding-right:36px; }
+    #bStep1 > div { gap:var(--spacing-lg); }
+    #bStep1 .select-input { height:36px; min-height:36px; padding:0 40px 0 16px; font-size:14px; }
+    /* multi-select */
+    .multi-sel-wrap { position:relative; }
+    .multi-sel-trigger { width:100%; min-height:36px; padding:4px 36px 4px 16px; border:1px solid #9E9E9E; border-radius:4px; display:flex; align-items:center; flex-wrap:wrap; gap:4px; cursor:pointer; background:#fff; position:relative; user-select:none; box-sizing:border-box; transition:border-color .15s; }
+    .multi-sel-trigger:hover { border-color:#616161; }
+    .multi-sel-trigger.open { border-color:var(--color-primary-main); border-width:2px; padding:4px 35px 4px 15px; }
+    .multi-sel-arrow { position:absolute !important; right:8px !important; top:50% !important; transform:translateY(-50%) !important; font-size:20px !important; color:#757575; pointer-events:none; transition:transform .2s; }
+    .multi-sel-trigger.open .multi-sel-arrow { transform:translateY(-50%) rotate(180deg) !important; }
+    .multi-sel-placeholder { color:#9E9E9E; font-size:14px; }
+    .multi-sel-chip { display:inline-flex; align-items:center; gap:2px; background:#E3F2FD; border:1px solid #90CAF9; border-radius:999px; padding:0 4px 0 8px; height:22px; font-size:12px; color:#1565C0; white-space:nowrap; flex-shrink:0; }
+    .multi-sel-chip .chip-x { font-size:14px !important; cursor:pointer; color:#64B5F6; line-height:1; vertical-align:middle; }
+    .multi-sel-chip .chip-x:hover { color:#1565C0; }
+    .multi-sel-menu { display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.1); z-index:1300; padding:4px 0; max-height:200px; overflow-y:auto; }
+    .multi-sel-menu.open { display:block; }
+    .multi-sel-item { display:flex; align-items:center; gap:10px; padding:0 16px; height:36px; cursor:pointer; font-size:14px; color:#212121; user-select:none; }
+    .multi-sel-item:hover { background:rgba(0,0,0,0.04); }
+    .multi-sel-item input[type=checkbox] { accent-color:#2196F3; width:15px; height:15px; flex-shrink:0; cursor:pointer; }
+    .multi-sel-item.item-disabled { opacity:0.38; cursor:default; pointer-events:none; }
+    /* preview table */
+    .preview-table-wrap { flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; border:1px solid #E0E0E0; border-radius:4px; }
+    .preview-table { width:100%; table-layout:fixed; border-collapse:collapse; font-size:13px; }
+    .preview-table thead th { position:sticky; top:0; z-index:1; background:#F5F5F5; border-bottom:1px solid #E0E0E0; padding:0 12px; height:36px; text-align:left; font-size:11px; font-weight:500; color:#757575; white-space:nowrap; overflow:hidden; }
+    .preview-table tbody td { padding:0 12px; height:32px; border-bottom:1px solid #F0F0F0; color:#212121; vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .preview-table tbody tr:last-child td { border-bottom:none; }
+    /* ─── Metric Card (from design system MetricCard component) ─── */
+    .metric-group { display:flex; flex-direction:row; gap:16px; align-items:flex-start; flex-shrink:0; margin-bottom:16px; }
+    .metric-card { display:flex; flex-direction:column; flex:1; min-width:170px; height:140px; background:#FFFFFF; border:1px solid #E0E0E0; border-radius:4px; padding:16px 16px 8px 16px; gap:8px; box-sizing:border-box; overflow:hidden; font-family:Roboto,sans-serif; }
+    .mc-label-row { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; height:24px; }
+    .mc-label-left { display:flex; align-items:center; gap:4px; min-width:0; overflow:hidden; }
+    .mc-label-icon { font-size:16px; color:#757575; flex-shrink:0; }
+    .mc-label-text { font-size:14px; font-weight:500; line-height:24px; color:#757575; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .mc-metrics { display:flex; flex-direction:column; flex:1; gap:8px; min-height:0; }
+    .mc-row { display:flex; flex-direction:row; align-items:flex-start; flex:1; min-height:0; }
+    .mc-col { display:flex; flex-direction:column; justify-content:flex-start; align-items:center; flex:1; min-width:0; gap:8px; overflow:hidden; }
+    .mc-value { font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
+    .mc-value--lg { font-size:34px; line-height:41px; }
+    .mc-sub-label { font-size:12px; font-weight:400; line-height:18px; color:#757575; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
+    .mc-icons-footer { display:flex; flex-direction:row; flex-shrink:0; height:18px; align-items:center; }
+    .mc-icon-segment { flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .mc-footer-icon { font-size:18px; color:#757575; }
+    .metric-card.mc-dim { opacity:0.4; }
+
+    /* ─── Tooltip chip wrapper ─── */
+    .tip-wrap { position:relative; display:inline-flex; }
+    .tip-wrap::after { content:attr(data-tip); position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:#212121; color:#fff; font-size:11px; line-height:1.5; padding:5px 9px; border-radius:4px; white-space:normal; width:240px; text-align:left; pointer-events:none; opacity:0; transition:opacity .15s; z-index:1400; font-weight:400; }
+    .tip-wrap:hover::after { opacity:1; }
+  </style>
+</head>
+<body>
+
+<!-- ─── Top Bar ─── -->
+<div class="g-nav-top">
+  <div class="g-nav-brand">
+    <div class="g-nav-wordmark">
+      <!-- TRIO VMS wordmark -->
+      <svg width="101" height="26" viewBox="0 0 101 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="TRIO VMS">
+        <text x="0" y="20" font-family="Roboto,sans-serif" font-size="20" font-weight="500" fill="white" letter-spacing="-0.3">trio</text>
+        <text x="54" y="14" font-family="Roboto,sans-serif" font-size="10" font-weight="400" fill="rgba(255,255,255,0.75)">VMS</text>
+      </svg>
+    </div>
+    <div class="logo-wip-badge">TRIO WIP</div>
+  </div>
+  <div class="g-nav-search">
+    <input type="text" placeholder="Search Trio" />
+    <div class="g-nav-search-div"></div>
+    <select class="g-nav-search-cat"><option>All</option></select>
+  </div>
+  <div class="g-nav-spacer"></div>
+  <div class="g-nav-user">
+    <div class="g-nav-avatar">JS</div>
+    <span class="g-nav-username">Jesse Szygiel</span>
+    <span class="material-icons g-nav-chevron">expand_more</span>
+  </div>
+</div>
+
+<!-- ─── Nav Bar ─── -->
+<div class="g-nav-bar">
+  <div class="g-nav-item">DASHBOARDS<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">NURSING/ALLIED<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">LOCUMS<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">PER DIEM<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">IRM<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">CLIENTS</div>
+  <div class="g-nav-item">AGENCIES</div>
+  <div class="g-nav-item">BILLING<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">REPORTS</div>
+  <div class="g-nav-item active">ADMINISTRATION<span class="material-icons">keyboard_arrow_down</span></div>
+</div>
+
+<!-- ─── Page Canvas ─── -->
+<div class="page-canvas">
+<div class="page-card">
+
+<!-- ─── Page Header Bar ─── -->
+<div class="page-header-bar">
+  <span class="page-title">Fee Management</span>
+</div>
+
+<!-- ─── AP / AR Tabs ─── -->
+<div class="page-tabs">
+  <div class="ptab active" onclick="selectTab('ap',this)">AP</div>
+  <div class="ptab" onclick="selectTab('ar',this)">AR</div>
+  <div class="ptab" onclick="selectTab('tenant',this)">Tenant</div>
+  <div class="ptab" onclick="selectTab('expenses',this)">Expenses</div>
+</div>
+
+<!-- ─── Content ─── -->
+<div class="content" id="contentArea">
+
+  <!-- Left Panel -->
+  <div class="left-panel">
+    <div class="lp-header">
+      <span class="lp-title">Fee Definitions</span>
+      <div class="lp-actions">
+        <button class="iBtn" title="Add" onclick="openFeeDefModal()"><span class="material-icons">add</span></button>
+      </div>
+    </div>
+
+    <div class="lp-controls">
+      <div class="lp-search-row">
+        <div class="lp-search">
+          <span class="material-icons">search</span>
+          <input type="text" id="searchInput" placeholder="Search Fee" oninput="renderCards()" />
+        </div>
+      </div>
+      <div class="lp-groupings">
+        <span class="grp-label">Groupings</span>
+        <div class="grp-filter-wrap">
+          <button class="grp-all-btn" id="grpAllBtn" onclick="toggleGroupDropdown()">
+            All <span class="material-icons">arrow_drop_down</span>
+          </button>
+          <div id="grpActiveChips"></div>
+          <div class="grp-dropdown" id="grpDropdown"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lp-cards" id="feeCards"></div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="right-panel">
+    <div class="rp-header">
+      <button class="iBtn" id="collapseBtn" title="Collapse panel" onclick="togglePanel()" style="margin-right:8px;flex-shrink:0;"><span class="material-icons" id="collapseIcon">chevron_left</span></button>
+      <span class="rp-title" id="rpTitle">Instances</span>
+      <div style="display:flex;align-items:center;gap:16px;margin-left:auto;">
+        <div class="toggle-row" style="display:none;">
+          <span class="toggle-label">Show Inactive</span>
+          <div class="toggle" id="inactiveToggle" onclick="toggleInactive(this)"></div>
+        </div>
+        <div class="add-inst-wrap">
+          <div class="split-btn">
+            <button class="split-btn-main" onclick="handleAddInstance()">Add Instance</button>
+            <div class="split-btn-divider"></div>
+            <button class="split-btn-arrow" onclick="toggleAddInstMenu()"><span class="material-icons">arrow_drop_down</span></button>
+          </div>
+          <div class="add-inst-menu" id="addInstMenu">
+            <div class="add-inst-menu-item" onclick="panelCollapsed ? openModalCollapsed() : (closeAddInstMenu(), openModal())">
+              <span class="material-icons">add</span> Add Instance
+            </div>
+            <div class="add-inst-menu-item" onclick="openFeeDefModal(); closeAddInstMenu()">
+              <span class="material-icons">library_add</span> Add Fee Definition
+            </div>
+            <div class="add-inst-menu-divider"></div>
+            <div class="add-inst-menu-item" onclick="openBulkModal()">
+              <span class="material-icons">playlist_add</span> Bulk Create Instances
+            </div>
+            <div class="add-inst-menu-item" onclick="closeAddInstMenu()">
+              <span class="material-icons">content_copy</span> Clone Instances
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-toolbar">
+      <div class="gtabs">
+        <div class="gtab active" onclick="setFilter('all',this)">All</div>
+        <div class="gtab-sep">|</div>
+        <div class="gtab" onclick="setFilter('past',this)">Past</div>
+        <div class="gtab-sep">|</div>
+        <div class="gtab" onclick="setFilter('current',this)">Current</div>
+        <div class="gtab-sep">|</div>
+        <div class="gtab" onclick="setFilter('future',this)">Future</div>
+      </div>
+      <div class="gpagination">
+        <span class="gpagination-count" id="rowCount">10</span>
+        <div class="gpagination-actions">
+          <button class="gpagination-btn"><span class="material-icons">filter_alt</span></button>
+          <button class="gpagination-btn"><span class="material-icons">file_download</span></button>
+          <button class="gpagination-btn"><span class="material-icons">refresh</span></button>
+        </div>
+        <div style="width:1px;height:20px;background:#E0E0E0;margin:0 1px;flex-shrink:0;"></div>
+        <div class="grid-quick-search">
+          <span class="material-icons">search</span>
+          <input type="text" id="instSearch" placeholder="Search all columns…" oninput="setInstSearch(this.value)" />
+        </div>
+        <button class="grid-filter-clear" id="filterClearBtn" onclick="clearAllFilters()">
+          <span class="material-icons">close</span>
+          Clear filters
+        </button>
+      </div>
+    </div><!-- /.grid-toolbar -->
+
+    <div class="grid-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-check"><input type="checkbox" id="selectAllChk" onchange="toggleSelectAll(this)" title="Select all"></th>
+            <th class="col-feedef">Fee Definition<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Fee Value<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Segments<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Client<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Agency<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Start Date<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>End Date<span class="material-icons sort-icon">unfold_more</span></th>
+            <th class="col-feedef">Group<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Category<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Account<span class="material-icons sort-icon">unfold_more</span></th>
+            <th class="col-feedef">App Type<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Status<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:64px"></th>
+          </tr>
+          <tr class="col-filter-row">
+            <th class="col-check"></th>
+            <th class="col-feedef"></th>
+            <th><input class="col-filter-input" placeholder="Value…" oninput="setColFilter('feeValue',this.value)" /></th>
+            <th><input class="col-filter-input" placeholder="Segment…" oninput="setColFilter('segments',this.value)" /></th>
+            <th><input class="col-filter-input" placeholder="Client…" oninput="setColFilter('client',this.value)" /></th>
+            <th><input class="col-filter-input" placeholder="Agency…" oninput="setColFilter('agency',this.value)" /></th>
+            <th></th>
+            <th></th>
+            <th class="col-feedef"></th>
+            <th><input class="col-filter-input" placeholder="Category…" oninput="setColFilter('category',this.value)" /></th>
+            <th><input class="col-filter-input" placeholder="Acct…" oninput="setColFilter('account',this.value)" /></th>
+            <th class="col-feedef"></th>
+            <th></th>
+            <th style="width:64px"></th>
+          </tr>
+        </thead>
+        <tbody id="instanceBody"></tbody>
+      </table>
+      <div class="empty-wrap" id="emptyState" style="display:none;">
+        <span class="material-icons">inbox</span>
+        <div class="empty-title" id="emptyTitle">No instances</div>
+        <div class="empty-sub" id="emptySub">Adjust the filter or add a new instance.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.content -->
+</div><!-- /.page-card -->
+</div><!-- /.page-canvas -->
+
+<!-- ─── Footer ─── -->
+<div class="page-footer">
+  <span class="footer-copy">© 2017–2023 American Health Technology Group, LLC: Trio 23.15.0.0</span>
+  <div class="footer-links">
+    <a href="#">Terms of Use</a>
+    <a href="#">Privacy Policy</a>
+  </div>
+</div>
+
+<!-- ─── Add Configuration Instance Modal ─── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeOutside(event)">
+  <div class="modal-container" style="width:500px;">
+    <div class="modal-header">
+      <h2 id="modalTitle">Add Configuration Instance</h2>
+      <button class="modal-close" onclick="closeModal()"><span class="material-icons">close</span></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="field" id="mFeeDef-field" style="display:none;">
+        <label>Fee Definition <span class="req">*</span></label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="mFeeDef-lbl" class="select-placeholder">— Select definition —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu" id="mFeeDefMenu"></div>
+          </div>
+        </div>
+        <input type="hidden" id="mFeeDef" value="">
+      </div>
+
+      <div class="field" id="mFeeValue-field">
+        <label>Fee Value Percentage <span class="req">*</span></label>
+        <input type="text" id="mFeeValue" />
+      </div>
+
+      <div class="field" id="mSegments-field">
+        <label>Segments <span class="req">*</span></label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="mSegments-lbl" class="select-placeholder">— Select —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item" onclick="selectD(this,'Non Clinical','mSegments',updateOverlap)">Non Clinical</div>
+              <div class="select-menu-item" onclick="selectD(this,'Allied','mSegments',updateOverlap)">Allied</div>
+              <div class="select-menu-item" onclick="selectD(this,'Nursing','mSegments',updateOverlap)">Nursing</div>
+              <div class="select-menu-item" onclick="selectD(this,'Physician','mSegments',updateOverlap)">Physician</div>
+              <div class="select-menu-item" onclick="selectD(this,'Per Diem','mSegments',updateOverlap)">Per Diem</div>
+              <div class="select-menu-item" onclick="selectD(this,'Travel','mSegments',updateOverlap)">Travel</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="mSegments" value="">
+      </div>
+
+      <div class="field" id="mClient-field">
+        <label>Client</label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="mClient-lbl" class="select-placeholder">— Any client —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item" onclick="selectD(this,'Atlas Healthcare','mClient',updateOverlap)">Atlas Healthcare</div>
+              <div class="select-menu-item" onclick="selectD(this,'Valley Health Network','mClient',updateOverlap)">Valley Health Network</div>
+              <div class="select-menu-item" onclick="selectD(this,'Sunrise Medical','mClient',updateOverlap)">Sunrise Medical</div>
+              <div class="select-menu-item" onclick="selectD(this,'Apex Medical','mClient',updateOverlap)">Apex Medical</div>
+              <div class="select-menu-item" onclick="selectD(this,'Coastal Providers','mClient',updateOverlap)">Coastal Providers</div>
+              <div class="select-menu-item" onclick="selectD(this,'Pacific Health Partners','mClient',updateOverlap)">Pacific Health Partners</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="mClient" value="">
+      </div>
+
+      <div class="field" id="mAgency-field">
+        <label>Agency</label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="mAgency-lbl" class="select-placeholder">— Any agency —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item" onclick="selectD(this,'Metro Clinical Group','mAgency',updateOverlap)">Metro Clinical Group</div>
+              <div class="select-menu-item" onclick="selectD(this,'MedPro Solutions','mAgency',updateOverlap)">MedPro Solutions</div>
+              <div class="select-menu-item" onclick="selectD(this,'National Staffing Co.','mAgency',updateOverlap)">National Staffing Co.</div>
+              <div class="select-menu-item" onclick="selectD(this,'Global Staffing','mAgency',updateOverlap)">Global Staffing</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="mAgency" value="">
+      </div>
+
+      <!-- Overlap preview — shown once Segments is selected -->
+      <div class="overlap-section" id="overlapSection" style="display:none;">
+        <div class="info-banner">
+          <span class="material-icons">info</span>
+          <div id="overlapBannerText">Select a start date to see how existing instances will be adjusted to avoid overlap.</div>
+        </div>
+        <div id="overlapCards"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field" id="mStartDate-field">
+          <label>Start Date <span class="req">*</span></label>
+          <div class="date-wrap">
+            <input type="text" id="mStartDate" placeholder="MM/DD/YYYY" oninput="updateOverlap()" />
+            <span class="material-icons">calendar_today</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>End Date <span class="req">*</span></label>
+          <div class="date-wrap">
+            <input type="text" id="mEndDate" placeholder="MM/DD/YYYY" />
+            <span class="material-icons">calendar_today</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Account Number</label>
+        <input type="text" id="mAccount" />
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-text" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── Data ─── */
+const fees = {
+  ap: [
+    { id:'factoring-fee',     name:'Factoring Fee',             group:'Admin Fees', groupKey:'admin',      appType:'Deductive', required:true,  active:true,  desc:'Fee applied when an agency has engaged with a factoring company.' },
+    { id:'placement-fee',     name:'Placement Fee',             group:'Admin Fees', groupKey:'admin',      appType:'Additive',  required:true,  active:true,  desc:'One-time fee charged per successful worker placement.' },
+    { id:'vendor-mgmt-fee',   name:'Vendor Management Fee',     group:'Admin Fees', groupKey:'admin',      appType:'Deductive', required:true,  active:true,  desc:'Ongoing fee covering vendor oversight and credentialing coordination.' },
+    { id:'credentialing-fee', name:'Credentialing Fee',         group:'Compliance', groupKey:'compliance', appType:'Deductive', required:true,  active:true,  desc:'Fee to cover third-party credentialing verification services.' },
+    { id:'background-check',  name:'Background Check Fee',      group:'Compliance', groupKey:'compliance', appType:'Deductive', required:false, active:true,  desc:'Fee covering the cost of mandatory pre-placement background screening.' },
+    { id:'drug-screen-fee',   name:'Drug Screening Fee',        group:'Compliance', groupKey:'compliance', appType:'Deductive', required:true,  active:true,  desc:'Fee for pre-placement and random drug screening requirements.' },
+    { id:'occ-health-fee',    name:'Occupational Health Fee',   group:'Compliance', groupKey:'compliance', appType:'Deductive', required:false, active:true,  desc:'Covers occupational health screenings including TB tests and titers.' },
+    { id:'malpractice-fee',   name:'Malpractice Insurance Fee', group:'Compliance', groupKey:'compliance', appType:'Deductive', required:true,  active:false, desc:'Pro-rated malpractice coverage contribution for clinical placements.' },
+    { id:'travel-allowance',  name:'Travel Allowance',          group:'Travel',     groupKey:'travel',     appType:'Deductive', required:true,  active:true,  desc:'Per-trip travel reimbursement for workers traveling more than 50 miles.' },
+    { id:'housing-stipend',   name:'Housing Stipend',           group:'Travel',     groupKey:'travel',     appType:'Deductive', required:true,  active:false, desc:'Monthly housing stipend for travel workers on assignment.' },
+    { id:'mileage-reimb',     name:'Mileage Reimbursement',     group:'Travel',     groupKey:'travel',     appType:'Deductive', required:false, active:true,  desc:'Per-mile reimbursement for approved local travel during assignment.' },
+    { id:'per-diem',          name:'Per Diem Allowance',        group:'Travel',     groupKey:'travel',     appType:'Deductive', required:false, active:true,  desc:'Daily non-taxable stipend for meals and incidentals during travel assignments.' },
+    { id:'holiday-diff',      name:'Holiday Differential',      group:'Premium',    groupKey:'premium',    appType:'Additive',  required:true,  active:true,  desc:'Premium rate applied to shifts worked on designated holidays.' },
+    { id:'on-call',           name:'On-Call Premium',           group:'Premium',    groupKey:'premium',    appType:'Additive',  required:true,  active:true,  desc:'Additional premium applied to workers assigned to on-call blocks.' },
+    { id:'charge-diff',       name:'Charge Nurse Differential', group:'Premium',    groupKey:'premium',    appType:'Additive',  required:false, active:true,  desc:'Rate premium for shifts where the worker serves in a charge nurse capacity.' },
+    { id:'weekend-diff',      name:'Weekend Differential',      group:'Premium',    groupKey:'premium',    appType:'Additive',  required:false, active:true,  desc:'Enhanced rate for shifts worked on Saturday or Sunday.' },
+    { id:'night-diff',        name:'Night Shift Differential',  group:'Premium',    groupKey:'premium',    appType:'Additive',  required:false, active:false, desc:'Shift differential applied to hours worked between 7pm and 7am.' },
+    { id:'orientation-fee',   name:'Orientation Fee',           group:'Ungrouped',  groupKey:'ungrouped',  appType:'Deductive', required:false, active:true,  desc:'One-time fee covering orientation and onboarding costs for new placements.' },
+    { id:'cancellation-fee',  name:'Cancellation Fee',          group:'Ungrouped',  groupKey:'ungrouped',  appType:'Deductive', required:false, active:true,  desc:'Fee assessed when a confirmed shift is cancelled within 4 hours of start time.' },
+  ],
+  ar: [
+    { id:'client-markup',     name:'Client Markup',             group:'Admin Fees', groupKey:'admin',      appType:'Additive',  required:true,  active:true,  desc:'Standard markup applied to all client invoices on worker bill rate.' },
+    { id:'vms-admin-fee',     name:'VMS Admin Fee',             group:'Admin Fees', groupKey:'admin',      appType:'Additive',  required:true,  active:true,  desc:'Administrative fee charged per placement to cover VMS platform costs.' },
+    { id:'msp-fee',           name:'MSP Service Fee',           group:'Admin Fees', groupKey:'admin',      appType:'Additive',  required:true,  active:true,  desc:'Managed service provider fee billed to client for program oversight.' },
+    { id:'invoice-proc-fee',  name:'Invoice Processing Fee',    group:'Admin Fees', groupKey:'admin',      appType:'Additive',  required:false, active:true,  desc:'Fee applied per invoice to cover accounts receivable processing costs.' },
+    { id:'late-payment-fee',  name:'Late Payment Fee',          group:'Compliance', groupKey:'compliance', appType:'Additive',  required:false, active:true,  desc:'Applied when client payment exceeds net-30 terms per the MSA.' },
+    { id:'audit-fee',         name:'Compliance Audit Fee',      group:'Compliance', groupKey:'compliance', appType:'Additive',  required:false, active:true,  desc:'Fee for periodic compliance audits conducted under Joint Commission standards.' },
+    { id:'markup-holiday',    name:'Holiday Bill Rate Markup',  group:'Premium',    groupKey:'premium',    appType:'Additive',  required:true,  active:true,  desc:'Client-facing markup adjustment for holiday-worked shifts.' },
+    { id:'markup-charge',     name:'Charge Nurse Bill Markup',  group:'Premium',    groupKey:'premium',    appType:'Additive',  required:false, active:true,  desc:'Additional client bill rate for shifts served in a charge capacity.' },
+    { id:'early-term-fee',    name:'Early Termination Fee',     group:'Ungrouped',  groupKey:'ungrouped',  appType:'Additive',  required:false, active:false, desc:'Fee billed when a client terminates a placement contract before the agreed end date.' },
+    { id:'rebill-fee',        name:'Rebill Processing Fee',     group:'Ungrouped',  groupKey:'ungrouped',  appType:'Additive',  required:false, active:true,  desc:'Fee applied when an invoice must be reissued due to client-requested changes.' },
+  ],
+  tenant: [
+    { id:'platform-license',  name:'Platform License Fee',      group:'Admin Fees', groupKey:'admin',      appType:'Additive',  required:true,  active:true,  desc:'Annual platform access and licensing fee per tenant agreement.' },
+    { id:'impl-fee',          name:'Implementation Fee',        group:'Admin Fees', groupKey:'admin',      appType:'Additive',  required:true,  active:true,  desc:'One-time setup, configuration, and onboarding fee for new tenant environments.' },
+    { id:'data-integration',  name:'Data Integration Fee',      group:'Platform',   groupKey:'platform',   appType:'Additive',  required:false, active:true,  desc:'Fee for connecting external HR, payroll, or ERP systems via API integration.' },
+    { id:'custom-reporting',  name:'Custom Reporting Fee',      group:'Platform',   groupKey:'platform',   appType:'Additive',  required:false, active:true,  desc:'Fee assessed for development and delivery of custom analytics and report configurations.' },
+    { id:'sla-penalty',       name:'SLA Penalty Fee',           group:'Compliance', groupKey:'compliance', appType:'Deductive', required:false, active:false, desc:'Penalty applied when platform uptime or support response SLA thresholds are breached.' },
+  ],
+  expenses: [
+    { id:'exp-mileage',       name:'Mileage Reimbursement',     group:'Reimbursement', groupKey:'reimb',  appType:'Deductive', required:false, active:true,  desc:'Per-mile reimbursement for worker travel to approved assignment locations.' },
+    { id:'exp-meals',         name:'Per Diem — Meals',          group:'Stipend',    groupKey:'stipend',    appType:'Deductive', required:false, active:true,  desc:'Daily non-taxable meal allowance for workers on qualifying travel assignments.' },
+    { id:'exp-incidentals',   name:'Per Diem — Incidentals',    group:'Stipend',    groupKey:'stipend',    appType:'Deductive', required:false, active:true,  desc:'Daily non-taxable incidental allowance covering tips, laundry, and minor travel expenses.' },
+    { id:'exp-housing',       name:'Housing Stipend',           group:'Stipend',    groupKey:'stipend',    appType:'Deductive', required:true,  active:true,  desc:'Monthly housing benefit for travel workers on assignment lasting 30+ days.' },
+    { id:'exp-relocation',    name:'Relocation Allowance',      group:'Reimbursement', groupKey:'reimb',  appType:'Deductive', required:false, active:false, desc:'One-time relocation support for permanent-to-travel assignment transitions.' },
+  ],
+};
+
+// feeValue, segments, client, agency, startDate, endDate (null=open), account, status
+const instances = {
+  /* ── AP ── */
+  'factoring-fee': [
+    { feeValue:'1.6%', segments:'Non Clinical', client:'Atlas Healthcare',       agency:'Valley Health Network',  startDate:'10/09/2024', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Allied',       client:'Metro Clinical Group',   agency:'MedPro Solutions',       startDate:'07/14/2024', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Nursing',      client:'Sunrise Medical',        agency:'National Staffing Co.',  startDate:'05/28/2024', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Physician',    client:'Sunrise Medical',        agency:'Global Staffing',        startDate:'11/29/2024', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Per Diem',     client:'Apex Medical',           agency:'MedPro Solutions',       startDate:'06/08/2024', endDate:'05/20/2026', account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Nursing',      client:'Valley Health Network',  agency:'Global Staffing',        startDate:'12/12/2024', endDate:'11/10/2026', account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Non Clinical', client:'Apex Medical',           agency:'Global Staffing',        startDate:'07/09/2025', endDate:'12/15/2026', account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Non Clinical', client:'Coastal Providers',      agency:'Sunrise Medical',        startDate:'06/28/2025', endDate:'10/16/2026', account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Allied',       client:'Valley Health Network',  agency:'Metro Clinical Group',   startDate:'04/24/2024', endDate:'10/06/2026', account:'25039', status:'current' },
+    { feeValue:'1.6%', segments:'Nursing',      client:'Pacific Health Partners',agency:'Valley Health Network',  startDate:'10/23/2025', endDate:'02/17/2027', account:'17011', status:'current' },
+    { feeValue:'1.6%', segments:'Per Diem',     client:'',                       agency:'Global Staffing',        startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'1.6%', segments:'Physician',    client:'Valley Health Network',  agency:'',                       startDate:'02/15/2026', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Non Clinical', client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Travel',       client:'',                       agency:'Metro Clinical Group',   startDate:'01/01/2026', endDate:'12/31/2026', account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Allied',       client:'Pacific Health Partners',agency:'Global Staffing',        startDate:'11/01/2025', endDate:null,         account:'17011', status:'current' },
+    { feeValue:'1.6%', segments:'Nursing',      client:'Apex Medical',           agency:'National Staffing Co.',  startDate:'09/15/2025', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Per Diem',     client:'Coastal Providers',      agency:'MedPro Solutions',       startDate:'03/01/2026', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Non Clinical', client:'Sunrise Medical',        agency:'National Staffing Co.',  startDate:'08/01/2025', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Allied',       client:'Apex Medical',           agency:'',                       startDate:'01/01/2026', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Physician',    client:'Atlas Healthcare',       agency:'Metro Clinical Group',   startDate:'05/01/2025', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.7%', segments:'Nursing',      client:'Atlas Healthcare',       agency:'Global Staffing',        startDate:'01/01/2027', endDate:'12/31/2027', account:'12345', status:'future'  },
+    { feeValue:'1.7%', segments:'Allied',       client:'Sunrise Medical',        agency:'MedPro Solutions',       startDate:'07/01/2026', endDate:'06/30/2027', account:'12345', status:'future'  },
+    { feeValue:'1.7%', segments:'Non Clinical', client:'Valley Health Network',  agency:'MedPro Solutions',       startDate:'07/01/2026', endDate:'06/30/2027', account:'12345', status:'future'  },
+    { feeValue:'1.6%', segments:'Per Diem',     client:'Pacific Health Partners',agency:'National Staffing Co.',  startDate:'04/01/2026', endDate:null,         account:'',      status:'future'  },
+    { feeValue:'1.7%', segments:'Physician',    client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'12345', status:'future'  },
+    { feeValue:'1.6%', segments:'Travel',       client:'Atlas Healthcare',       agency:'National Staffing Co.',  startDate:'01/01/2025', endDate:'12/31/2025', account:'12345', status:'past'    },
+    { feeValue:'1.4%', segments:'Nursing',      client:'Coastal Providers',      agency:'MedPro Solutions',       startDate:'03/01/2024', endDate:'02/28/2025', account:'12345', status:'past'    },
+    { feeValue:'1.4%', segments:'Allied',       client:'Apex Medical',           agency:'Metro Clinical Group',   startDate:'01/01/2024', endDate:'12/31/2024', account:'12345', status:'past'    },
+    { feeValue:'1.4%', segments:'Non Clinical', client:'Sunrise Medical',        agency:'Valley Health Network',  startDate:'06/01/2023', endDate:'05/31/2024', account:'12345', status:'past'    },
+    { feeValue:'1.4%', segments:'Physician',    client:'Coastal Providers',      agency:'',                       startDate:'01/01/2024', endDate:'12/31/2024', account:'12345', status:'past'    },
+    { feeValue:'1.4%', segments:'Per Diem',     client:'',                       agency:'',                       startDate:'01/01/2024', endDate:'12/31/2024', account:'12345', status:'past'    },
+    { feeValue:'1.5%', segments:'Nursing',      client:'Pacific Health Partners',agency:'Metro Clinical Group',   startDate:'01/01/2025', endDate:'12/31/2025', account:'12345', status:'past'    },
+    { feeValue:'1.5%', segments:'Allied',       client:'Atlas Healthcare',       agency:'Global Staffing',        startDate:'06/01/2024', endDate:'05/31/2025', account:'12345', status:'past'    },
+    { feeValue:'1.5%', segments:'Non Clinical', client:'Valley Health Network',  agency:'National Staffing Co.',  startDate:'01/01/2025', endDate:'09/30/2025', account:'12345', status:'past'    },
+    { feeValue:'1.4%', segments:'Travel',       client:'',                       agency:'MedPro Solutions',       startDate:'01/01/2023', endDate:'12/31/2023', account:'12345', status:'past'    },
+    { feeValue:'1.4%', segments:'Physician',    client:'Apex Medical',           agency:'Metro Clinical Group',   startDate:'01/01/2023', endDate:'12/31/2023', account:'12345', status:'past'    },
+    { feeValue:'1.4%', segments:'Allied',       client:'Sunrise Medical',        agency:'',                       startDate:'01/01/2023', endDate:'12/31/2023', account:'12345', status:'past'    },
+    { feeValue:'1.5%', segments:'Per Diem',     client:'Coastal Providers',      agency:'Global Staffing',        startDate:'03/01/2024', endDate:'02/28/2025', account:'12345', status:'past'    },
+    { feeValue:'1.5%', segments:'Non Clinical', client:'Apex Medical',           agency:'National Staffing Co.',  startDate:'06/01/2024', endDate:'12/31/2024', account:'12345', status:'past'    },
+    { feeValue:'1.5%', segments:'Nursing',      client:'',                       agency:'Valley Health Network',  startDate:'01/01/2024', endDate:'06/30/2024', account:'12345', status:'past'    },
+    { feeValue:'1.6%', segments:'Travel',       client:'Valley Health Network',  agency:'MedPro Solutions',       startDate:'01/01/2025', endDate:'12/31/2025', account:'12345', status:'past'    },
+    { feeValue:'1.5%', segments:'Allied',       client:'Pacific Health Partners',agency:'National Staffing Co.',  startDate:'01/01/2024', endDate:'12/31/2024', account:'17011', status:'past'    },
+    { feeValue:'1.6%', segments:'Physician',    client:'Valley Health Network',  agency:'Metro Clinical Group',   startDate:'06/01/2024', endDate:'12/31/2024', account:'12345', status:'past'    },
+    { feeValue:'1.6%', segments:'Non Clinical', client:'Apex Medical',           agency:'',                       startDate:'03/01/2025', endDate:'12/31/2025', account:'12345', status:'past'    },
+    { feeValue:'1.6%', segments:'Nursing',      client:'Atlas Healthcare',       agency:'MedPro Solutions',       startDate:'01/01/2025', endDate:'08/31/2025', account:'12345', status:'past'    },
+    /* ── additional current ── */
+    { feeValue:'1.6%', segments:'Travel',       client:'Sunrise Medical',        agency:'National Staffing Co.',  startDate:'02/01/2026', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Nursing',      client:'Coastal Providers',      agency:'Metro Clinical Group',   startDate:'04/15/2025', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Allied',       client:'Atlas Healthcare',       agency:'National Staffing Co.',  startDate:'03/10/2025', endDate:'06/30/2027', account:'25039', status:'current' },
+    { feeValue:'1.6%', segments:'Physician',    client:'Apex Medical',           agency:'MedPro Solutions',       startDate:'01/15/2026', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Per Diem',     client:'Valley Health Network',  agency:'National Staffing Co.',  startDate:'05/01/2025', endDate:'04/30/2027', account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Non Clinical', client:'Pacific Health Partners',agency:'Metro Clinical Group',   startDate:'07/01/2025', endDate:null,         account:'17011', status:'current' },
+    { feeValue:'1.6%', segments:'Travel',       client:'Apex Medical',           agency:'Global Staffing',        startDate:'09/01/2025', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Nursing',      client:'',                       agency:'Metro Clinical Group',   startDate:'01/01/2026', endDate:'12/31/2026', account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Allied',       client:'Coastal Providers',      agency:'Global Staffing',        startDate:'10/01/2025', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Physician',    client:'Pacific Health Partners',agency:'',                       startDate:'06/01/2025', endDate:null,         account:'17011', status:'current' },
+    { feeValue:'1.6%', segments:'Per Diem',     client:'Atlas Healthcare',       agency:'National Staffing Co.',  startDate:'02/15/2026', endDate:'12/31/2026', account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Non Clinical', client:'Valley Health Network',  agency:'Global Staffing',        startDate:'08/01/2025', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Travel',       client:'Coastal Providers',      agency:'MedPro Solutions',       startDate:'11/01/2025', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Nursing',      client:'Pacific Health Partners',agency:'National Staffing Co.',  startDate:'03/15/2026', endDate:null,         account:'17011', status:'current' },
+    { feeValue:'1.6%', segments:'Allied',       client:'Sunrise Medical',        agency:'Global Staffing',        startDate:'01/01/2026', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Physician',    client:'Coastal Providers',      agency:'Metro Clinical Group',   startDate:'04/01/2026', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Per Diem',     client:'',                       agency:'National Staffing Co.',  startDate:'01/01/2026', endDate:'06/30/2026', account:'',      status:'current' },
+    { feeValue:'1.6%', segments:'Travel',       client:'Valley Health Network',  agency:'',                       startDate:'03/01/2026', endDate:null,         account:'12345', status:'current' },
+    { feeValue:'1.6%', segments:'Non Clinical', client:'Atlas Healthcare',       agency:'MedPro Solutions',       startDate:'05/15/2025', endDate:null,         account:'12345', status:'current' },
+    /* ── additional future ── */
+    { feeValue:'1.7%', segments:'Travel',       client:'Coastal Providers',      agency:'Metro Clinical Group',   startDate:'01/01/2027', endDate:'12/31/2027', account:'12345', status:'future'  },
+    { feeValue:'1.7%', segments:'Per Diem',     client:'Sunrise Medical',        agency:'Global Staffing',        startDate:'07/01/2026', endDate:'06/30/2027', account:'12345', status:'future'  },
+    { feeValue:'1.75%', segments:'Nursing',     client:'Pacific Health Partners',agency:'MedPro Solutions',       startDate:'01/01/2027', endDate:'12/31/2027', account:'17011', status:'future'  },
+    { feeValue:'1.7%', segments:'Non Clinical', client:'',                       agency:'Metro Clinical Group',   startDate:'07/01/2026', endDate:'12/31/2026', account:'12345', status:'future'  },
+    { feeValue:'1.75%', segments:'Allied',      client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'12345', status:'future'  },
+    /* ── additional past ── */
+    { feeValue:'1.3%', segments:'Nursing',      client:'Atlas Healthcare',       agency:'National Staffing Co.',  startDate:'01/01/2022', endDate:'12/31/2022', account:'12345', status:'past'    },
+    { feeValue:'1.3%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2022', endDate:'12/31/2022', account:'12345', status:'past'    },
+    { feeValue:'1.3%', segments:'Non Clinical', client:'Valley Health Network',  agency:'Metro Clinical Group',   startDate:'01/01/2022', endDate:'12/31/2022', account:'12345', status:'past'    },
+    { feeValue:'1.3%', segments:'Physician',    client:'',                       agency:'Global Staffing',        startDate:'01/01/2022', endDate:'12/31/2022', account:'12345', status:'past'    },
+    { feeValue:'1.4%', segments:'Travel',       client:'Sunrise Medical',        agency:'MedPro Solutions',       startDate:'01/01/2023', endDate:'12/31/2023', account:'12345', status:'past'    },
+    { feeValue:'1.4%', segments:'Per Diem',     client:'Atlas Healthcare',       agency:'Metro Clinical Group',   startDate:'06/01/2023', endDate:'05/31/2024', account:'12345', status:'past'    },
+    { feeValue:'1.4%', segments:'Nursing',      client:'Pacific Health Partners',agency:'',                       startDate:'01/01/2023', endDate:'12/31/2023', account:'17011', status:'past'    },
+    { feeValue:'1.5%', segments:'Travel',       client:'Apex Medical',           agency:'National Staffing Co.',  startDate:'03/01/2024', endDate:'02/28/2025', account:'12345', status:'past'    },
+    { feeValue:'1.5%', segments:'Physician',    client:'Sunrise Medical',        agency:'MedPro Solutions',       startDate:'01/01/2024', endDate:'12/31/2024', account:'12345', status:'past'    },
+    { feeValue:'1.5%', segments:'Per Diem',     client:'Valley Health Network',  agency:'',                       startDate:'06/01/2024', endDate:'05/31/2025', account:'12345', status:'past'    },
+    { feeValue:'1.5%', segments:'Non Clinical', client:'Coastal Providers',      agency:'Global Staffing',        startDate:'01/01/2025', endDate:'06/30/2025', account:'12345', status:'past'    },
+    { feeValue:'1.5%', segments:'Travel',       client:'Pacific Health Partners',agency:'Metro Clinical Group',   startDate:'01/01/2024', endDate:'12/31/2024', account:'17011', status:'past'    },
+    { feeValue:'1.6%', segments:'Allied',       client:'Coastal Providers',      agency:'National Staffing Co.',  startDate:'01/01/2025', endDate:'12/31/2025', account:'12345', status:'past'    },
+    { feeValue:'1.6%', segments:'Per Diem',     client:'Apex Medical',           agency:'Global Staffing',        startDate:'06/01/2024', endDate:'05/31/2025', account:'12345', status:'past'    },
+  ],
+  'placement-fee': [
+    { feeValue:'$250.00', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'55001', status:'past'    },
+    { feeValue:'$300.00', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'55001', status:'current' },
+    { feeValue:'$300.00', segments:'Allied',     client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'55001', status:'current' },
+    { feeValue:'$350.00', segments:'Physician',  client:'Sunrise Medical',        agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'55001', status:'current' },
+    { feeValue:'$325.00', segments:'Nursing',    client:'Atlas Healthcare',       agency:'Metro Clinical Group',   startDate:'03/01/2026', endDate:null,         account:'55001', status:'current' },
+    { feeValue:'$350.00', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'55001', status:'future'  },
+  ],
+  'vendor-mgmt-fee': [
+    { feeValue:'2.0%',  segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'55100', status:'past'    },
+    { feeValue:'2.0%',  segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'55100', status:'past'    },
+    { feeValue:'2.25%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'55100', status:'current' },
+    { feeValue:'2.25%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'55100', status:'current' },
+    { feeValue:'2.0%',  segments:'Nursing',      client:'Valley Health Network',  agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55100', status:'current' },
+    { feeValue:'2.5%',  segments:'Physician',    client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'55100', status:'future'  },
+  ],
+  'credentialing-fee': [
+    { feeValue:'$35.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'55200', status:'past'    },
+    { feeValue:'$40.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55200', status:'current' },
+    { feeValue:'$40.00', segments:'Allied',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55200', status:'current' },
+    { feeValue:'$45.00', segments:'Physician',   client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55200', status:'current' },
+    { feeValue:'$40.00', segments:'Nursing',     client:'Apex Medical',           agency:'National Staffing Co.',  startDate:'06/01/2026', endDate:null,         account:'55200', status:'current' },
+    { feeValue:'$45.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'55200', status:'future'  },
+  ],
+  'background-check': [
+    { feeValue:'$15.00', segments:'Allied',      client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2024', endDate:'12/31/2024', account:'22345', status:'past'    },
+    { feeValue:'$15.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'22345', status:'past'    },
+    { feeValue:'$18.00', segments:'Allied',      client:'Valley Health Network',  agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'22345', status:'past'    },
+    { feeValue:'$18.00', segments:'Physician',   client:'Sunrise Medical',        agency:'',                       startDate:'06/01/2025', endDate:'12/31/2025', account:'22345', status:'past'    },
+    { feeValue:'$20.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'22345', status:'current' },
+    { feeValue:'$20.00', segments:'Allied',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'22345', status:'current' },
+    { feeValue:'$20.00', segments:'Physician',   client:'Sunrise Medical',        agency:'Metro Clinical Group',   startDate:'01/01/2026', endDate:null,         account:'22345', status:'current' },
+    { feeValue:'$22.00', segments:'Nursing',     client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'22345', status:'future'  },
+  ],
+  'drug-screen-fee': [
+    { feeValue:'$28.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'55300', status:'past'    },
+    { feeValue:'$32.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55300', status:'current' },
+    { feeValue:'$32.00', segments:'Allied',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55300', status:'current' },
+    { feeValue:'$38.00', segments:'Physician',   client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55300', status:'current' },
+    { feeValue:'$35.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'55300', status:'future'  },
+  ],
+  'occ-health-fee': [
+    { feeValue:'$55.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'55400', status:'past'    },
+    { feeValue:'$62.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55400', status:'current' },
+    { feeValue:'$62.00', segments:'Allied',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55400', status:'current' },
+    { feeValue:'$70.00', segments:'Physician',   client:'Sunrise Medical',        agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55400', status:'current' },
+  ],
+  'malpractice-fee': [
+    { feeValue:'0.50%', segments:'Nursing',      client:'Atlas Healthcare',       agency:'Metro Clinical Group',   startDate:'01/01/2024', endDate:'12/31/2024', account:'44001', status:'past'    },
+    { feeValue:'0.50%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'44001', status:'past'    },
+    { feeValue:'0.50%', segments:'Physician',    client:'Valley Health Network',  agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'44001', status:'past'    },
+    { feeValue:'0.75%', segments:'Physician',    client:'Sunrise Medical',        agency:'',                       startDate:'01/01/2026', endDate:null,         account:'44001', status:'current' },
+    { feeValue:'0.75%', segments:'Nursing',      client:'',                       agency:'MedPro Solutions',       startDate:'01/01/2026', endDate:'12/31/2026', account:'44001', status:'current' },
+    { feeValue:'0.75%', segments:'Allied',       client:'Apex Medical',           agency:'',                       startDate:'01/01/2026', endDate:null,         account:'44001', status:'current' },
+    { feeValue:'0.75%', segments:'Nursing',      client:'Coastal Providers',      agency:'Global Staffing',        startDate:'04/01/2026', endDate:null,         account:'44001', status:'current' },
+    { feeValue:'0.80%', segments:'Physician',    client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'44001', status:'future'  },
+  ],
+  'travel-allowance': [
+    { feeValue:'$0.655/mi', segments:'Travel',   client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'$0.67/mi',  segments:'Travel',   client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$0.70/mi',  segments:'Travel',   client:'Sunrise Medical',        agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$0.67/mi',  segments:'Travel',   client:'Valley Health Network',  agency:'National Staffing Co.',  startDate:'03/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$0.67/mi',  segments:'Travel',   client:'Apex Medical',           agency:'',                       startDate:'02/01/2026', endDate:null,         account:'',      status:'current' },
+    { feeValue:'$0.70/mi',  segments:'Travel',   client:'',                       agency:'Metro Clinical Group',   startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'housing-stipend': [
+    { feeValue:'$1,100/mo', segments:'Travel',   client:'',                       agency:'',                       startDate:'01/01/2024', endDate:'12/31/2024', account:'',      status:'past'    },
+    { feeValue:'$1,200/mo', segments:'Travel',   client:'Valley Health Network',  agency:'Global Staffing',        startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'$1,200/mo', segments:'Travel',   client:'',                       agency:'Metro Clinical Group',   startDate:'06/01/2025', endDate:'05/31/2026', account:'',      status:'current' },
+    { feeValue:'$1,400/mo', segments:'Travel',   client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$1,400/mo', segments:'Travel',   client:'Sunrise Medical',        agency:'MedPro Solutions',       startDate:'03/01/2026', endDate:'02/28/2027', account:'',      status:'current' },
+    { feeValue:'$1,500/mo', segments:'Travel',   client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'mileage-reimb': [
+    { feeValue:'$0.655/mi', segments:'Nursing',  client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'$0.67/mi',  segments:'Nursing',  client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$0.67/mi',  segments:'Allied',   client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$0.67/mi',  segments:'Nursing',  client:'Apex Medical',           agency:'',                       startDate:'02/01/2026', endDate:null,         account:'',      status:'current' },
+    { feeValue:'$0.70/mi',  segments:'Nursing',  client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'per-diem': [
+    { feeValue:'$59.00/day', segments:'Travel',  client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'$63.00/day', segments:'Travel',  client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$67.00/day', segments:'Travel',  client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$63.00/day', segments:'Travel',  client:'Valley Health Network',  agency:'Metro Clinical Group',   startDate:'03/01/2026', endDate:null,         account:'',      status:'current' },
+    { feeValue:'$68.00/day', segments:'Travel',  client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'holiday-diff': [
+    { feeValue:'12.5%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2024', endDate:'12/31/2024', account:'',      status:'past'    },
+    { feeValue:'12.5%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2024', endDate:'12/31/2024', account:'',      status:'past'    },
+    { feeValue:'15.0%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'15.0%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'15.0%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'15.0%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'15.0%', segments:'Physician',    client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'15.0%', segments:'Per Diem',     client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'17.5%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'on-call': [
+    { feeValue:'$3.50/hr', segments:'Nursing',   client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'$4.00/hr', segments:'Nursing',   client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$4.00/hr', segments:'Allied',    client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$4.00/hr', segments:'Nursing',   client:'Sunrise Medical',        agency:'Metro Clinical Group',   startDate:'03/01/2026', endDate:null,         account:'',      status:'current' },
+    { feeValue:'$4.50/hr', segments:'Nursing',   client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'charge-diff': [
+    { feeValue:'$3.00/hr', segments:'Nursing',   client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'$3.50/hr', segments:'Nursing',   client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$3.50/hr', segments:'Allied',    client:'Apex Medical',           agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$4.00/hr', segments:'Nursing',   client:'Valley Health Network',  agency:'',                       startDate:'01/01/2026', endDate:null,         account:'',      status:'current' },
+    { feeValue:'$4.00/hr', segments:'Nursing',   client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'weekend-diff': [
+    { feeValue:'8.0%',  segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'10.0%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'10.0%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'10.0%', segments:'Physician',    client:'Sunrise Medical',        agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'12.0%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'night-diff': [
+    { feeValue:'5.0%',  segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'5.0%',  segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'5.0%',  segments:'Nursing',      client:'Apex Medical',           agency:'',                       startDate:'01/01/2024', endDate:'12/31/2024', account:'',      status:'past'    },
+  ],
+  'orientation-fee': [
+    { feeValue:'$125.00', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'55500', status:'past'    },
+    { feeValue:'$150.00', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55500', status:'current' },
+    { feeValue:'$150.00', segments:'Allied',     client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55500', status:'current' },
+    { feeValue:'$175.00', segments:'Physician',  client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'55500', status:'future'  },
+  ],
+  'cancellation-fee': [
+    { feeValue:'$75.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'55600', status:'past'    },
+    { feeValue:'$100.00', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55600', status:'current' },
+    { feeValue:'$100.00', segments:'Allied',     client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'55600', status:'current' },
+    { feeValue:'$100.00', segments:'Nursing',    client:'Atlas Healthcare',       agency:'Metro Clinical Group',   startDate:'03/01/2026', endDate:null,         account:'55600', status:'current' },
+    { feeValue:'$125.00', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'55600', status:'future'  },
+  ],
+  /* ── AR ── */
+  'client-markup': [
+    { feeValue:'20.0%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2024', endDate:'12/31/2024', account:'22345', status:'past'    },
+    { feeValue:'21.0%', segments:'Nursing',      client:'Sunrise Medical',        agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'22345', status:'past'    },
+    { feeValue:'21.0%', segments:'Allied',       client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'22345', status:'past'    },
+    { feeValue:'25.0%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'22345', status:'current' },
+    { feeValue:'25.0%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'22345', status:'current' },
+    { feeValue:'25.0%', segments:'Physician',    client:'Sunrise Medical',        agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'22345', status:'current' },
+    { feeValue:'23.0%', segments:'Nursing',      client:'Valley Health Network',  agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'22345', status:'current' },
+    { feeValue:'27.0%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'22345', status:'future'  },
+  ],
+  'vms-admin-fee': [
+    { feeValue:'$40.00', segments:'Allied',      client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'33345', status:'past'    },
+    { feeValue:'$45.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'33345', status:'current' },
+    { feeValue:'$45.00', segments:'Allied',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'33345', status:'current' },
+    { feeValue:'$45.00', segments:'Physician',   client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'33345', status:'current' },
+    { feeValue:'$50.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'33345', status:'future'  },
+  ],
+  'msp-fee': [
+    { feeValue:'3.0%',  segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'33400', status:'past'    },
+    { feeValue:'3.5%',  segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'33400', status:'current' },
+    { feeValue:'3.5%',  segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'33400', status:'current' },
+    { feeValue:'3.0%',  segments:'Nursing',      client:'Valley Health Network',  agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'33400', status:'current' },
+    { feeValue:'4.0%',  segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'33400', status:'future'  },
+  ],
+  'invoice-proc-fee': [
+    { feeValue:'$8.00',  segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'33500', status:'past'    },
+    { feeValue:'$10.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'33500', status:'current' },
+    { feeValue:'$10.00', segments:'Allied',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'33500', status:'current' },
+    { feeValue:'$12.00', segments:'Physician',   client:'Apex Medical',           agency:'',                       startDate:'01/01/2026', endDate:null,         account:'33500', status:'current' },
+    { feeValue:'$12.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'33500', status:'future'  },
+  ],
+  'late-payment-fee': [
+    { feeValue:'1.0%/mo', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'1.5%/mo', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'',      status:'current' },
+    { feeValue:'1.5%/mo', segments:'Allied',     client:'Sunrise Medical',        agency:'',                       startDate:'03/01/2026', endDate:null,         account:'',      status:'current' },
+    { feeValue:'1.5%/mo', segments:'Physician',  client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'',      status:'current' },
+    { feeValue:'2.0%/mo', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'audit-fee': [
+    { feeValue:'$500.00', segments:'Nursing',    client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'33600', status:'past'    },
+    { feeValue:'$600.00', segments:'Nursing',    client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'33600', status:'current' },
+    { feeValue:'$600.00', segments:'Allied',     client:'Valley Health Network',  agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'33600', status:'current' },
+    { feeValue:'$750.00', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'33600', status:'future'  },
+  ],
+  'markup-holiday': [
+    { feeValue:'15.0%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'17.5%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'17.5%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'17.5%', segments:'Physician',    client:'Sunrise Medical',        agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'20.0%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'markup-charge': [
+    { feeValue:'$4.00/hr', segments:'Nursing',   client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'$5.00/hr', segments:'Nursing',   client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'',      status:'current' },
+    { feeValue:'$5.00/hr', segments:'Allied',    client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'',      status:'current' },
+    { feeValue:'$6.00/hr', segments:'Nursing',   client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'early-term-fee': [
+    { feeValue:'$1,000.00', segments:'Nursing',  client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2024', endDate:'12/31/2024', account:'33700', status:'past'    },
+    { feeValue:'$1,000.00', segments:'Allied',   client:'Sunrise Medical',        agency:'',                       startDate:'06/01/2024', endDate:'05/31/2025', account:'33700', status:'past'    },
+    { feeValue:'$1,200.00', segments:'Nursing',  client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'33700', status:'past'    },
+  ],
+  'rebill-fee': [
+    { feeValue:'$25.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'33800', status:'past'    },
+    { feeValue:'$30.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'33800', status:'current' },
+    { feeValue:'$30.00', segments:'Allied',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'33800', status:'current' },
+    { feeValue:'$35.00', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'33800', status:'future'  },
+  ],
+  /* ── Tenant ── */
+  'platform-license': [
+    { feeValue:'$18,000/yr', segments:'Nursing', client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'90001', status:'past'    },
+    { feeValue:'$20,000/yr', segments:'Nursing', client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'90001', status:'current' },
+    { feeValue:'$20,000/yr', segments:'Nursing', client:'Valley Health Network',  agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'90001', status:'current' },
+    { feeValue:'$22,000/yr', segments:'Nursing', client:'Sunrise Medical',        agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'90001', status:'current' },
+    { feeValue:'$22,000/yr', segments:'Nursing', client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'90001', status:'future'  },
+  ],
+  'impl-fee': [
+    { feeValue:'$8,500.00', segments:'Nursing',  client:'Atlas Healthcare',       agency:'',                       startDate:'03/01/2024', endDate:'03/01/2024', account:'90002', status:'past'    },
+    { feeValue:'$8,500.00', segments:'Nursing',  client:'Valley Health Network',  agency:'',                       startDate:'07/15/2025', endDate:'07/15/2025', account:'90002', status:'past'    },
+    { feeValue:'$9,500.00', segments:'Nursing',  client:'Apex Medical',           agency:'',                       startDate:'01/15/2026', endDate:'01/15/2026', account:'90002', status:'past'    },
+  ],
+  'data-integration': [
+    { feeValue:'$3,600/yr', segments:'Nursing',  client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'90003', status:'past'    },
+    { feeValue:'$4,200/yr', segments:'Nursing',  client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'90003', status:'current' },
+    { feeValue:'$4,200/yr', segments:'Nursing',  client:'Valley Health Network',  agency:'',                       startDate:'06/01/2026', endDate:'05/31/2027', account:'90003', status:'current' },
+    { feeValue:'$4,800/yr', segments:'Nursing',  client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'90003', status:'future'  },
+  ],
+  'custom-reporting': [
+    { feeValue:'$1,200/yr', segments:'Nursing',  client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'90004', status:'current' },
+    { feeValue:'$1,200/yr', segments:'Nursing',  client:'Sunrise Medical',        agency:'',                       startDate:'03/01/2026', endDate:'02/28/2027', account:'90004', status:'current' },
+    { feeValue:'$1,500/yr', segments:'Nursing',  client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'90004', status:'future'  },
+  ],
+  'sla-penalty': [
+    { feeValue:'$500.00', segments:'Nursing',    client:'Atlas Healthcare',       agency:'',                       startDate:'02/01/2024', endDate:'02/28/2024', account:'90005', status:'past'    },
+    { feeValue:'$500.00', segments:'Nursing',    client:'Valley Health Network',  agency:'',                       startDate:'09/01/2025', endDate:'09/30/2025', account:'90005', status:'past'    },
+  ],
+  /* ── Expenses ── */
+  'exp-mileage': [
+    { feeValue:'$0.655/mi', segments:'Travel',   client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'$0.67/mi',  segments:'Travel',   client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$0.67/mi',  segments:'Nursing',  client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$0.67/mi',  segments:'Allied',   client:'Valley Health Network',  agency:'',                       startDate:'03/01/2026', endDate:null,         account:'',      status:'current' },
+    { feeValue:'$0.70/mi',  segments:'Travel',   client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'exp-meals': [
+    { feeValue:'$42.00/day', segments:'Travel',  client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'$47.00/day', segments:'Travel',  client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$52.00/day', segments:'Travel',  client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$52.00/day', segments:'Travel',  client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'exp-incidentals': [
+    { feeValue:'$17.00/day', segments:'Travel',  client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'$17.00/day', segments:'Travel',  client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$17.00/day', segments:'Travel',  client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'exp-housing': [
+    { feeValue:'$1,200/mo', segments:'Travel',   client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',      status:'past'    },
+    { feeValue:'$1,400/mo', segments:'Travel',   client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$1,600/mo', segments:'Travel',   client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',      status:'current' },
+    { feeValue:'$1,400/mo', segments:'Travel',   client:'Valley Health Network',  agency:'',                       startDate:'03/01/2026', endDate:'02/28/2027', account:'',      status:'current' },
+    { feeValue:'$1,600/mo', segments:'Travel',   client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'',      status:'future'  },
+  ],
+  'exp-relocation': [
+    { feeValue:'$2,500.00', segments:'Travel',   client:'Atlas Healthcare',       agency:'',                       startDate:'04/01/2024', endDate:'04/30/2024', account:'',      status:'past'    },
+    { feeValue:'$2,500.00', segments:'Travel',   client:'Sunrise Medical',        agency:'',                       startDate:'11/01/2024', endDate:'11/30/2024', account:'',      status:'past'    },
+  ],
+};
+
+// Overlap preview by feeId
+const overlapPreview = {
+  'factoring-fee': [{ dates:'01/01/2026 – Open', fee:'1.6%', account:'12345', segment:'Non Clinical' }],
+  'client-markup': [{ dates:'01/01/2026 – 12/31/2026', fee:'25.0%', account:'22345', segment:'Nursing' }],
+};
+
+const tabGroups = {
+  ap:       ['Admin Fees', 'Compliance', 'Travel', 'Premium'],
+  ar:       ['Admin Fees', 'Compliance', 'Premium'],
+  tenant:   ['Admin Fees', 'Platform', 'Compliance'],
+  expenses: ['Reimbursement', 'Stipend'],
+};
+
+let tab = 'ap', feeId = 'factoring-fee', filter = 'all', showInactive = false, panelCollapsed = false;
+let selectedGroups = new Set();
+let groups = tabGroups['ap'];
+let fdGroupValue = '';
+let instQuickSearch = '';
+const colFilters = { feeValue:'', segments:'', client:'', agency:'', category:'', account:'' };
+
+/* ─── Category derivation ─── */
+function getCategory(r) {
+  if (r.client && r.agency)  return 'Client + Agency';
+  if (r.client && !r.agency) return 'Client-specific';
+  if (!r.client && r.agency) return 'Agency-specific';
+  return 'Global';
+}
+function categoryChipClass(cat) {
+  return 'cell-chip-gray';
+}
+
+/* ─── Left panel cards ─── */
+function renderCards() {
+  const q = (document.getElementById('searchInput').value || '').toLowerCase();
+  const list = fees[tab].filter(f => {
+    if (q && !f.name.toLowerCase().includes(q)) return false;
+    if (selectedGroups.size > 0 && !selectedGroups.has(f.group)) return false;
+    return true;
+  }).sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0));
+  document.getElementById('feeCards').innerHTML = list.map(f => {
+    const isSelected = f.id === feeId;
+    const isDisabled = !f.active;
+    return `
+    <div class="def-card ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled-card' : ''}" onclick="selectFee('${f.id}')">
+      <div class="dc-header">
+        <span class="dc-name">${f.name}</span>
+        <span class="dc-group">${f.group}</span>
+      </div>
+      ${isSelected ? `<div class="dc-desc">${f.desc}</div>` : ''}
+      <div class="dc-chips">
+        <span class="dc-chip">${f.appType}</span>
+        <span class="dc-chip">${f.required ? 'Required' : 'Optional'}</span>
+        <span class="dc-chip ${f.active ? 'dc-chip-green' : 'dc-chip-muted'}">${f.active ? 'Active' : 'Inactive'}</span>
+      </div>
+    </div>`;
+  }).join('') || '<div style="padding:24px;text-align:center;font-size:13px;color:#9E9E9E;">No fee definitions match</div>';
+}
+
+/* ─── Right panel ─── */
+function renderInstances() {
+  let rows;
+  if (panelCollapsed) {
+    // Aggregate all instances across all fee definitions in the current tab; inactive definitions sort to bottom
+    rows = fees[tab]
+      .flatMap(f =>
+        (instances[f.id] || [])
+          .filter(i => filter === 'all' || i.status === filter)
+          .map(i => ({ ...i, _feeName: f.name, _feeGroup: f.group, _feeAppType: f.appType, _feeActive: f.active }))
+      )
+      .sort((a, b) => (b._feeActive ? 1 : 0) - (a._feeActive ? 1 : 0));
+  } else {
+    const parentFee = fees[tab].find(f => f.id === feeId);
+    const parentActive = parentFee ? parentFee.active : true;
+    rows = (instances[feeId] || [])
+      .filter(i => filter === 'all' || i.status === filter)
+      .map(i => ({ ...i, _feeActive: parentActive }));
+  }
+
+  // Quick search
+  const qs = instQuickSearch.trim().toLowerCase();
+  if (qs) {
+    rows = rows.filter(r => {
+      const cat = getCategory(r);
+      return [r._feeName||'', r.feeValue||'', r.segments||'', r.client||'', r.agency||'',
+              r.startDate||'', r.endDate||'', r._feeGroup||'', cat, r.account||'', r._feeAppType||'', r.status||'']
+             .some(v => v.toLowerCase().includes(qs));
+    });
+  }
+  // Column filters
+  if (colFilters.feeValue)  rows = rows.filter(r => (r.feeValue||'').toLowerCase().includes(colFilters.feeValue.toLowerCase()));
+  if (colFilters.segments)  rows = rows.filter(r => (r.segments||'').toLowerCase().includes(colFilters.segments.toLowerCase()));
+  if (colFilters.client)    rows = rows.filter(r => (r.client||'').toLowerCase().includes(colFilters.client.toLowerCase()));
+  if (colFilters.agency)    rows = rows.filter(r => (r.agency||'').toLowerCase().includes(colFilters.agency.toLowerCase()));
+  if (colFilters.category)  rows = rows.filter(r => getCategory(r).toLowerCase().includes(colFilters.category.toLowerCase()));
+  if (colFilters.account)   rows = rows.filter(r => (r.account||'').toLowerCase().includes(colFilters.account.toLowerCase()));
+
+  const tbody = document.getElementById('instanceBody');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('rowCount').textContent = rows.length;
+
+  if (!rows.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'flex';
+    const hasSearch = qs || Object.values(colFilters).some(v => v);
+    if (hasSearch) {
+      document.getElementById('emptyTitle').textContent = 'No matching instances';
+      document.getElementById('emptySub').textContent   = 'Try adjusting your search or clearing the filters.';
+    } else {
+      document.getElementById('emptyTitle').textContent = { past:'No past instances', current:'No current instances', future:'No upcoming instances', all:'No instances defined' }[filter];
+      document.getElementById('emptySub').textContent   = { past:'No historical records.', current:'No active instances right now.', future:'No upcoming instances scheduled.', all:'Add the first instance to get started.' }[filter];
+    }
+    return;
+  }
+  empty.style.display = 'none';
+  const dash = `<span style="color:#BDBDBD">—</span>`;
+  tbody.innerHTML = rows.map(r => {
+    const cat = getCategory(r);
+    const instStatus = !r._feeActive
+      ? { label:'Inactive', cls:'cell-chip-gray' }
+      : r.status === 'past'   ? { label:'Inactive', cls:'cell-chip-gray' }
+      : r.status === 'future' ? { label:'Upcoming', cls:'cell-chip-blue' }
+      :                         { label:'Active',   cls:'cell-chip-green' };
+    const trClass = (!r._feeActive || r.status === 'past') ? 'row-inactive' : '';
+    const appTypeChip = r._feeAppType === 'Additive'
+      ? `<span class="cell-chip cell-chip-blue">${r._feeAppType}</span>`
+      : `<span class="cell-chip cell-chip-gray">${r._feeAppType}</span>`;
+    return `
+    <tr class="${trClass}">
+      <td class="col-check"><input type="checkbox" class="row-chk" onchange="updateSelectAll()"></td>
+      <td class="col-feedef" style="font-weight:500;">${r._feeName || ''}</td>
+      <td class="mono">${r.feeValue}</td>
+      <td>${r.segments}</td>
+      <td class="muted">${r.client || dash}</td>
+      <td class="muted">${r.agency || dash}</td>
+      <td class="muted">${r.startDate}</td>
+      <td class="muted">${r.endDate || '<span style="color:#9E9E9E">Open</span>'}</td>
+      <td class="col-feedef muted">${r._feeGroup || ''}</td>
+      <td><span class="cell-chip ${categoryChipClass(cat)}">${cat}</span></td>
+      <td class="muted">${r.account || dash}</td>
+      <td class="col-feedef">${r._feeAppType ? appTypeChip : ''}</td>
+      <td><span class="cell-chip ${instStatus.cls}">${instStatus.label}</span></td>
+      <td>
+        <div class="row-acts">
+          <button class="act-btn" title="Edit" ${r.status === 'past' ? 'disabled' : `onclick="openEditModal(${JSON.stringify(r).replace(/"/g,'&quot;')})"`}><span class="material-icons">edit</span></button>
+          <button class="act-btn danger" title="Delete" ${r.status !== 'future' ? 'disabled' : ''}><span class="material-icons">delete_outline</span></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderHeader() {
+  if (panelCollapsed) {
+    document.getElementById('rpTitle').textContent = 'Fee Definitions & Instances';
+  } else {
+    const def = fees[tab].find(f => f.id === feeId);
+    document.getElementById('rpTitle').textContent = def ? `${def.name} — Instances` : 'Instances';
+  }
+}
+
+function render() { renderCards(); renderInstances(); renderHeader(); }
+
+/* ─── Instance search / filter handlers ─── */
+function setInstSearch(val) {
+  instQuickSearch = val;
+  updateFilterClearBtn();
+  renderInstances();
+}
+function setColFilter(col, val) {
+  colFilters[col] = val;
+  updateFilterClearBtn();
+  renderInstances();
+}
+function clearAllFilters() {
+  instQuickSearch = '';
+  Object.keys(colFilters).forEach(k => colFilters[k] = '');
+  document.getElementById('instSearch').value = '';
+  document.querySelectorAll('.col-filter-input').forEach(el => el.value = '');
+  updateFilterClearBtn();
+  renderInstances();
+}
+function updateFilterClearBtn() {
+  const active = instQuickSearch || Object.values(colFilters).some(v => v);
+  document.getElementById('filterClearBtn').classList.toggle('visible', !!active);
+}
+
+/* ─── Interactions ─── */
+function selectTab(t, el) {
+  tab = t; feeId = fees[t][0].id;
+  groups = tabGroups[t] || [];
+  selectedGroups.clear();
+  renderActiveGroupChips();
+  document.querySelectorAll('.ptab').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+function selectFee(id) { feeId = id; render(); }
+function togglePanel() {
+  panelCollapsed = !panelCollapsed;
+  document.getElementById('contentArea').classList.toggle('panel-collapsed', panelCollapsed);
+  document.querySelector('.left-panel').classList.toggle('collapsed', panelCollapsed);
+  document.getElementById('collapseIcon').textContent = panelCollapsed ? 'chevron_right' : 'chevron_left';
+  render();
+}
+function handleAddInstance() {
+  if (panelCollapsed) { openModalCollapsed(); } else { openModal(); }
+}
+function toggleAddInstMenu() {
+  document.getElementById('addInstMenu').classList.toggle('open');
+}
+function closeAddInstMenu() {
+  document.getElementById('addInstMenu').classList.remove('open');
+}
+function openModalCollapsed() {
+  closeAddInstMenu();
+  // Populate fee definition select from current tab
+  const menu = document.getElementById('mFeeDefMenu');
+  menu.innerHTML = fees[tab]
+    .filter(f => f.active)
+    .map(f => `<div class="select-menu-item" onclick="selectD(this,'${f.name.replace(/'/g,"\\'")}','mFeeDef')">${f.name}</div>`)
+    .join('');
+  document.getElementById('mFeeDef-field').style.display = 'flex';
+  openModal(true);
+}
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.add-inst-wrap');
+  if (wrap && !wrap.contains(e.target)) closeAddInstMenu();
+});
+function toggleSelectAll(chk) {
+  document.querySelectorAll('.row-chk').forEach(c => c.checked = chk.checked);
+}
+function updateSelectAll() {
+  const all = [...document.querySelectorAll('.row-chk')];
+  const chk = document.getElementById('selectAllChk');
+  if (!chk) return;
+  const checked = all.filter(c => c.checked).length;
+  chk.checked = checked === all.length && all.length > 0;
+  chk.indeterminate = checked > 0 && checked < all.length;
+}
+
+function setFilter(f, el) {
+  filter = f;
+  document.querySelectorAll('.gtab').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  renderInstances();
+}
+/* ─── Group filter dropdown ─── */
+function toggleGroupDropdown() {
+  const dd = document.getElementById('grpDropdown');
+  const btn = document.getElementById('grpAllBtn');
+  const isOpen = dd.classList.contains('open');
+  if (isOpen) { dd.classList.remove('open'); btn.classList.remove('open'); }
+  else { renderGroupDropdown(); dd.classList.add('open'); btn.classList.add('open'); }
+}
+function renderGroupDropdown() {
+  const allOptions = ['Ungrouped', ...groups];
+  document.getElementById('grpDropdown').innerHTML = allOptions.map(g => `
+    <div class="grp-drop-item ${selectedGroups.has(g) ? 'selected' : ''}" onclick="toggleGroupSelection('${g.replace(/'/g,"\\'")}')">
+      <span class="grp-drop-check">${selectedGroups.has(g) ? '<span class="material-icons">check</span>' : ''}</span>
+      ${g}
+    </div>`).join('');
+}
+function toggleGroupSelection(name) {
+  if (selectedGroups.has(name)) selectedGroups.delete(name);
+  else selectedGroups.add(name);
+  renderGroupDropdown();
+  renderActiveGroupChips();
+  renderCards();
+}
+function removeGroupSelection(name) {
+  selectedGroups.delete(name);
+  renderActiveGroupChips();
+  renderCards();
+}
+function renderActiveGroupChips() {
+  const btn = document.getElementById('grpAllBtn');
+  document.getElementById('grpActiveChips').innerHTML = [...selectedGroups].map(g => `
+    <span class="grp-chip-active">
+      ${g}<span class="material-icons" onclick="removeGroupSelection('${g.replace(/'/g,"\\'")}')">close</span>
+    </span>`).join('');
+  btn.classList.toggle('has-filter', selectedGroups.size > 0);
+}
+function toggleInactive(el) {
+  showInactive = !showInactive;
+  el.classList.toggle('on', showInactive);
+  renderCards();
+  renderInstances();
+}
+
+/* ─── Modal overlap preview ─── */
+function updateOverlap() {
+  const seg    = document.getElementById('mSegments').value;
+  const start  = document.getElementById('mStartDate').value.trim();
+  const section = document.getElementById('overlapSection');
+  const banner  = document.getElementById('overlapBannerText');
+  const cards   = document.getElementById('overlapCards');
+  const preview = overlapPreview[feeId] || [];
+
+  if (!seg) { section.style.display = 'none'; return; }
+  section.style.display = 'flex';
+
+  cards.innerHTML = preview.map(p => `
+    <div class="inst-card">
+      <div>
+        <div class="inst-card-dates">${p.dates}</div>
+        <div class="inst-card-meta">Fee: ${p.fee}${p.account ? '&nbsp;&nbsp;Acct: ' + p.account : ''}</div>
+      </div>
+      <div class="inst-card-seg">${p.segment}</div>
+    </div>`).join('');
+
+  banner.textContent = start
+    ? 'Existing instances that overlap this scope will be end-dated to avoid conflicts when you save.'
+    : 'Select a start date to see how existing instances will be adjusted to avoid overlap.';
+}
+
+function setModalLock(fieldIds, locked) {
+  fieldIds.forEach(id => {
+    const field = document.getElementById(id + '-field');
+    if (field) field.classList.toggle('field-locked', locked);
+    const input = document.getElementById(id);
+    if (input) input.disabled = locked;
+  });
+}
+
+function openModal(fromCollapsed) {
+  document.getElementById('modalTitle').textContent = 'Add Configuration Instance';
+  ['mFeeValue','mStartDate','mEndDate','mAccount'].forEach(id => document.getElementById(id).value = '');
+  resetSelect('mSegments', '— Select —');
+  resetSelect('mClient',   '— Any client —');
+  resetSelect('mAgency',   '— Any agency —');
+  if (!fromCollapsed) {
+    document.getElementById('mFeeDef-field').style.display = 'none';
+    document.getElementById('mFeeDef').value = '';
+    const lbl = document.getElementById('mFeeDef-lbl');
+    lbl.textContent = '— Select definition —';
+    lbl.className = 'select-placeholder';
+  }
+  setModalLock(['mFeeValue','mSegments','mClient','mAgency','mStartDate'], false);
+  document.getElementById('overlapSection').style.display = 'none';
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+function openEditModal(r) {
+  const isCurrent = r.status === 'current';
+  document.getElementById('modalTitle').textContent = isCurrent ? 'Edit Instance' : 'Edit Instance';
+
+  // Populate all fields
+  document.getElementById('mFeeValue').value  = r.feeValue || '';
+  document.getElementById('mStartDate').value = r.startDate || '';
+  document.getElementById('mEndDate').value   = r.endDate || '';
+  document.getElementById('mAccount').value   = r.account || '';
+
+  // Populate custom selects
+  if (r.segments) { document.getElementById('mSegments').value = r.segments; const lbl = document.getElementById('mSegments-lbl'); lbl.textContent = r.segments; lbl.classList.remove('select-placeholder'); }
+  else resetSelect('mSegments', '— Select —');
+  if (r.client)   { document.getElementById('mClient').value = r.client;   const lbl = document.getElementById('mClient-lbl');   lbl.textContent = r.client;   lbl.classList.remove('select-placeholder'); }
+  else resetSelect('mClient', '— Any client —');
+  if (r.agency)   { document.getElementById('mAgency').value = r.agency;   const lbl = document.getElementById('mAgency-lbl');   lbl.textContent = r.agency;   lbl.classList.remove('select-placeholder'); }
+  else resetSelect('mAgency', '— Any agency —');
+
+  // Lock scope fields for current instances — only End Date + Account editable
+  setModalLock(['mFeeValue','mSegments','mClient','mAgency','mStartDate'], isCurrent);
+
+  document.getElementById('overlapSection').style.display = 'none';
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+function closeModal()  { document.getElementById('modalOverlay').classList.remove('active'); }
+function closeOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+/* ─── Fee Definition Modal ─── */
+function openFeeDefModal() {
+  document.getElementById('fdName').value = '';
+  document.getElementById('fdDesc').value = '';
+  resetSelect('fdFeeType', '— Select —');
+  resetSelect('fdAppType', '— Select —');
+  fdGroupValue = '';
+  document.getElementById('fdGroupInput').value = '';
+  document.getElementById('fdGroup').value = '';
+  closeGroupAc();
+  document.getElementById('fdRequiredToggle').classList.add('on');
+  document.getElementById('fdRequiredLbl').textContent = 'Required';
+  document.getElementById('fdRequired').value = 'required';
+  const tog = document.getElementById('fdActiveToggle');
+  tog.classList.add('on');
+  document.getElementById('fdActiveLbl').textContent = 'Active';
+  document.getElementById('feeDefModalOverlay').classList.add('active');
+}
+function closeFeeDefModal() { document.getElementById('feeDefModalOverlay').classList.remove('active'); }
+function closeFeeDefOutside(e) { if (e.target === document.getElementById('feeDefModalOverlay')) closeFeeDefModal(); }
+function toggleFdRequired(el) {
+  el.classList.toggle('on');
+  document.getElementById('fdRequiredLbl').textContent = el.classList.contains('on') ? 'Required' : 'Optional';
+  document.getElementById('fdRequired').value = el.classList.contains('on') ? 'required' : 'optional';
+}
+function toggleFdActive(el) {
+  el.classList.toggle('on');
+  document.getElementById('fdActiveLbl').textContent = el.classList.contains('on') ? 'Active' : 'Inactive';
+}
+
+/* ─── Group Autocomplete ─── */
+function openGroupAc() {
+  renderGroupAc(document.getElementById('fdGroupInput').value);
+  document.getElementById('fdGroupDropdown').classList.add('open');
+}
+function closeGroupAc() {
+  document.getElementById('fdGroupDropdown').classList.remove('open');
+}
+function renderGroupAc(q) {
+  const ql = (q || '').trim().toLowerCase();
+  const qTrim = (q || '').trim();
+  const dropdown = document.getElementById('fdGroupDropdown');
+  const filtered = groups.filter(g => !ql || g.toLowerCase().includes(ql));
+  const exactMatch = groups.some(g => g.toLowerCase() === ql);
+  dropdown.innerHTML =
+    filtered.map(g => `
+      <div class="ac-item${fdGroupValue === g ? ' selected' : ''}" onclick="selectGroupItem('${g.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
+        <span class="ac-item-text">${g}</span>
+        <button class="ac-remove" onclick="removeGroupItem(event,'${g.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
+          <span class="material-icons">close</span>
+        </button>
+      </div>`).join('') +
+    (qTrim && !exactMatch ? `
+      <div class="ac-add-item" onclick="addGroupItem('${qTrim.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
+        <span class="material-icons">add</span>Add "${qTrim}"
+      </div>` : '') +
+    (!filtered.length && !qTrim ? '<div style="padding:12px 16px;font-size:13px;color:#9E9E9E;">No groups defined</div>' : '');
+}
+function selectGroupItem(name) {
+  fdGroupValue = name;
+  document.getElementById('fdGroupInput').value = name;
+  document.getElementById('fdGroup').value = name;
+  closeGroupAc();
+}
+function addGroupItem(name) {
+  if (!groups.includes(name)) groups.push(name);
+  selectGroupItem(name);
+}
+let pendingDeleteGroup = null;
+function removeGroupItem(evt, name) {
+  evt.stopPropagation();
+  pendingDeleteGroup = name;
+  document.getElementById('deleteGroupName').textContent = name;
+  document.getElementById('deleteGroupOverlay').classList.add('active');
+}
+function cancelDeleteGroup() {
+  pendingDeleteGroup = null;
+  document.getElementById('deleteGroupOverlay').classList.remove('active');
+}
+function confirmDeleteGroup() {
+  const name = pendingDeleteGroup;
+  if (!name) return;
+  groups = groups.filter(g => g !== name);
+  if (fdGroupValue === name) {
+    fdGroupValue = '';
+    document.getElementById('fdGroupInput').value = '';
+    document.getElementById('fdGroup').value = '';
+  }
+  // Ungroup all fee definitions using this group
+  ['ap','ar'].forEach(t => fees[t].forEach(f => {
+    if (f.group === name) { f.group = 'Ungrouped'; f.groupKey = 'ungrouped'; }
+  }));
+  // Remove from active group filter if selected
+  selectedGroups.delete(name);
+  renderActiveGroupChips();
+  pendingDeleteGroup = null;
+  document.getElementById('deleteGroupOverlay').classList.remove('active');
+  renderGroupAc(document.getElementById('fdGroupInput').value);
+  renderCards();
+}
+/* ─── Custom select helpers ─── */
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.select-wrapper')) {
+    document.querySelectorAll('.select-menu.open').forEach(m => {
+      m.classList.remove('open');
+      m.parentElement.querySelector('.select-input').classList.remove('open');
+    });
+  }
+  if (!e.target.closest('.autocomplete-wrap')) closeGroupAc();
+  if (!e.target.closest('.grp-filter-wrap')) {
+    document.getElementById('grpDropdown').classList.remove('open');
+    document.getElementById('grpAllBtn').classList.remove('open');
+  }
+});
+
+function toggleMenu(trigger) {
+  if (trigger.classList.contains('disabled')) return;
+  const menu = trigger.parentElement.querySelector('.select-menu');
+  const isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.select-menu.open').forEach(m => {
+    if (m !== menu) { m.classList.remove('open'); m.parentElement.querySelector('.select-input').classList.remove('open'); }
+  });
+  if (isOpen) { menu.classList.remove('open'); trigger.classList.remove('open'); }
+  else         { menu.classList.add('open');    trigger.classList.add('open'); }
+}
+
+function selectD(item, value, id, callback) {
+  const menu = item.parentElement;
+  const trigger = menu.parentElement.querySelector('.select-input');
+  const lbl = trigger.querySelector('span:first-child');
+  menu.querySelectorAll('.select-menu-item').forEach(i => i.classList.remove('selected'));
+  item.classList.add('selected');
+  lbl.textContent = value;
+  lbl.classList.remove('select-placeholder');
+  menu.classList.remove('open');
+  trigger.classList.remove('open');
+  document.getElementById(id).value = value;
+  if (callback) callback();
+}
+
+function resetSelect(id, placeholder) {
+  const hidden = document.getElementById(id);
+  if (!hidden) return;
+  hidden.value = '';
+  const wrapper = hidden.previousElementSibling;
+  if (!wrapper) return;
+  const lbl = wrapper.querySelector('.select-input span:first-child');
+  if (lbl) { lbl.textContent = placeholder; lbl.className = 'select-placeholder'; }
+  wrapper.querySelectorAll('.select-menu-item').forEach(i => i.classList.remove('selected'));
+  const menu = wrapper.querySelector('.select-menu');
+  const inp  = wrapper.querySelector('.select-input');
+  if (menu) menu.classList.remove('open');
+  if (inp)  inp.classList.remove('open');
+}
+
+render();
+</script>
+
+<!-- ─── Add Fee Definition Modal ─── -->
+<div class="modal-overlay" id="feeDefModalOverlay" onclick="closeFeeDefOutside(event)">
+  <div class="modal-container" style="width:540px;">
+    <div class="modal-header">
+      <h2>Add Fee Definition</h2>
+      <button class="modal-close" onclick="closeFeeDefModal()"><span class="material-icons">close</span></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="field">
+        <label>Name <span class="req">*</span></label>
+        <input type="text" id="fdName" placeholder="e.g. Agency Staffing Fee" />
+      </div>
+
+      <div class="field">
+        <label>Description</label>
+        <textarea id="fdDesc" rows="3" placeholder="Describe when and how this fee applies…" style="border:1px solid #BDBDBD;border-radius:4px;padding:8px 12px;font-family:Roboto,sans-serif;font-size:14px;color:#212121;background:#fff;outline:none;resize:vertical;line-height:1.5;transition:border-color .15s;"></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Fee Type <span class="req">*</span></label>
+          <div class="select-wrapper">
+            <div class="select-control">
+              <div class="select-input" onclick="toggleMenu(this)">
+                <span id="fdFeeType-lbl" class="select-placeholder">— Select —</span>
+                <span class="material-icons select-icon">arrow_drop_down</span>
+              </div>
+              <div class="select-menu">
+                <div class="select-menu-item" onclick="selectD(this,'AP','fdFeeType')">AP</div>
+                <div class="select-menu-item" onclick="selectD(this,'AR','fdFeeType')">AR</div>
+                <div class="select-menu-item" onclick="selectD(this,'Tenant','fdFeeType')">Tenant</div>
+                <div class="select-menu-item" onclick="selectD(this,'Expense','fdFeeType')">Expense</div>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="fdFeeType" value="">
+        </div>
+        <div class="field">
+          <label>Application Type <span class="req">*</span></label>
+          <div class="select-wrapper">
+            <div class="select-control">
+              <div class="select-input" onclick="toggleMenu(this)">
+                <span id="fdAppType-lbl" class="select-placeholder">— Select —</span>
+                <span class="material-icons select-icon">arrow_drop_down</span>
+              </div>
+              <div class="select-menu">
+                <div class="select-menu-item" onclick="selectD(this,'Deductive','fdAppType')">Deductive</div>
+                <div class="select-menu-item" onclick="selectD(this,'Additive','fdAppType')">Additive</div>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="fdAppType" value="">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Group</label>
+        <div class="autocomplete-wrap" id="fdGroupWrap">
+          <div style="position:relative;">
+            <input type="text" id="fdGroupInput" class="ac-input" placeholder="Search or create a group…" autocomplete="off"
+              oninput="renderGroupAc(this.value)"
+              onfocus="openGroupAc()" />
+            <span class="material-icons ac-arrow">arrow_drop_down</span>
+          </div>
+          <div class="ac-dropdown" id="fdGroupDropdown"></div>
+        </div>
+        <input type="hidden" id="fdGroup" value="">
+      </div>
+
+      <input type="hidden" id="fdRequired" value="required">
+
+      <span style="font-size:12px;color:#9E9E9E;line-height:1.5;">Fee Type and Application Type cannot be changed after creation.</span>
+
+      <div style="display:flex;flex-direction:column;width:100%;border:1px solid #E0E0E0;border-radius:4px;overflow:hidden;">
+        <div class="switch-row" onclick="toggleFdRequired(document.getElementById('fdRequiredToggle'))" style="cursor:pointer;padding:8px 12px;">
+          <span class="switch-row-label" id="fdRequiredLbl">Required</span>
+          <div class="toggle on" id="fdRequiredToggle"></div>
+        </div>
+        <div style="height:1px;background:#E0E0E0;"></div>
+        <div class="switch-row" onclick="toggleFdActive(document.getElementById('fdActiveToggle'))" style="cursor:pointer;padding:8px 12px;">
+          <span class="switch-row-label" id="fdActiveLbl">Active</span>
+          <div class="toggle on" id="fdActiveToggle"></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-text" onclick="closeFeeDefModal()">Cancel</button>
+      <button class="btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Delete Group Confirmation Modal ─── -->
+<div class="modal-overlay" id="deleteGroupOverlay" onclick="if(event.target===this)cancelDeleteGroup()">
+  <div class="modal-container" style="width:440px;">
+    <div class="modal-header modal-header-error">
+      <h2>Delete Group</h2>
+      <button class="modal-close" onclick="cancelDeleteGroup()"><span class="material-icons">close</span></button>
+    </div>
+    <div class="modal-body" style="gap:12px;">
+      <p style="margin:0;font-size:14px;color:#212121;line-height:1.6;">
+        Delete <strong id="deleteGroupName"></strong>?
+        All fee definitions in this group will become <strong>Ungrouped</strong>.
+      </p>
+      <p style="margin:0;font-size:13px;color:#757575;line-height:1.5;">
+        This action cannot be undone. The group name will be removed from all fee definitions and from the system.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-text" onclick="cancelDeleteGroup()">Cancel</button>
+      <button class="btn-danger" onclick="confirmDeleteGroup()">Delete Group</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Bulk Create Instances Modal ─── -->
+<div class="modal-overlay" id="bulkModalOverlay" onclick="closeBulkOutside(event)">
+  <div class="modal-container" style="width:900px;">
+    <div class="modal-header">
+      <h2>Bulk Create Instances</h2>
+      <button class="modal-close" onclick="closeBulkModal()"><span class="material-icons">close</span></button>
+    </div>
+    <!-- Step indicator -->
+    <div class="bulk-stepper">
+      <div class="step" id="bStepInd1">
+        <div class="step-circle active" id="bCircle1"><span class="step-number active" id="bNum1">1</span></div>
+        <span class="step-label active" id="bLabel1">Configure</span>
+      </div>
+      <div class="connector upcoming" id="bStepConnector"></div>
+      <div class="step" id="bStepInd2">
+        <div class="step-circle" id="bCircle2"><span class="step-number upcoming" id="bNum2">2</span></div>
+        <span class="step-label upcoming" id="bLabel2">Preview &amp; Confirm</span>
+      </div>
+    </div>
+    <!-- Body -->
+    <div class="bulk-modal-body">
+
+      <!-- Step 1: Configure -->
+      <div id="bStep1" style="flex:1;min-height:0;display:flex;flex-direction:column;gap:16px;overflow-y:auto;padding-top:16px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+          <!-- Fee Definition -->
+          <div class="field" style="grid-column:1/-1;">
+            <label>Fee Definition <span class="req">*</span></label>
+            <div class="select-wrapper">
+              <div class="select-control">
+                <div class="select-input" onclick="toggleMenu(this)">
+                  <span id="bFeeDefLbl" class="select-placeholder">— Select definition —</span>
+                  <span class="material-icons select-icon">arrow_drop_down</span>
+                </div>
+                <div class="select-menu" id="bFeeDefMenu"></div>
+              </div>
+            </div>
+            <input type="hidden" id="bFeeDefHidden" value="">
+          </div>
+
+          <!-- Fee Value -->
+          <div class="field">
+            <label>Fee Value % <span class="req">*</span></label>
+            <input type="text" id="bFeeValue" placeholder="e.g. 3.5" />
+          </div>
+          <div></div>
+
+          <!-- Segments -->
+          <div class="field" style="grid-column:1/-1;">
+            <label>Segments <span class="req">*</span></label>
+            <div class="multi-sel-wrap">
+              <div class="multi-sel-trigger" id="bSegTrigger" onclick="toggleMultiSel('bSegTrigger','bSegMenu')">
+                <span class="multi-sel-placeholder">— Select segments —</span>
+                <span class="material-icons multi-sel-arrow">arrow_drop_down</span>
+              </div>
+              <div class="multi-sel-menu" id="bSegMenu" data-trigger="bSegTrigger"></div>
+            </div>
+          </div>
+
+          <!-- Scope constraint note — always visible above Clients and Agencies -->
+          <div id="bScopeHint" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;padding:8px 12px;border-radius:4px;background:#F5F5F5;border:1px solid #E0E0E0;">
+            <span class="material-icons" id="bScopeIcon" style="font-size:16px;color:#757575;flex-shrink:0;margin-top:1px;">info_outline</span>
+            <span id="bScopeTxt" style="font-size:12px;color:#757575;line-height:1.5;">You can select <strong>multiple clients with a single agency</strong>, or <strong>multiple agencies with a single client</strong> — not multiples of both at once.</span>
+          </div>
+
+          <!-- Clients -->
+          <div class="field" style="grid-column:1/-1;">
+            <label>Clients</label>
+            <div class="multi-sel-wrap">
+              <div class="multi-sel-trigger" id="bClientTrigger" onclick="toggleMultiSel('bClientTrigger','bClientMenu')">
+                <span class="multi-sel-placeholder">— Any client —</span>
+                <span class="material-icons multi-sel-arrow">arrow_drop_down</span>
+              </div>
+              <div class="multi-sel-menu" id="bClientMenu" data-trigger="bClientTrigger"></div>
+            </div>
+          </div>
+
+          <!-- Agencies -->
+          <div class="field" style="grid-column:1/-1;">
+            <label>Agencies</label>
+            <div class="multi-sel-wrap">
+              <div class="multi-sel-trigger" id="bAgencyTrigger" onclick="toggleMultiSel('bAgencyTrigger','bAgencyMenu')">
+                <span class="multi-sel-placeholder">— Any agency —</span>
+                <span class="material-icons multi-sel-arrow">arrow_drop_down</span>
+              </div>
+              <div class="multi-sel-menu" id="bAgencyMenu" data-trigger="bAgencyTrigger"></div>
+            </div>
+          </div>
+
+          <!-- Dates -->
+          <div class="field">
+            <label>Start Date <span class="req">*</span></label>
+            <div class="date-wrap">
+              <input type="text" id="bStartDate" placeholder="MM/DD/YYYY" />
+              <span class="material-icons">calendar_today</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>End Date</label>
+            <div class="date-wrap">
+              <input type="text" id="bEndDate" placeholder="MM/DD/YYYY" />
+              <span class="material-icons">calendar_today</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Step 2: Preview & Confirm -->
+      <div id="bStep2" style="display:none;flex:1;min-height:0;flex-direction:column;gap:0;padding-top:12px;">
+        <div class="metric-group">
+          <!-- Created -->
+          <div class="metric-card">
+            <div class="mc-label-row">
+              <div class="mc-label-left">
+                <span class="mc-label-text">Created</span>
+              </div>
+            </div>
+            <div class="mc-metrics">
+              <div class="mc-row">
+                <div class="mc-col">
+                  <span class="mc-value mc-value--lg" id="bMetricCreated" style="color:#2e7d32">—</span>
+                  <span class="mc-sub-label">Instances</span>
+                </div>
+              </div>
+              <div class="mc-icons-footer">
+                <div class="mc-icon-segment">
+                  <span class="material-icons mc-footer-icon" style="color:#2e7d32">check_circle</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Existing Modified -->
+          <div class="metric-card" id="bCardModified">
+            <div class="mc-label-row">
+              <div class="mc-label-left">
+                <span class="mc-label-text">Existing Modified</span>
+              </div>
+            </div>
+            <div class="mc-metrics">
+              <div class="mc-row">
+                <div class="mc-col">
+                  <span class="mc-value mc-value--lg" id="bMetricModified" style="color:#E17109">—</span>
+                  <span class="mc-sub-label">End date adjusted</span>
+                </div>
+              </div>
+              <div class="mc-icons-footer">
+                <div class="mc-icon-segment">
+                  <span class="material-icons mc-footer-icon" style="color:#E17109">warning_amber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Blocked -->
+          <div class="metric-card" id="bCardBlocked">
+            <div class="mc-label-row">
+              <div class="mc-label-left">
+                <span class="mc-label-text">Blocked</span>
+              </div>
+            </div>
+            <div class="mc-metrics">
+              <div class="mc-row">
+                <div class="mc-col">
+                  <span class="mc-value mc-value--lg" id="bMetricBlocked" style="color:#DB4537">—</span>
+                  <span class="mc-sub-label">Cannot be created</span>
+                </div>
+              </div>
+              <div class="mc-icons-footer">
+                <div class="mc-icon-segment">
+                  <span class="material-icons mc-footer-icon" style="color:#DB4537">error</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-table-wrap">
+          <table class="preview-table">
+            <colgroup>
+              <col style="width:15%">
+              <col style="width:22%">
+              <col style="width:22%">
+              <col style="width:14%">
+              <col style="width:14%">
+              <col style="width:13%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Segment</th>
+                <th>Client</th>
+                <th>Agency</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="bPreviewTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-text" onclick="closeBulkModal()">Cancel</button>
+      <div style="flex:1;"></div>
+      <button class="btn-text" id="bBtnBack" style="display:none;" onclick="showBulkStep(1)">&#8592; Back</button>
+      <button class="btn-primary" id="bBtnPreview" onclick="generateBulkPreview()">Preview &#8594;</button>
+      <button class="btn-primary" id="bBtnSave" style="display:none;" onclick="saveBulkInstances()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── Bulk Create Instances ─── */
+const BULK_SEGMENTS = ['Non Clinical','Allied','Nursing','Physician','Per Diem','Travel'];
+const BULK_CLIENTS  = ['Atlas Healthcare','Valley Health Network','Sunrise Medical','Apex Medical','Coastal Providers','Pacific Health Partners'];
+const BULK_AGENCIES = ['Metro Clinical Group','MedPro Solutions','National Staffing Co.','Global Staffing'];
+
+let bulkSelectedSegments = new Set();
+let bulkSelectedClients  = new Set();
+let bulkSelectedAgencies = new Set();
+
+function openBulkModal() {
+  closeAddInstMenu();
+  bulkSelectedSegments = new Set();
+  bulkSelectedClients  = new Set();
+  bulkSelectedAgencies = new Set();
+  document.getElementById('bFeeDefHidden').value = '';
+  document.getElementById('bFeeDefLbl').textContent = '— Select definition —';
+  document.getElementById('bFeeDefLbl').className = 'select-placeholder';
+  document.getElementById('bFeeValue').value  = '';
+  document.getElementById('bStartDate').value = '';
+  document.getElementById('bEndDate').value   = '';
+  // reset scope hint to default state
+  document.getElementById('bScopeHint').style.background = '#F5F5F5';
+  document.getElementById('bScopeHint').style.borderColor = '#E0E0E0';
+  // Populate fee def menu from current tab
+  initBulkFeeDefMenu();
+  // Render multi-select dropdowns
+  refreshBulkMultiSel();
+  showBulkStep(1);
+  document.getElementById('bulkModalOverlay').classList.add('active');
+}
+
+function closeBulkModal() {
+  document.getElementById('bulkModalOverlay').classList.remove('active');
+}
+
+function closeBulkOutside(e) {
+  if (e.target === document.getElementById('bulkModalOverlay')) closeBulkModal();
+}
+
+function showBulkStep(n) {
+  document.getElementById('bStep1').style.display = n === 1 ? 'flex' : 'none';
+  document.getElementById('bStep2').style.display = n === 2 ? 'flex' : 'none';
+  document.getElementById('bBtnPreview').style.display = n === 1 ? '' : 'none';
+  document.getElementById('bBtnBack').style.display    = n === 2 ? '' : 'none';
+  document.getElementById('bBtnSave').style.display    = n === 2 ? '' : 'none';
+  // Stepper — step 1
+  const c1 = document.getElementById('bCircle1');
+  const l1 = document.getElementById('bLabel1');
+  if (n === 1) {
+    c1.className = 'step-circle active';
+    c1.innerHTML = '<span class="step-number active">1</span>';
+    l1.className = 'step-label active';
+  } else {
+    c1.className = 'step-circle';
+    c1.innerHTML = '<span class="material-icons" style="font-size:16px;color:#37636b;">check</span>';
+    l1.className = 'step-label completed';
+  }
+  // Stepper — step 2
+  const c2 = document.getElementById('bCircle2');
+  const l2 = document.getElementById('bLabel2');
+  if (n === 2) {
+    c2.className = 'step-circle active';
+    c2.innerHTML = '<span class="step-number active">2</span>';
+    l2.className = 'step-label active';
+  } else {
+    c2.className = 'step-circle';
+    c2.innerHTML = '<span class="step-number upcoming">2</span>';
+    l2.className = 'step-label upcoming';
+  }
+  // Connector
+  document.getElementById('bStepConnector').className = 'connector ' + (n === 2 ? 'completed' : 'upcoming');
+}
+
+/* ─── Multi-select ─── */
+function refreshBulkMultiSel() {
+  const disableClients  = bulkSelectedAgencies.size > 1 && bulkSelectedClients.size  >= 1;
+  const disableAgencies = bulkSelectedClients.size  > 1 && bulkSelectedAgencies.size >= 1;
+  renderMultiSel('bSegTrigger',    'bSegMenu',    BULK_SEGMENTS, bulkSelectedSegments, 'seg',    '— Select segments —', false);
+  renderMultiSel('bClientTrigger', 'bClientMenu', BULK_CLIENTS,  bulkSelectedClients,  'client', '— Any client —',      disableClients);
+  renderMultiSel('bAgencyTrigger', 'bAgencyMenu', BULK_AGENCIES, bulkSelectedAgencies, 'agency', '— Any agency —',      disableAgencies);
+
+  // Update scope constraint hint
+  const icon = document.getElementById('bScopeIcon');
+  const txt  = document.getElementById('bScopeTxt');
+  const hint = document.getElementById('bScopeHint');
+  if (disableAgencies) {
+    hint.style.background = '#FCF1E0';
+    hint.style.borderColor = 'var(--color-warning-main)';
+    icon.style.color = 'var(--color-warning-main)';
+    icon.textContent = 'warning_amber';
+    txt.style.color = '#212121';
+    txt.innerHTML = 'Multiple clients selected — <strong>agencies are limited to one</strong>. Deselect clients to unlock.';
+  } else if (disableClients) {
+    hint.style.background = '#FCF1E0';
+    hint.style.borderColor = 'var(--color-warning-main)';
+    icon.style.color = 'var(--color-warning-main)';
+    icon.textContent = 'warning_amber';
+    txt.style.color = '#212121';
+    txt.innerHTML = 'Multiple agencies selected — <strong>clients are limited to one</strong>. Deselect agencies to unlock.';
+  } else {
+    hint.style.background = '#F5F5F5';
+    hint.style.borderColor = '#E0E0E0';
+    icon.style.color = '#757575';
+    icon.textContent = 'info_outline';
+    txt.style.color = '#757575';
+    txt.innerHTML = 'You can select <strong>multiple clients with a single agency</strong>, or <strong>multiple agencies with a single client</strong> — not multiples of both at once.';
+  }
+}
+
+function renderMultiSel(triggerId, menuId, options, selected, key, placeholder, disableUnselected) {
+  const trigger = document.getElementById(triggerId);
+  const menu    = document.getElementById(menuId);
+  const wasOpen = menu.classList.contains('open');
+  const chipsHtml = [...selected].map(v =>
+    `<span class="multi-sel-chip">${v}<span class="material-icons chip-x" onclick="event.stopPropagation();bulkDeselect('${key}','${v}')">close</span></span>`
+  ).join('');
+  trigger.innerHTML = (selected.size === 0
+    ? `<span class="multi-sel-placeholder">${placeholder}</span>`
+    : chipsHtml
+  ) + `<span class="material-icons multi-sel-arrow">arrow_drop_down</span>`;
+  if (wasOpen) trigger.classList.add('open'); else trigger.classList.remove('open');
+  menu.innerHTML = options.map(opt => {
+    const isSelected = selected.has(opt);
+    const isDisabled = disableUnselected && !isSelected;
+    return `<label class="multi-sel-item${isDisabled ? ' item-disabled' : ''}"><input type="checkbox" ${isSelected ? 'checked' : ''} ${isDisabled ? 'disabled' : ''} onchange="bulkToggleOpt('${key}','${opt}',this)"> ${opt}</label>`;
+  }).join('');
+}
+
+function bulkToggleOpt(key, value, checkbox) {
+  const maps = { seg: bulkSelectedSegments, client: bulkSelectedClients, agency: bulkSelectedAgencies };
+  if (checkbox.checked) maps[key].add(value); else maps[key].delete(value);
+  refreshBulkMultiSel();
+}
+
+function bulkDeselect(key, value) {
+  const maps = { seg: bulkSelectedSegments, client: bulkSelectedClients, agency: bulkSelectedAgencies };
+  maps[key].delete(value);
+  refreshBulkMultiSel();
+}
+
+function toggleMultiSel(triggerId, menuId) {
+  const trigger = document.getElementById(triggerId);
+  const menu    = document.getElementById(menuId);
+  const isOpen  = menu.classList.contains('open');
+  // Close all multi-sel dropdowns
+  document.querySelectorAll('.multi-sel-menu.open').forEach(m => {
+    m.classList.remove('open');
+    const t = document.getElementById(m.dataset.trigger);
+    if (t) t.classList.remove('open');
+  });
+  if (!isOpen) {
+    menu.classList.add('open');
+    trigger.classList.add('open');
+  }
+}
+
+/* ─── Fee def menu ─── */
+function initBulkFeeDefMenu() {
+  const menu = document.getElementById('bFeeDefMenu');
+  const currentTab = document.querySelector('.ptab.active')?.textContent?.trim().toLowerCase() || 'ap';
+  const defs = (fees[currentTab] || fees.ap).filter(d => d.active);
+  menu.innerHTML = defs.map(d =>
+    `<div class="select-menu-item" onclick="selectBulkFeeDef(this,'${d.name.replace(/'/g,"\\'")}')">${d.name}</div>`
+  ).join('');
+}
+
+function selectBulkFeeDef(item, name) {
+  document.getElementById('bFeeDefHidden').value = name;
+  document.getElementById('bFeeDefLbl').textContent = name;
+  document.getElementById('bFeeDefLbl').className = '';
+  item.parentElement.querySelectorAll('.select-menu-item').forEach(i => i.classList.remove('selected'));
+  item.classList.add('selected');
+  const menu = item.parentElement;
+  const trigger = menu.closest('.select-control').querySelector('.select-input');
+  menu.classList.remove('open');
+  trigger.classList.remove('open');
+}
+
+/* ─── Preview generation ─── */
+function generateBulkPreview() {
+  const feeDef  = document.getElementById('bFeeDefHidden').value;
+  const feeVal  = document.getElementById('bFeeValue').value.trim();
+  const start   = document.getElementById('bStartDate').value.trim();
+  const end     = document.getElementById('bEndDate').value.trim() || 'No end date';
+  const clients  = [...bulkSelectedClients];
+  const agencies = [...bulkSelectedAgencies];
+
+  if (!feeDef)                         { alert('Select a fee definition.'); return; }
+  if (!feeVal)                         { alert('Enter a fee value.'); return; }
+  if (bulkSelectedSegments.size === 0) { alert('Select at least one segment.'); return; }
+  if (!start)                          { alert('Enter a start date.'); return; }
+
+  // Build scope pairs (cartesian product of clients × agencies, or either alone)
+  const pairs = [];
+  if (clients.length > 0 && agencies.length > 0) {
+    for (const c of clients) for (const a of agencies) pairs.push({ client: c, agency: a });
+  } else if (clients.length > 0) {
+    for (const c of clients) pairs.push({ client: c, agency: '—' });
+  } else if (agencies.length > 0) {
+    for (const a of agencies) pairs.push({ client: '—', agency: a });
+  } else {
+    pairs.push({ client: '—', agency: '—' }); // global
+  }
+
+  // Build instances
+  const instances = [];
+  let idx = 0;
+  for (const seg of bulkSelectedSegments) {
+    for (const pair of pairs) {
+      const hash = (seg.length + pair.client.length + pair.agency.length + idx) % 10;
+      let status, detail;
+      if (hash < 6) {
+        status = 'clean';
+      } else if (hash < 8) {
+        status = 'adjusted';
+        detail = `Existing instance (${pair.client !== '—' ? pair.client : pair.agency}) will end on ${prevDay(start)} instead of 12/31/2026 to avoid overlap.`;
+      } else {
+        status = 'blocked';
+        detail = `Two future instances already exist for this scope — ${seg}. Dates cannot be auto-resolved. Adjust or delete existing instances first.`;
+      }
+      instances.push({ seg, client: pair.client, agency: pair.agency, start, end, status, detail });
+      idx++;
+    }
+  }
+
+  const cleanCount    = instances.filter(i => i.status === 'clean').length;
+  const adjustedCount = instances.filter(i => i.status === 'adjusted').length;
+  const blockedCount  = instances.filter(i => i.status === 'blocked').length;
+  const saveCount     = cleanCount + adjustedCount;
+
+  // Metric cards
+  document.getElementById('bMetricCreated').textContent  = saveCount;
+  document.getElementById('bMetricModified').textContent = adjustedCount;
+  document.getElementById('bMetricBlocked').textContent  = blockedCount;
+  document.getElementById('bCardModified').classList.toggle('mc-dim', adjustedCount === 0);
+  document.getElementById('bCardBlocked').classList.toggle('mc-dim',  blockedCount  === 0);
+
+  // Save button label
+  const saveBtn = document.getElementById('bBtnSave');
+  saveBtn.textContent = blockedCount > 0 ? `Save ${saveCount} of ${instances.length}` : `Save all ${saveCount}`;
+
+  // Build table rows
+  document.getElementById('bPreviewTbody').innerHTML = instances.map((inst) => {
+    let statusCell;
+    if (inst.status === 'clean') {
+      statusCell = `<span class="chip chip-sm chip-success-outline"><span class="chip-label">Ready</span></span>`;
+    } else if (inst.status === 'adjusted') {
+      const tip = inst.detail.replace(/"/g, '&quot;');
+      statusCell = `<span class="tip-wrap" data-tip="${tip}"><span class="chip chip-sm chip-warning-outline"><span class="chip-label">Adjusted</span></span></span>`;
+    } else {
+      const tip = inst.detail.replace(/"/g, '&quot;');
+      statusCell = `<span class="tip-wrap" data-tip="${tip}"><span class="chip chip-sm chip-error-outline"><span class="chip-label">Blocked</span></span></span>`;
+    }
+    return `<tr><td>${inst.seg}</td><td>${inst.client}</td><td>${inst.agency}</td><td>${inst.start}</td><td>${inst.end}</td><td>${statusCell}</td></tr>`;
+  }).join('');
+
+  showBulkStep(2);
+}
+
+function prevDay(dateStr) {
+  const p = dateStr.split('/');
+  if (p.length !== 3) return dateStr;
+  const d = new Date(p[2], p[0] - 1, p[1] - 1);
+  return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+}
+
+function saveBulkInstances() {
+  closeBulkModal();
+}
+
+/* Close multi-sel on outside click */
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.multi-sel-wrap')) {
+    document.querySelectorAll('.multi-sel-menu.open').forEach(m => {
+      m.classList.remove('open');
+      const t = document.getElementById(m.dataset.trigger);
+      if (t) t.classList.remove('open');
+    });
+  }
+});
+</script>
+
+</body>
+</html>

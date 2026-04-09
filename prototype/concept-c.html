@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fee Management — TRIO WFS (Concept C)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="../../ahtg-design-system/design-system-shell.css" />
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+
+  <style>
+    *, *::before, *::after { box-sizing:border-box; }
+    body { margin:0; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#F5F5F5; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+
+    /* ─── Top Bar ─── */
+    .g-nav-top { background:#607D8B; height:48px; display:flex; align-items:center; padding:0 24px; gap:28px; flex-shrink:0; }
+    .g-nav-brand { display:flex; align-items:flex-start; flex-shrink:0; }
+    .g-nav-wordmark { display:flex; align-items:center; gap:4px; height:48px; }
+    .logo-wip-badge { background:#DB4537; color:#fff; font-size:20px; font-weight:500; font-family:Roboto,sans-serif; line-height:24px; padding:2px 10px; border-radius:0 0 4px 4px; align-self:flex-start; flex-shrink:0; }
+    .g-nav-search { display:flex; align-items:center; border:1px solid rgba(255,255,255,0.3); border-radius:4px; height:32px; overflow:hidden; flex-shrink:0; }
+    .g-nav-search input { background:rgba(255,255,255,0.12); border:none; outline:none; color:#fff; font-size:13px; font-family:Roboto,sans-serif; padding:0 10px; height:100%; width:185px; }
+    .g-nav-search input::placeholder { color:rgba(255,255,255,0.5); }
+    .g-nav-search-div { background:rgba(255,255,255,0.25); width:1px; height:100%; flex-shrink:0; }
+    .g-nav-search-cat { background:rgba(255,255,255,0.1); border:none; outline:none; color:rgba(255,255,255,0.85); font-size:12px; font-family:Roboto,sans-serif; padding:0 8px; height:100%; cursor:pointer; flex-shrink:0; }
+    .g-nav-spacer { flex:1; }
+    .g-nav-user { display:flex; align-items:center; gap:6px; flex-shrink:0; cursor:pointer; }
+    .g-nav-avatar { width:32px; height:34px; border-radius:4px; background:#AB47BC; border:2px solid #fff; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:400; flex-shrink:0; }
+    .g-nav-username { color:#fff; font-size:14px; font-weight:500; white-space:nowrap; }
+    .g-nav-chevron { color:#fff; font-size:20px; }
+
+    /* ─── Nav Bar ─── */
+    .g-nav-bar { background:#fff; border-bottom:1px solid #E0E0E0; height:50px; padding:0 16px; display:flex; align-items:stretch; flex-shrink:0; }
+    .g-nav-item { display:flex; align-items:center; gap:3px; padding:0 16px; font-size:11px; font-weight:500; color:#212121; cursor:pointer; white-space:nowrap; user-select:none; position:relative; flex-shrink:0; }
+    .g-nav-item:hover { background:rgba(0,0,0,0.04); }
+    .g-nav-item.active { background:#F5F5F5; }
+    .g-nav-item.active::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:#212121; }
+    .g-nav-item .material-icons { font-size:16px; }
+
+    /* ─── Page Canvas + Card ─── */
+    .page-canvas { flex:1; background:#F5F5F5; padding:16px; overflow:hidden; display:flex; flex-direction:column; }
+    .page-card { flex:1; background:#fff; border-radius:4px; border:1px solid #E0E0E0; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
+
+    /* ─── Page Header ─── */
+    .page-header-bar { background:#fff; border-bottom:1px solid #E0E0E0; padding:0 24px; height:52px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .page-title { font-size:16px; font-weight:500; color:#212121; }
+
+    /* ─── AP / AR Tabs ─── */
+    .page-tabs { background:#F5F5F5; border-bottom:1px solid #E0E0E0; padding:0 24px; display:flex; align-items:flex-end; flex-shrink:0; }
+    .ptab { position:relative; height:36px; display:inline-flex; align-items:center; padding:0 4px; margin-right:16px; font-size:14px; font-weight:400; color:#757575; cursor:pointer; border-bottom:2px solid transparent; user-select:none; }
+    .ptab.active { color:#2196F3; font-weight:500; border-bottom-color:#2196F3; }
+    .ptab:hover:not(.active) { color:#212121; }
+
+    /* ─── Inner Tabs (Fee Library / Active Configurations) ─── */
+    .inner-tabs { background:#fff; border-bottom:1px solid #E0E0E0; padding:0 24px; display:flex; align-items:flex-end; flex-shrink:0; gap:4px; }
+    .itab { position:relative; height:44px; display:inline-flex; align-items:center; padding:0 4px; margin-right:12px; font-size:14px; font-weight:400; color:#757575; cursor:pointer; border-bottom:2px solid transparent; user-select:none; gap:6px; }
+    .itab.active { color:#212121; font-weight:500; border-bottom-color:#212121; }
+    .itab:hover:not(.active) { color:#212121; }
+    .itab .material-icons { font-size:18px; }
+    .itab-count { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:18px; padding:0 5px; background:#E0E0E0; color:#616161; border-radius:999px; font-size:11px; font-weight:500; }
+    .itab.active .itab-count { background:#212121; color:#fff; }
+
+    /* ─── Toolbars ─── */
+    .grid-toolbar { background:#F5F5F5; display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:40px; border-bottom:1px solid #E0E0E0; flex-shrink:0; gap:12px; }
+    .toolbar-left { display:flex; align-items:center; gap:8px; }
+    .toolbar-right { display:flex; align-items:center; gap:8px; }
+
+    /* Date filter pills */
+    .gtabs { display:flex; align-items:center; gap:0; }
+    .gtab { font-size:13px; color:#757575; cursor:pointer; padding:0 2px; user-select:none; }
+    .gtab.active { color:#2196F3; font-weight:500; border-bottom:2px solid #2196F3; }
+    .gtab:hover:not(.active) { color:#212121; }
+    .gtab-sep { color:#BDBDBD; padding:0 6px; font-size:12px; }
+
+    /* Definition filter chip */
+    .def-filter-chip { display:inline-flex; align-items:center; gap:4px; height:24px; padding:0 8px 0 10px; background:rgba(33,150,243,0.1); border:1px solid rgba(33,150,243,0.3); border-radius:999px; font-size:12px; color:#1565C0; font-weight:500; cursor:default; }
+    .def-filter-chip button { background:transparent; border:none; padding:0; cursor:pointer; color:#1565C0; display:flex; align-items:center; line-height:1; }
+    .def-filter-chip button .material-icons { font-size:14px; }
+
+    /* Toolbar search */
+    .toolbar-search { display:flex; align-items:center; height:28px; border:1px solid #E0E0E0; border-radius:4px; background:#fff; overflow:hidden; }
+    .toolbar-search .material-icons { font-size:16px; color:#9E9E9E; padding:0 6px; }
+    .toolbar-search input { border:none; outline:none; font-family:Roboto,sans-serif; font-size:13px; color:#212121; background:transparent; height:100%; width:180px; padding-right:8px; }
+
+    /* Pagination */
+    .gpagination { display:flex; align-items:center; gap:8px; }
+    .gpagination-count { font-size:12px; color:#757575; white-space:nowrap; }
+    .gpagination-actions { display:flex; gap:2px; }
+    .gpagination-btn { width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; border-radius:4px; cursor:pointer; color:#616161; }
+    .gpagination-btn:hover { background:rgba(0,0,0,0.06); }
+    .gpagination-btn .material-icons { font-size:16px; }
+
+    /* ─── Shared Grid ─── */
+    .grid-scroll { flex:1; overflow:auto; }
+    table { width:100%; border-collapse:collapse; }
+    thead th { position:sticky; top:0; background:#fff; border-bottom:2px solid #E0E0E0; padding:0 12px; height:40px; font-size:12px; font-weight:500; color:#757575; text-align:left; white-space:nowrap; z-index:2; }
+    thead th.right { text-align:right; }
+    thead th .sort-icon { font-size:14px; vertical-align:middle; color:#BDBDBD; margin-left:2px; }
+
+    /* ─── Library rows ─── */
+    .lib-row { border-bottom:1px solid rgba(0,0,0,0.05); }
+    .lib-row:nth-child(even) { background:#FAFAFA; }
+    .lib-row:hover { background:#F0F7FF; }
+    .lib-row td { padding:0 12px; height:44px; font-size:13px; color:#212121; white-space:nowrap; vertical-align:middle; }
+    .lib-row td.name-cell { font-weight:500; }
+    .lib-row td.muted { color:#757575; }
+    .lib-row td.desc-cell { color:#9E9E9E; font-size:12px; max-width:320px; overflow:hidden; text-overflow:ellipsis; }
+    .lib-row td.count-cell { text-align:right; }
+    .inst-link { color:#2196F3; font-size:12px; font-weight:500; cursor:pointer; background:transparent; border:none; padding:0; font-family:Roboto,sans-serif; display:inline-flex; align-items:center; gap:2px; white-space:nowrap; }
+    .inst-link:hover { text-decoration:underline; }
+    .inst-link .material-icons { font-size:14px; }
+    .inst-count-zero { color:#BDBDBD; font-size:12px; }
+    .status-active { color:#4CAF50; font-size:13px; font-weight:500; }
+    .status-inactive { color:#9E9E9E; font-size:13px; }
+
+    /* ─── Configuration rows ─── */
+    .conf-row { border-bottom:1px solid rgba(0,0,0,0.05); }
+    .conf-row:nth-child(even) { background:#FAFAFA; }
+    .conf-row:hover { background:#F0F7FF; }
+    .conf-row td { padding:0 12px; height:40px; font-size:13px; color:#212121; white-space:nowrap; vertical-align:middle; }
+    .conf-row td.muted { color:#757575; }
+    .conf-row td.mono { font-family:'Roboto Mono',monospace; font-size:13px; }
+    .fee-def-link { color:#212121; font-weight:500; cursor:pointer; background:transparent; border:none; padding:0; font-family:Roboto,sans-serif; font-size:13px; text-decoration:none; }
+    .fee-def-link:hover { color:#2196F3; text-decoration:underline; }
+
+    /* ─── Category chips ─── */
+    .cell-chip { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:999px; font-size:11px; font-weight:500; white-space:nowrap; }
+    .cell-chip-gray { background:#EEEEEE; color:#616161; }
+    .cell-chip-blue { background:rgba(33,150,243,0.1); color:#1565C0; }
+
+    /* ─── Action buttons ─── */
+    .row-acts { display:flex; gap:2px; }
+    .act-btn { width:24px; height:24px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; cursor:pointer; border-radius:2px; color:#616161; }
+    .act-btn:hover { background:rgba(0,0,0,0.06); }
+    .act-btn .material-icons { font-size:16px; }
+    .act-btn.danger { color:#DB4537; }
+    .act-btn:disabled { color:#BDBDBD; cursor:default; pointer-events:none; }
+
+    /* ─── Buttons ─── */
+    .btn-outline { display:inline-flex; align-items:center; gap:4px; height:32px; padding:0 16px; background:transparent; border:1px solid #2196F3; border-radius:4px; font-family:Roboto,sans-serif; font-size:14px; color:#2196F3; cursor:pointer; font-weight:500; }
+    .btn-outline:hover { background:rgba(33,150,243,0.08); }
+    .btn-outline .material-icons { font-size:16px; }
+    .btn-primary { background:#2196F3; color:#fff; border:none; border-radius:4px; font-family:Roboto,sans-serif; font-size:14px; font-weight:500; padding:0 16px; height:32px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+    .btn-primary:hover { background:#1E88E5; }
+    .btn-primary .material-icons { font-size:16px; }
+    .btn-text { background:transparent; border:none; color:#2196F3; font-family:Roboto,sans-serif; font-size:14px; font-weight:500; cursor:pointer; padding:0 12px; height:32px; border-radius:4px; }
+    .btn-text:hover { background:rgba(33,150,243,0.08); }
+
+    /* ─── Empty state ─── */
+    .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 24px; gap:8px; }
+    .empty-state .material-icons { font-size:40px; color:#E0E0E0; }
+    .empty-state-title { font-size:14px; font-weight:500; color:#757575; }
+    .empty-state-sub { font-size:13px; color:#9E9E9E; }
+
+    /* ─── Modals ─── */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:1000; }
+    .modal-overlay.active { display:flex; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .modal-container { background:#fff; border-radius:4px; box-shadow:0 5px 40px rgba(0,0,0,0.18); max-height:90vh; overflow:hidden; display:flex; flex-direction:column; animation:slideUp 200ms ease-out; }
+    .modal-header { padding:24px 40px; background:#2196F3; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+    .modal-header h2 { font-size:20px; font-weight:500; color:#fff; margin:0; }
+    .modal-close { background:transparent; border:none; color:#fff; cursor:pointer; padding:0; display:flex; align-items:center; }
+    .modal-close .material-icons { font-size:22px; }
+    .modal-body { padding:24px 40px; display:flex; flex-direction:column; gap:16px; overflow-y:auto; }
+    .modal-footer { display:flex; justify-content:flex-end; gap:8px; align-items:center; padding:12px 40px; border-top:1px solid #E0E0E0; flex-shrink:0; }
+
+    /* Fields */
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .field label { font-size:12px; font-weight:500; color:#757575; }
+    .field input, .field textarea { height:40px; border:1px solid #BDBDBD; border-radius:4px; padding:0 12px; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#fff; outline:none; transition:border-color .15s; }
+    .field input:focus { border-color:#2196F3; border-width:2px; }
+    .req { color:#DB4537; }
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .date-wrap { position:relative; display:flex; align-items:center; }
+    .date-wrap input { width:100%; padding-right:36px; }
+    .date-wrap .material-icons { position:absolute; right:10px; font-size:16px; color:#757575; pointer-events:none; }
+
+    /* Select */
+    .select-wrapper { display:block; min-width:0; position:relative; }
+    .select-control { position:relative; }
+    .select-input { width:100%; height:40px; padding:0 40px 0 12px; border:1px solid #BDBDBD; border-radius:4px; background:#fff; font-family:Roboto,sans-serif; font-size:14px; color:#212121; display:flex; align-items:center; cursor:pointer; position:relative; transition:border-color .15s; user-select:none; }
+    .select-input.open { border-color:#2196F3; border-width:2px; }
+    .select-icon { position:absolute; right:8px; top:50%; transform:translateY(-50%); pointer-events:none; color:#757575; transition:transform .2s; font-size:20px !important; }
+    .select-input.open .select-icon { transform:translateY(-50%) rotate(180deg); }
+    .select-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:8px 0; z-index:1200; display:none; }
+    .select-menu.open { display:block; }
+    .select-menu-item { min-height:36px; padding:8px 16px; display:flex; align-items:center; font-size:14px; color:#212121; cursor:pointer; user-select:none; }
+    .select-menu-item:hover { background:rgba(0,0,0,0.04); }
+    .select-menu-item.selected { background:rgba(33,150,243,0.08); }
+    .select-placeholder { color:#9E9E9E; }
+    .field-locked .select-input { background:#F5F5F5; color:#757575; cursor:default; pointer-events:none; }
+    .field-locked label { color:#9E9E9E; }
+
+    /* Toggle */
+    .toggle { width:32px; height:18px; background:#E0E0E0; border-radius:9px; position:relative; cursor:pointer; transition:background .2s; flex-shrink:0; }
+    .toggle.on { background:#2196F3; }
+    .toggle::after { content:''; position:absolute; width:14px; height:14px; background:#fff; border-radius:50%; top:2px; left:2px; transition:left .2s; box-shadow:0 1px 2px rgba(0,0,0,.25); }
+    .toggle.on::after { left:16px; }
+
+    /* Inline definition filter select (toolbar) */
+    .filter-select-wrap { position:relative; display:inline-block; }
+    .filter-select { height:28px; padding:0 28px 0 8px; border:1px solid #E0E0E0; border-radius:4px; background:#fff; font-family:Roboto,sans-serif; font-size:12px; color:#212121; cursor:pointer; appearance:none; outline:none; min-width:160px; }
+    .filter-select-icon { position:absolute; right:4px; top:50%; transform:translateY(-50%); font-size:16px !important; color:#757575; pointer-events:none; }
+
+    /* Footer */
+    .page-footer { height:32px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; flex-shrink:0; }
+    .page-footer span { font-size:11px; color:#BDBDBD; }
+    .page-footer div { display:flex; gap:16px; }
+    .page-footer a { font-size:11px; color:#BDBDBD; text-decoration:none; }
+    .page-footer a:hover { color:#757575; }
+
+    /* Tab panel visibility */
+    .tab-panel { flex:1; display:none; flex-direction:column; overflow:hidden; min-height:0; }
+    .tab-panel.active { display:flex; }
+  </style>
+</head>
+<body>
+
+<!-- ─── Top Bar ─── -->
+<div class="g-nav-top">
+  <div class="g-nav-brand">
+    <div class="g-nav-wordmark">
+      <svg width="101" height="26" viewBox="0 0 101 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="20" font-family="Roboto,sans-serif" font-size="20" font-weight="500" fill="white" letter-spacing="-0.3">trio</text>
+        <text x="54" y="14" font-family="Roboto,sans-serif" font-size="10" font-weight="400" fill="rgba(255,255,255,0.75)">VMS</text>
+      </svg>
+    </div>
+    <div class="logo-wip-badge">TRIO WIP</div>
+  </div>
+  <div class="g-nav-search">
+    <input type="text" placeholder="Search Trio" />
+    <div class="g-nav-search-div"></div>
+    <select class="g-nav-search-cat"><option>All</option></select>
+  </div>
+  <div class="g-nav-spacer"></div>
+  <div class="g-nav-user">
+    <div class="g-nav-avatar">JS</div>
+    <span class="g-nav-username">Jesse Szygiel</span>
+    <span class="material-icons g-nav-chevron">expand_more</span>
+  </div>
+</div>
+
+<!-- ─── Nav Bar ─── -->
+<div class="g-nav-bar">
+  <div class="g-nav-item">DASHBOARDS<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">NURSING/ALLIED<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">LOCUMS<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">PER DIEM<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">IRM<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">CLIENTS</div>
+  <div class="g-nav-item">AGENCIES</div>
+  <div class="g-nav-item">BILLING<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">REPORTS</div>
+  <div class="g-nav-item active">ADMINISTRATION<span class="material-icons">keyboard_arrow_down</span></div>
+</div>
+
+<!-- ─── Page Canvas ─── -->
+<div class="page-canvas">
+<div class="page-card">
+
+  <!-- Page Header -->
+  <div class="page-header-bar">
+    <span class="page-title">Fee Management</span>
+    <div id="headerActions">
+      <!-- swaps based on active inner tab -->
+    </div>
+  </div>
+
+  <!-- AP / AR Tabs -->
+  <div class="page-tabs">
+    <div class="ptab active" onclick="selectApAr('ap',this)">AP</div>
+    <div class="ptab" onclick="selectApAr('ar',this)">AR</div>
+  </div>
+
+  <!-- Inner Tabs -->
+  <div class="inner-tabs">
+    <div class="itab active" id="itab-library" onclick="selectInnerTab('library')">
+      <span class="material-icons">list</span>
+      Fee Library
+      <span class="itab-count" id="libCount">—</span>
+    </div>
+    <div class="itab" id="itab-configs" onclick="selectInnerTab('configs')">
+      <span class="material-icons">settings</span>
+      Active Configurations
+      <span class="itab-count" id="confCount">—</span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       TAB PANEL A: Fee Library
+  ════════════════════════════════════════ -->
+  <div class="tab-panel active" id="panel-library">
+
+    <div class="grid-toolbar">
+      <div class="toolbar-left">
+        <div class="toolbar-search">
+          <span class="material-icons">search</span>
+          <input type="text" placeholder="Search definitions…" id="libSearch" oninput="renderLibrary()" />
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <span class="gpagination-count" id="libRowCount">—</span>
+        <div class="gpagination-actions">
+          <button class="gpagination-btn"><span class="material-icons">filter_alt</span></button>
+          <button class="gpagination-btn"><span class="material-icons">file_download</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Name<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:130px;">Group<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:120px;">App Type<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:100px;">Required<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:80px;">Status<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Description</th>
+            <th style="width:110px;" class="right">Instances</th>
+            <th style="width:40px;"></th>
+          </tr>
+        </thead>
+        <tbody id="libBody"></tbody>
+      </table>
+    </div>
+  </div><!-- /panel-library -->
+
+  <!-- ════════════════════════════════════════
+       TAB PANEL B: Active Configurations
+  ════════════════════════════════════════ -->
+  <div class="tab-panel" id="panel-configs">
+
+    <div class="grid-toolbar">
+      <div class="toolbar-left">
+        <div class="gtabs">
+          <div class="gtab" onclick="setDateFilter('all',this)">All</div>
+          <div class="gtab-sep">|</div>
+          <div class="gtab" onclick="setDateFilter('past',this)">Past</div>
+          <div class="gtab-sep">|</div>
+          <div class="gtab active" onclick="setDateFilter('current',this)">Current</div>
+          <div class="gtab-sep">|</div>
+          <div class="gtab" onclick="setDateFilter('future',this)">Future</div>
+        </div>
+        <div id="defFilterWrap" style="margin-left:8px;"></div>
+      </div>
+      <div class="toolbar-right">
+        <div class="filter-select-wrap">
+          <select class="filter-select" id="defFilterSelect" onchange="applyDefFilter(this.value)">
+            <option value="">All Definitions</option>
+          </select>
+          <span class="material-icons filter-select-icon">arrow_drop_down</span>
+        </div>
+        <span class="gpagination-count" id="confRowCount">—</span>
+        <div class="gpagination-actions">
+          <button class="gpagination-btn"><span class="material-icons">filter_alt</span></button>
+          <button class="gpagination-btn"><span class="material-icons">file_download</span></button>
+          <button class="gpagination-btn"><span class="material-icons">refresh</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Fee Definition<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:90px;">Fee (%)<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:130px;">Segments<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Client<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Agency<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:140px;">Category<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:100px;">Start Date<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:100px;">End Date<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:90px;">Account<span class="material-icons sort-icon">unfold_more</span></th>
+            <th style="width:64px;"></th>
+          </tr>
+        </thead>
+        <tbody id="confBody"></tbody>
+      </table>
+    </div>
+  </div><!-- /panel-configs -->
+
+</div><!-- /.page-card -->
+</div><!-- /.page-canvas -->
+
+<!-- ─── Footer ─── -->
+<div class="page-footer">
+  <span>© 2017-2025 American Health Technology Group, LLC. Trio 23.15.0.0</span>
+  <div>
+    <a href="#">Terms of Use</a>
+    <a href="#">Privacy Policy</a>
+  </div>
+</div>
+
+<!-- ─── Add Instance Modal ─── -->
+<div class="modal-overlay" id="instModalOverlay" onclick="if(event.target===this)closeInstModal()">
+  <div class="modal-container" style="width:500px;">
+    <div class="modal-header">
+      <h2 id="instModalTitle">Add Configuration Instance</h2>
+      <button class="modal-close" onclick="closeInstModal()"><span class="material-icons">close</span></button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Fee Definition <span class="req">*</span></label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="mFeeDef-lbl" class="select-placeholder">— Select —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu" id="mFeeDef-menu"></div>
+          </div>
+        </div>
+        <input type="hidden" id="mFeeDef" value="">
+      </div>
+      <div class="field">
+        <label>Fee Value <span class="req">*</span></label>
+        <input type="text" id="mFeeValue" placeholder="e.g. 1.6% or $15.00" />
+      </div>
+      <div class="field">
+        <label>Segments <span class="req">*</span></label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="mSegments-lbl" class="select-placeholder">— Select —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item" onclick="selectD(this,'Non Clinical','mSegments')">Non Clinical</div>
+              <div class="select-menu-item" onclick="selectD(this,'Allied','mSegments')">Allied</div>
+              <div class="select-menu-item" onclick="selectD(this,'Nursing','mSegments')">Nursing</div>
+              <div class="select-menu-item" onclick="selectD(this,'Physician','mSegments')">Physician</div>
+              <div class="select-menu-item" onclick="selectD(this,'Per Diem','mSegments')">Per Diem</div>
+              <div class="select-menu-item" onclick="selectD(this,'Travel','mSegments')">Travel</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="mSegments" value="">
+      </div>
+      <div class="field">
+        <label>Client</label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="mClient-lbl" class="select-placeholder">— Any client —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item" onclick="selectD(this,'Atlas Healthcare','mClient')">Atlas Healthcare</div>
+              <div class="select-menu-item" onclick="selectD(this,'Valley Health Network','mClient')">Valley Health Network</div>
+              <div class="select-menu-item" onclick="selectD(this,'Sunrise Medical','mClient')">Sunrise Medical</div>
+              <div class="select-menu-item" onclick="selectD(this,'Apex Medical','mClient')">Apex Medical</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="mClient" value="">
+      </div>
+      <div class="field">
+        <label>Agency</label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="mAgency-lbl" class="select-placeholder">— Any agency —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item" onclick="selectD(this,'Metro Clinical Group','mAgency')">Metro Clinical Group</div>
+              <div class="select-menu-item" onclick="selectD(this,'MedPro Solutions','mAgency')">MedPro Solutions</div>
+              <div class="select-menu-item" onclick="selectD(this,'National Staffing Co.','mAgency')">National Staffing Co.</div>
+              <div class="select-menu-item" onclick="selectD(this,'Global Staffing','mAgency')">Global Staffing</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="mAgency" value="">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Start Date <span class="req">*</span></label>
+          <div class="date-wrap">
+            <input type="text" id="mStartDate" placeholder="MM/DD/YYYY" />
+            <span class="material-icons">calendar_today</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>End Date</label>
+          <div class="date-wrap">
+            <input type="text" id="mEndDate" placeholder="MM/DD/YYYY" />
+            <span class="material-icons">calendar_today</span>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Account Number</label>
+        <input type="text" id="mAccount" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-text" onclick="closeInstModal()">Cancel</button>
+      <button class="btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Add Fee Definition Modal ─── -->
+<div class="modal-overlay" id="feeDefModalOverlay" onclick="if(event.target===this)closeFeeDefModal()">
+  <div class="modal-container" style="width:540px;">
+    <div class="modal-header">
+      <h2>Add Fee Definition</h2>
+      <button class="modal-close" onclick="closeFeeDefModal()"><span class="material-icons">close</span></button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Name <span class="req">*</span></label>
+        <input type="text" id="fdName" placeholder="e.g. Agency Staffing Fee" />
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea id="fdDesc" rows="3" placeholder="Describe when and how this fee applies…" style="border:1px solid #BDBDBD;border-radius:4px;padding:8px 12px;font-family:Roboto,sans-serif;font-size:14px;color:#212121;background:#fff;outline:none;resize:vertical;line-height:1.5;"></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Fee Type <span class="req">*</span></label>
+          <div class="select-wrapper">
+            <div class="select-control">
+              <div class="select-input" onclick="toggleMenu(this)">
+                <span id="fdFeeType-lbl" class="select-placeholder">— Select —</span>
+                <span class="material-icons select-icon">arrow_drop_down</span>
+              </div>
+              <div class="select-menu">
+                <div class="select-menu-item" onclick="selectD(this,'Percentage','fdFeeType')">Percentage</div>
+                <div class="select-menu-item" onclick="selectD(this,'Flat Rate','fdFeeType')">Flat Rate</div>
+                <div class="select-menu-item" onclick="selectD(this,'Differential','fdFeeType')">Differential</div>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="fdFeeType" value="">
+        </div>
+        <div class="field">
+          <label>Application Type <span class="req">*</span></label>
+          <div class="select-wrapper">
+            <div class="select-control">
+              <div class="select-input" onclick="toggleMenu(this)">
+                <span id="fdAppType-lbl" class="select-placeholder">— Select —</span>
+                <span class="material-icons select-icon">arrow_drop_down</span>
+              </div>
+              <div class="select-menu">
+                <div class="select-menu-item" onclick="selectD(this,'Deductive','fdAppType')">Deductive</div>
+                <div class="select-menu-item" onclick="selectD(this,'Additive','fdAppType')">Additive</div>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="fdAppType" value="">
+        </div>
+      </div>
+      <div class="field">
+        <label>Group</label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="fdGroup-lbl" class="select-placeholder">— Ungrouped —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item" onclick="selectD(this,'Admin Fees','fdGroup')">Admin Fees</div>
+              <div class="select-menu-item" onclick="selectD(this,'Compliance','fdGroup')">Compliance</div>
+              <div class="select-menu-item" onclick="selectD(this,'Travel','fdGroup')">Travel</div>
+              <div class="select-menu-item" onclick="selectD(this,'Premium','fdGroup')">Premium</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="fdGroup" value="">
+      </div>
+      <div class="field">
+        <label>Required</label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="fdRequired-lbl">Required</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item selected" onclick="selectD(this,'Required','fdRequired')">Required</div>
+              <div class="select-menu-item" onclick="selectD(this,'Optional','fdRequired')">Optional</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="fdRequired" value="required">
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:4px 0;">
+        <div class="toggle on" id="fdActiveToggle" onclick="this.classList.toggle('on');document.getElementById('fdActiveLbl').textContent=this.classList.contains('on')?'Active':'Inactive'"></div>
+        <span style="font-size:14px;color:#212121;" id="fdActiveLbl">Active</span>
+        <span style="font-size:12px;color:#9E9E9E;margin-left:4px;">Fee Type and Application Type cannot be changed after creation.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-text" onclick="closeFeeDefModal()">Cancel</button>
+      <button class="btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── Data ─── */
+const fees = {
+  ap: [
+    { id:'factoring-fee',     name:'Factoring Fee',           group:'Admin Fees',  appType:'Deductive', required:true,  active:true,  desc:'Fee applied when an agency has engaged with a factoring company.' },
+    { id:'placement-fee',     name:'Placement Fee',           group:'Admin Fees',  appType:'Additive',  required:true,  active:true,  desc:'One-time fee charged per successful worker placement.' },
+    { id:'vendor-mgmt-fee',   name:'Vendor Management Fee',   group:'Admin Fees',  appType:'Deductive', required:true,  active:true,  desc:'Ongoing fee covering vendor oversight and credentialing coordination.' },
+    { id:'credentialing-fee', name:'Credentialing Fee',       group:'Compliance',  appType:'Deductive', required:true,  active:true,  desc:'Fee to cover third-party credentialing verification services.' },
+    { id:'background-check',  name:'Background Check Fee',    group:'Compliance',  appType:'Deductive', required:false, active:true,  desc:'Fee covering mandatory pre-placement background screening.' },
+    { id:'drug-screen-fee',   name:'Drug Screening Fee',      group:'Compliance',  appType:'Deductive', required:true,  active:true,  desc:'Fee for pre-placement and random drug screening requirements.' },
+    { id:'occ-health-fee',    name:'Occupational Health Fee', group:'Compliance',  appType:'Deductive', required:false, active:true,  desc:'Covers occupational health screenings including TB tests and titers.' },
+    { id:'travel-allowance',  name:'Travel Allowance',        group:'Travel',      appType:'Deductive', required:true,  active:true,  desc:'Per-trip reimbursement for workers traveling more than 50 miles.' },
+    { id:'housing-stipend',   name:'Housing Stipend',         group:'Travel',      appType:'Deductive', required:true,  active:false, desc:'Monthly housing stipend for travel workers on assignment.' },
+    { id:'mileage-reimb',     name:'Mileage Reimbursement',   group:'Travel',      appType:'Deductive', required:false, active:true,  desc:'Per-mile reimbursement for approved local travel during assignment.' },
+    { id:'holiday-diff',      name:'Holiday Differential',    group:'Premium',     appType:'Additive',  required:true,  active:true,  desc:'Premium rate applied to shifts worked on designated holidays.' },
+    { id:'on-call',           name:'On-Call Premium',         group:'Premium',     appType:'Additive',  required:true,  active:true,  desc:'Additional premium applied to workers assigned to on-call blocks.' },
+    { id:'weekend-diff',      name:'Weekend Differential',    group:'Premium',     appType:'Additive',  required:false, active:true,  desc:'Enhanced rate for shifts worked on Saturday or Sunday.' },
+  ],
+  ar: [
+    { id:'client-markup',     name:'Client Markup',           group:'Admin Fees',  appType:'Additive',  required:true,  active:true,  desc:'Standard markup applied to all client invoices on worker bill rate.' },
+    { id:'vms-admin-fee',     name:'VMS Admin Fee',           group:'Admin Fees',  appType:'Additive',  required:true,  active:true,  desc:'Administrative fee charged per placement to cover VMS platform costs.' },
+    { id:'msp-fee',           name:'MSP Service Fee',         group:'Admin Fees',  appType:'Additive',  required:true,  active:true,  desc:'Managed service provider fee billed to client for program oversight.' },
+    { id:'late-payment-fee',  name:'Late Payment Fee',        group:'Compliance',  appType:'Additive',  required:false, active:true,  desc:'Applied when client payment exceeds net-30 terms per the MSA.' },
+    { id:'markup-holiday',    name:'Holiday Bill Rate Markup',group:'Premium',     appType:'Additive',  required:true,  active:true,  desc:'Client-facing markup adjustment for holiday-worked shifts.' },
+    { id:'rebill-fee',        name:'Rebill Processing Fee',   group:'Ungrouped',   appType:'Additive',  required:false, active:true,  desc:'Fee applied when an invoice must be reissued due to client changes.' },
+  ],
+};
+
+const instances = {
+  'factoring-fee': [
+    { feeValue:'1.6%', segments:'Non Clinical', client:'Atlas Healthcare',      agency:'Valley Health Network', startDate:'10/09/2024', endDate:null,         account:'12345',      status:'current' },
+    { feeValue:'1.6%', segments:'Allied',       client:'Metro Clinical Group',  agency:'MedPro Solutions',      startDate:'07/14/2024', endDate:null,         account:'12345',      status:'current' },
+    { feeValue:'1.6%', segments:'Nursing',      client:'Sunrise Medical',       agency:'National Staffing Co',  startDate:'05/28/2024', endDate:null,         account:'12345',      status:'current' },
+    { feeValue:'1.6%', segments:'Per Diem',     client:'Apex Medical',          agency:'MedPro Solutions',      startDate:'06/08/2024', endDate:'05/20/2026', account:'12345',      status:'current' },
+    { feeValue:'1.6%', segments:'Allied',       client:'Valley Health Network', agency:'Metro Clinical Group',  startDate:'04/24/2024', endDate:'10/06/2026', account:'$25,039.41', status:'current' },
+    { feeValue:'1.4%', segments:'Nursing',      client:'',                      agency:'',                      startDate:'01/01/2025', endDate:'12/31/2025', account:'',           status:'past'    },
+    { feeValue:'1.8%', segments:'Travel',       client:'Pacific Health Partners',agency:'',                     startDate:'04/01/2026', endDate:'12/31/2026', account:'',           status:'future'  },
+  ],
+  'background-check': [
+    { feeValue:'$15.00', segments:'Allied',  client:'Atlas Healthcare', agency:'', startDate:'01/01/2025', endDate:'12/31/2025', account:'22345', status:'past'    },
+    { feeValue:'$20.00', segments:'Nursing', client:'',                 agency:'', startDate:'01/01/2026', endDate:null,         account:'22345', status:'current' },
+    { feeValue:'$22.00', segments:'Nursing', client:'',                 agency:'', startDate:'01/01/2027', endDate:null,         account:'22345', status:'future'  },
+  ],
+  'travel-allowance': [
+    { feeValue:'$0.67/mi', segments:'Travel', client:'', agency:'Metro Clinical Group', startDate:'03/01/2025', endDate:null,         account:'33456', status:'current' },
+    { feeValue:'$0.65/mi', segments:'Travel', client:'', agency:'',                     startDate:'01/01/2024', endDate:'02/28/2025', account:'33456', status:'past'    },
+  ],
+  'holiday-diff': [
+    { feeValue:'1.5x',  segments:'Nursing',      client:'', agency:'', startDate:'01/01/2026', endDate:null,         account:'', status:'current' },
+    { feeValue:'1.5x',  segments:'Allied',        client:'', agency:'', startDate:'01/01/2026', endDate:null,         account:'', status:'current' },
+    { feeValue:'1.25x', segments:'Non Clinical',  client:'', agency:'', startDate:'04/01/2026', endDate:null,         account:'', status:'future'  },
+  ],
+  'client-markup': [
+    { feeValue:'18%', segments:'Nursing',     client:'Atlas Healthcare',      agency:'', startDate:'01/01/2026', endDate:null, account:'44100', status:'current' },
+    { feeValue:'16%', segments:'Allied',      client:'Valley Health Network', agency:'', startDate:'01/01/2026', endDate:null, account:'44101', status:'current' },
+    { feeValue:'15%', segments:'Non Clinical',client:'Sunrise Medical',       agency:'', startDate:'01/01/2026', endDate:null, account:'44102', status:'current' },
+  ],
+  'vms-admin-fee': [
+    { feeValue:'3%', segments:'All', client:'', agency:'', startDate:'07/01/2025', endDate:null, account:'55200', status:'current' },
+  ],
+};
+
+/* ─── State ─── */
+let apAr = 'ap';
+let innerTab = 'library';
+let dateFilter = 'current';
+let definitionFilter = null; // feeId or null
+
+/* ─── Helpers ─── */
+function getCategory(r) {
+  if (r.client && r.agency)  return 'Client + Agency';
+  if (r.client && !r.agency) return 'Client-specific';
+  if (!r.client && r.agency) return 'Agency-specific';
+  return 'Global';
+}
+function categoryChipClass(cat) {
+  return { 'Global':'cell-chip-gray','Client-specific':'cell-chip-blue','Agency-specific':'cell-chip-gray','Client + Agency':'cell-chip-blue' }[cat] || 'cell-chip-gray';
+}
+function allInstances() {
+  const dash = '—';
+  const result = [];
+  fees[apAr].forEach(f => {
+    (instances[f.id] || []).forEach(r => result.push({ ...r, feeName: f.name, feeId: f.id }));
+  });
+  return result;
+}
+function instCount(feeId) {
+  return (instances[feeId] || []).length;
+}
+
+/* ─── Tab Switching ─── */
+function selectApAr(val, el) {
+  apAr = val;
+  definitionFilter = null;
+  document.querySelectorAll('.ptab').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function selectInnerTab(tab) {
+  innerTab = tab;
+  document.querySelectorAll('.itab').forEach(x => x.classList.remove('active'));
+  document.getElementById('itab-' + tab).classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  updateHeaderActions();
+  render();
+}
+
+function updateHeaderActions() {
+  const el = document.getElementById('headerActions');
+  if (innerTab === 'library') {
+    el.innerHTML = `<button class="btn-outline" onclick="openFeeDefModal()"><span class="material-icons">add</span>Add Fee Definition</button>`;
+  } else {
+    el.innerHTML = `<button class="btn-primary" onclick="openInstModal()"><span class="material-icons">add</span>Add Instance</button>`;
+  }
+}
+
+/* ─── Render Library ─── */
+function renderLibrary() {
+  const search = (document.getElementById('libSearch').value || '').toLowerCase();
+  const tbody = document.getElementById('libBody');
+  const currentFees = fees[apAr];
+  let html = '';
+  let count = 0;
+
+  currentFees.forEach(f => {
+    if (search && !f.name.toLowerCase().includes(search) && !f.group.toLowerCase().includes(search)) return;
+    count++;
+    const cnt = instCount(f.id);
+    html += `
+    <tr class="lib-row">
+      <td class="name-cell">${f.name}</td>
+      <td class="muted">${f.group}</td>
+      <td class="muted">${f.appType}</td>
+      <td class="muted">${f.required ? 'Required' : 'Optional'}</td>
+      <td class="${f.active ? 'status-active' : 'status-inactive'}">${f.active ? 'Active' : 'Inactive'}</td>
+      <td class="desc-cell">${f.desc}</td>
+      <td class="count-cell">
+        ${cnt > 0
+          ? `<button class="inst-link" onclick="viewInstances('${f.id}')">${cnt} instance${cnt !== 1 ? 's' : ''}<span class="material-icons">arrow_forward</span></button>`
+          : `<span class="inst-count-zero">None</span>`
+        }
+      </td>
+      <td>
+        <div class="row-acts">
+          <button class="act-btn" title="Edit"><span class="material-icons">edit</span></button>
+        </div>
+      </td>
+    </tr>`;
+  });
+
+  if (!count) {
+    html = `<tr><td colspan="8"><div class="empty-state"><span class="material-icons">search_off</span><span class="empty-state-title">No definitions match your search</span></div></td></tr>`;
+  }
+
+  tbody.innerHTML = html;
+  document.getElementById('libRowCount').textContent = count + ' definitions';
+  document.getElementById('libCount').textContent = fees[apAr].length;
+}
+
+/* ─── Render Configurations ─── */
+function renderConfigs() {
+  const tbody = document.getElementById('confBody');
+  const dash = `<span style="color:#BDBDBD">—</span>`;
+  let rows = allInstances();
+
+  // Apply definition filter
+  if (definitionFilter) {
+    rows = rows.filter(r => r.feeId === definitionFilter);
+  }
+  // Apply date filter
+  if (dateFilter !== 'all') {
+    rows = rows.filter(r => r.status === dateFilter);
+  }
+
+  let html = '';
+  rows.forEach(r => {
+    const cat = getCategory(r);
+    html += `
+    <tr class="conf-row">
+      <td><button class="fee-def-link" onclick="viewDefinition('${r.feeId}')">${r.feeName}</button></td>
+      <td class="mono">${r.feeValue}</td>
+      <td>${r.segments}</td>
+      <td class="muted">${r.client || dash}</td>
+      <td class="muted">${r.agency || dash}</td>
+      <td><span class="cell-chip ${categoryChipClass(cat)}">${cat}</span></td>
+      <td class="muted">${r.startDate}</td>
+      <td class="muted">${r.endDate || '<span style="color:#9E9E9E">Open</span>'}</td>
+      <td class="muted">${r.account || dash}</td>
+      <td>
+        <div class="row-acts">
+          <button class="act-btn" title="Edit" ${r.status === 'past' ? 'disabled' : ''}><span class="material-icons">edit</span></button>
+          <button class="act-btn danger" title="Delete" ${r.status !== 'future' ? 'disabled' : ''}><span class="material-icons">delete_outline</span></button>
+        </div>
+      </td>
+    </tr>`;
+  });
+
+  if (!rows.length) {
+    html = `<tr><td colspan="10"><div class="empty-state"><span class="material-icons">inbox</span><span class="empty-state-title">No instances found</span><span class="empty-state-sub">Try changing the date filter or clearing the definition filter</span></div></td></tr>`;
+  }
+
+  tbody.innerHTML = html;
+  document.getElementById('confRowCount').textContent = rows.length + ' rows';
+  document.getElementById('confCount').textContent = allInstances().length;
+
+  // Update definition filter select
+  const sel = document.getElementById('defFilterSelect');
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="">All Definitions</option>';
+  fees[apAr].forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f.id;
+    opt.textContent = f.name;
+    if (f.id === definitionFilter) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  if (!definitionFilter) sel.value = '';
+
+  // Active filter chip
+  const wrap = document.getElementById('defFilterWrap');
+  if (definitionFilter) {
+    const defName = (fees[apAr].find(f => f.id === definitionFilter) || {}).name || '';
+    wrap.innerHTML = `<span class="def-filter-chip">${defName}<button onclick="clearDefFilter()" title="Clear filter"><span class="material-icons">close</span></button></span>`;
+  } else {
+    wrap.innerHTML = '';
+  }
+}
+
+/* ─── Cross-tab navigation ─── */
+function viewInstances(feeId) {
+  definitionFilter = feeId;
+  selectInnerTab('configs');
+}
+
+function viewDefinition(feeId) {
+  selectInnerTab('library');
+  // Could highlight the row — for prototype, just switching tab is enough
+}
+
+function applyDefFilter(val) {
+  definitionFilter = val || null;
+  renderConfigs();
+}
+
+function clearDefFilter() {
+  definitionFilter = null;
+  document.getElementById('defFilterSelect').value = '';
+  renderConfigs();
+}
+
+/* ─── Date filter ─── */
+function setDateFilter(f, el) {
+  dateFilter = f;
+  document.querySelectorAll('.gtab').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  renderConfigs();
+}
+
+/* ─── Master render ─── */
+function render() {
+  renderLibrary();
+  renderConfigs();
+}
+
+/* ─── Custom Select helpers ─── */
+function toggleMenu(el) {
+  const menu = el.nextElementSibling;
+  const wasOpen = menu.classList.contains('open');
+  document.querySelectorAll('.select-menu.open').forEach(m => {
+    m.classList.remove('open');
+    m.previousElementSibling.classList.remove('open');
+  });
+  if (!wasOpen) { menu.classList.add('open'); el.classList.add('open'); }
+}
+function selectD(item, val, hiddenId) {
+  const menu = item.closest('.select-menu');
+  const input = item.closest('.select-control').parentElement.querySelector('input[type=hidden]');
+  const lbl = item.closest('.select-control').querySelector('[id$="-lbl"]');
+  menu.querySelectorAll('.select-menu-item').forEach(i => i.classList.remove('selected'));
+  item.classList.add('selected');
+  if (input) input.value = val;
+  if (lbl) { lbl.textContent = val; lbl.classList.remove('select-placeholder'); }
+  menu.classList.remove('open');
+  menu.previousElementSibling.classList.remove('open');
+}
+function resetSelect(lbl, placeholder) {
+  const lblEl = document.getElementById(lbl + '-lbl');
+  if (lblEl) { lblEl.textContent = placeholder; lblEl.classList.add('select-placeholder'); }
+  const hidden = document.getElementById(lbl);
+  if (hidden) hidden.value = '';
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.select-control')) {
+    document.querySelectorAll('.select-menu.open').forEach(m => {
+      m.classList.remove('open');
+      m.previousElementSibling.classList.remove('open');
+    });
+  }
+});
+
+/* ─── Instance Modal ─── */
+function openInstModal(presetFeeId) {
+  // Populate fee definition dropdown from current AP/AR
+  const menu = document.getElementById('mFeeDef-menu');
+  menu.innerHTML = fees[apAr].map(f =>
+    `<div class="select-menu-item${f.id === presetFeeId ? ' selected' : ''}" onclick="selectD(this,'${f.name}','mFeeDef')">${f.name}</div>`
+  ).join('');
+  if (presetFeeId) {
+    const f = fees[apAr].find(x => x.id === presetFeeId);
+    if (f) {
+      document.getElementById('mFeeDef').value = presetFeeId;
+      const lbl = document.getElementById('mFeeDef-lbl');
+      lbl.textContent = f.name;
+      lbl.classList.remove('select-placeholder');
+    }
+  } else {
+    resetSelect('mFeeDef', '— Select —');
+  }
+  document.getElementById('mFeeValue').value = '';
+  resetSelect('mSegments', '— Select —');
+  resetSelect('mClient', '— Any client —');
+  resetSelect('mAgency', '— Any agency —');
+  document.getElementById('mStartDate').value = '';
+  document.getElementById('mEndDate').value = '';
+  document.getElementById('mAccount').value = '';
+  document.getElementById('instModalOverlay').classList.add('active');
+}
+function closeInstModal() {
+  document.getElementById('instModalOverlay').classList.remove('active');
+}
+
+/* ─── Fee Definition Modal ─── */
+function openFeeDefModal() {
+  document.getElementById('feeDefModalOverlay').classList.add('active');
+}
+function closeFeeDefModal() {
+  document.getElementById('feeDefModalOverlay').classList.remove('active');
+}
+
+/* ─── Init ─── */
+updateHeaderActions();
+render();
+</script>
+</body>
+</html>

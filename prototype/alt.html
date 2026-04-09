@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fee Management — TRIO WFS (Alt)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="../../ahtg-design-system/design-system-shell.css" />
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+
+  <style>
+    *, *::before, *::after { box-sizing:border-box; }
+    body { margin:0; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#F5F5F5; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+
+    /* ─── Top Bar ─── */
+    .g-nav-top { background:#607D8B; height:48px; display:flex; align-items:center; padding:0 24px; gap:28px; flex-shrink:0; }
+    .g-nav-brand { display:flex; align-items:flex-start; flex-shrink:0; }
+    .g-nav-wordmark { display:flex; align-items:center; gap:4px; height:48px; }
+    .logo-wip-badge { background:#DB4537; color:#fff; font-size:20px; font-weight:500; font-family:Roboto,sans-serif; line-height:24px; padding:2px 10px; border-radius:0 0 4px 4px; align-self:flex-start; flex-shrink:0; }
+    .g-nav-search { display:flex; align-items:center; border:1px solid rgba(255,255,255,0.3); border-radius:4px; height:32px; overflow:hidden; flex-shrink:0; }
+    .g-nav-search input { background:rgba(255,255,255,0.12); border:none; outline:none; color:#fff; font-size:13px; font-family:Roboto,sans-serif; padding:0 10px; height:100%; width:185px; }
+    .g-nav-search input::placeholder { color:rgba(255,255,255,0.5); }
+    .g-nav-search-div { background:rgba(255,255,255,0.25); width:1px; height:100%; flex-shrink:0; }
+    .g-nav-search-cat { background:rgba(255,255,255,0.1); border:none; outline:none; color:rgba(255,255,255,0.85); font-size:12px; font-family:Roboto,sans-serif; padding:0 8px; height:100%; cursor:pointer; flex-shrink:0; }
+    .g-nav-spacer { flex:1; }
+    .g-nav-user { display:flex; align-items:center; gap:6px; flex-shrink:0; cursor:pointer; }
+    .g-nav-avatar { width:32px; height:34px; border-radius:4px; background:#AB47BC; border:2px solid #fff; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:400; flex-shrink:0; }
+    .g-nav-username { color:#fff; font-size:14px; font-weight:500; white-space:nowrap; }
+    .g-nav-chevron { color:#fff; font-size:20px; }
+
+    /* ─── Nav Bar ─── */
+    .g-nav-bar { background:#fff; border-bottom:1px solid #E0E0E0; height:50px; padding:0 16px; display:flex; align-items:stretch; flex-shrink:0; }
+    .g-nav-item { display:flex; align-items:center; gap:3px; padding:0 16px; font-size:11px; font-weight:500; color:#212121; cursor:pointer; white-space:nowrap; user-select:none; position:relative; flex-shrink:0; }
+    .g-nav-item:hover { background:rgba(0,0,0,0.04); }
+    .g-nav-item.active { background:#F5F5F5; }
+    .g-nav-item.active::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:#212121; }
+    .g-nav-item .material-icons { font-size:16px; }
+
+    /* ─── Page Canvas + Card ─── */
+    .page-canvas { flex:1; background:#F5F5F5; padding:16px; overflow:hidden; display:flex; flex-direction:column; }
+    .page-card { flex:1; background:#fff; border-radius:4px; border:1px solid #E0E0E0; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
+
+    /* ─── Page Header ─── */
+    .page-header-bar { background:#fff; border-bottom:1px solid #E0E0E0; padding:0 24px; height:52px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .page-title { font-size:16px; font-weight:500; color:#212121; }
+
+    /* ─── AP / AR Tabs ─── */
+    .page-tabs { background:#F5F5F5; border-bottom:1px solid #E0E0E0; padding:0 24px; display:flex; align-items:flex-end; flex-shrink:0; }
+    .ptab { position:relative; height:36px; display:inline-flex; align-items:center; padding:0 4px; margin-right:16px; font-size:14px; font-weight:400; color:#757575; cursor:pointer; border-bottom:2px solid transparent; user-select:none; }
+    .ptab.active { color:#2196F3; font-weight:500; border-bottom-color:#2196F3; }
+    .ptab:hover:not(.active) { color:#212121; }
+
+    /* ─── Grid Toolbar ─── */
+    .grid-toolbar { background:#F5F5F5; display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:40px; border-bottom:1px solid #E0E0E0; flex-shrink:0; }
+    .gtabs { display:flex; align-items:center; gap:0; }
+    .gtab { font-size:13px; color:#757575; cursor:pointer; padding:0 2px; user-select:none; }
+    .gtab.active { color:#2196F3; font-weight:500; border-bottom:2px solid #2196F3; }
+    .gtab:hover:not(.active) { color:#212121; }
+    .gtab-sep { color:#BDBDBD; padding:0 6px; font-size:12px; }
+    .gpagination { display:flex; align-items:center; gap:8px; }
+    .gpagination-count { font-size:12px; color:#757575; }
+    .gpagination-actions { display:flex; gap:2px; }
+    .gpagination-btn { width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; border-radius:4px; cursor:pointer; color:#616161; }
+    .gpagination-btn:hover { background:rgba(0,0,0,0.06); }
+    .gpagination-btn .material-icons { font-size:16px; }
+
+    /* ─── Hierarchical Grid ─── */
+    .grid-scroll { flex:1; overflow:auto; }
+
+    table { width:100%; border-collapse:collapse; }
+    thead th { position:sticky; top:0; background:#fff; border-bottom:2px solid #E0E0E0; padding:0 12px; height:40px; font-size:12px; font-weight:500; color:#757575; text-align:left; white-space:nowrap; z-index:2; }
+    thead th .sort-icon { font-size:14px; vertical-align:middle; color:#BDBDBD; margin-left:2px; }
+
+    /* ─── Outer definition grid rows ─── */
+    .group-row { border-bottom:1px solid #E0E0E0; cursor:pointer; user-select:none; }
+    .group-row.stripe-odd  { background:#F5F5F5; }
+    .group-row.stripe-even { background:#EBEBEB; }
+    .group-row:hover { background:#E3EDF8 !important; }
+    .group-row td { height:48px; padding:0 12px; vertical-align:middle; white-space:nowrap; }
+    .group-row td:first-child { padding-left:12px; width:44px; }
+    .group-chevron { font-size:18px; color:#757575; transition:transform .2s; display:block; transform:rotate(-90deg); }
+    .group-chevron.open { transform:rotate(0deg); }
+    .group-name { font-size:13px; font-weight:500; color:#212121; }
+    .group-cell { font-size:13px; color:#757575; }
+    .group-desc { font-size:12px; color:#9E9E9E; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:300px; display:block; }
+    .group-count { font-size:12px; color:#9E9E9E; white-space:nowrap; text-align:right; }
+    .btn-text-sm { background:transparent; border:none; color:#2196F3; font-family:Roboto,sans-serif; font-size:13px; font-weight:500; cursor:pointer; padding:0; white-space:nowrap; }
+    .btn-text-sm:hover { text-decoration:underline; }
+
+    /* ─── Detail / expanded container ─── */
+    .detail-row > td { padding:0 !important; background:#F5F5F5; border-bottom:1px solid #E0E0E0; }
+    .nested-container { margin:12px 16px 12px 56px; background:#FFFFFF; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden; }
+    .nested-toolbar { display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:36px; border-bottom:1px solid #E0E0E0; background:#FAFAFA; }
+    .nested-toolbar-left { font-size:12px; font-weight:500; color:#757575; }
+    .nested-toolbar-left span { color:#9E9E9E; font-weight:400; margin-left:4px; }
+
+    /* ─── Nested instance table ─── */
+    .nested-table { width:100%; border-collapse:collapse; }
+    .nested-table thead th { background:#FAFAFA; border-bottom:1px solid #E0E0E0; padding:0 12px; height:36px; font-size:11px; font-weight:500; color:#9E9E9E; text-align:left; white-space:nowrap; letter-spacing:0.3px; text-transform:uppercase; }
+    .nested-table thead th .sort-icon { font-size:13px; vertical-align:middle; color:#BDBDBD; margin-left:2px; }
+
+    /* Instance rows */
+    .inst-row { border-bottom:1px solid rgba(0,0,0,0.04); }
+    .inst-row:last-child { border-bottom:none; }
+    .inst-row:nth-child(even) { background:#FAFAFA; }
+    .inst-row:hover { background:#F0F7FF; }
+    .inst-row td { padding:0 12px; height:40px; font-size:13px; color:#212121; white-space:nowrap; }
+    .inst-row td.muted { color:#757575; }
+    .inst-row td.mono { font-family:'Roboto Mono',monospace; font-size:13px; }
+
+    /* Category chips */
+    .cell-chip { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:999px; font-size:11px; font-weight:500; white-space:nowrap; }
+    .cell-chip-gray { background:#EEEEEE; color:#616161; }
+    .cell-chip-blue { background:rgba(33,150,243,0.1); color:#1565C0; }
+
+    /* Action buttons */
+    .row-acts { display:flex; gap:2px; }
+    .act-btn { width:24px; height:24px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; cursor:pointer; border-radius:2px; color:#616161; }
+    .act-btn:hover { background:rgba(0,0,0,0.06); }
+    .act-btn .material-icons { font-size:16px; }
+    .act-btn.danger { color:#DB4537; }
+    .act-btn:disabled { color:#BDBDBD; cursor:default; pointer-events:none; }
+
+    /* Add instance inline button */
+    .btn-add-inst-sm { display:inline-flex; align-items:center; gap:3px; height:28px; padding:0 10px; background:transparent; border:1px solid #2196F3; border-radius:4px; font-family:Roboto,sans-serif; font-size:12px; color:#2196F3; cursor:pointer; font-weight:500; white-space:nowrap; }
+    .btn-add-inst-sm:hover { background:rgba(33,150,243,0.08); }
+    .btn-add-inst-sm .material-icons { font-size:14px; }
+
+    /* Buttons */
+    .btn-outline { display:inline-flex; align-items:center; gap:4px; height:32px; padding:0 16px; background:transparent; border:1px solid #2196F3; border-radius:4px; font-family:Roboto,sans-serif; font-size:14px; color:#2196F3; cursor:pointer; font-weight:500; }
+    .btn-outline:hover { background:rgba(33,150,243,0.08); }
+    .btn-outline .material-icons { font-size:16px; }
+    .btn-text { background:transparent; border:none; color:#2196F3; font-family:Roboto,sans-serif; font-size:14px; font-weight:500; cursor:pointer; padding:0 12px; height:32px; border-radius:4px; }
+    .btn-text:hover { background:rgba(33,150,243,0.08); }
+    .btn-primary { background:#2196F3; color:#fff; border:none; border-radius:4px; font-family:Roboto,sans-serif; font-size:14px; font-weight:500; padding:0 16px; height:32px; cursor:pointer; }
+    .btn-primary:hover { background:#1E88E5; }
+
+    /* Empty group state */
+    .empty-group-row td { padding:16px 44px; font-size:13px; color:#9E9E9E; font-style:italic; }
+
+    /* ─── Modals ─── */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:1000; }
+    .modal-overlay.active { display:flex; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .modal-container { background:#fff; border-radius:4px; box-shadow:0 5px 40px rgba(0,0,0,0.18); max-height:90vh; overflow:hidden; display:flex; flex-direction:column; animation:slideUp 200ms ease-out; }
+    .modal-header { padding:24px 40px; background:#2196F3; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+    .modal-header h2 { font-size:20px; font-weight:500; color:#fff; margin:0; }
+    .modal-close { background:transparent; border:none; color:#fff; cursor:pointer; padding:0; display:flex; align-items:center; }
+    .modal-close .material-icons { font-size:22px; }
+    .modal-body { padding:24px 40px; display:flex; flex-direction:column; gap:16px; overflow-y:auto; }
+    .modal-footer { display:flex; justify-content:flex-end; gap:8px; align-items:center; padding:12px 40px; border-top:1px solid #E0E0E0; flex-shrink:0; }
+
+    /* Fields */
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .field label { font-size:12px; font-weight:500; color:#757575; }
+    .field input, .field textarea { height:40px; border:1px solid #BDBDBD; border-radius:4px; padding:0 12px; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#fff; outline:none; transition:border-color .15s; }
+    .field input:focus { border-color:#2196F3; border-width:2px; }
+    .req { color:#DB4537; }
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .date-wrap { position:relative; display:flex; align-items:center; }
+    .date-wrap input { width:100%; padding-right:36px; }
+    .date-wrap .material-icons { position:absolute; right:10px; font-size:16px; color:#757575; pointer-events:none; }
+
+    /* Select */
+    .select-wrapper { display:block; min-width:0; position:relative; }
+    .select-control { position:relative; }
+    .select-input { width:100%; height:40px; padding:0 40px 0 12px; border:1px solid #BDBDBD; border-radius:4px; background:#fff; font-family:Roboto,sans-serif; font-size:14px; color:#212121; display:flex; align-items:center; cursor:pointer; position:relative; transition:border-color .15s; user-select:none; }
+    .select-input.open { border-color:#2196F3; border-width:2px; }
+    .select-icon { position:absolute; right:8px; top:50%; transform:translateY(-50%); pointer-events:none; color:#757575; transition:transform .2s; font-size:20px !important; }
+    .select-input.open .select-icon { transform:translateY(-50%) rotate(180deg); }
+    .select-menu { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:8px 0; z-index:1200; display:none; }
+    .select-menu.open { display:block; }
+    .select-menu-item { min-height:36px; padding:8px 16px; display:flex; align-items:center; font-size:14px; color:#212121; cursor:pointer; user-select:none; }
+    .select-menu-item:hover { background:rgba(0,0,0,0.04); }
+    .select-menu-item.selected { background:rgba(33,150,243,0.08); }
+    .select-placeholder { color:#9E9E9E; }
+
+    /* Field lock */
+    .field-locked input { background:#F5F5F5; color:#757575; cursor:default; pointer-events:none; }
+    .field-locked .select-input { background:#F5F5F5; color:#757575; cursor:default; pointer-events:none; }
+    .field-locked .select-icon { color:#BDBDBD; }
+    .field-locked label { color:#9E9E9E; }
+
+    /* Toggle */
+    .toggle { width:32px; height:18px; background:#E0E0E0; border-radius:9px; position:relative; cursor:pointer; transition:background .2s; flex-shrink:0; }
+    .toggle.on { background:#2196F3; }
+    .toggle::after { content:''; position:absolute; width:14px; height:14px; background:#fff; border-radius:50%; top:2px; left:2px; transition:left .2s; box-shadow:0 1px 2px rgba(0,0,0,.25); }
+    .toggle.on::after { left:16px; }
+
+    /* Footer */
+    .page-footer { height:32px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; flex-shrink:0; }
+    .page-footer span { font-size:11px; color:#BDBDBD; }
+    .page-footer div { display:flex; gap:16px; }
+    .page-footer a { font-size:11px; color:#BDBDBD; text-decoration:none; }
+    .page-footer a:hover { color:#757575; }
+  </style>
+</head>
+<body>
+
+<!-- ─── Top Bar ─── -->
+<div class="g-nav-top">
+  <div class="g-nav-brand">
+    <div class="g-nav-wordmark">
+      <svg width="101" height="26" viewBox="0 0 101 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="20" font-family="Roboto,sans-serif" font-size="20" font-weight="500" fill="white" letter-spacing="-0.3">trio</text>
+        <text x="54" y="14" font-family="Roboto,sans-serif" font-size="10" font-weight="400" fill="rgba(255,255,255,0.75)">VMS</text>
+      </svg>
+    </div>
+    <div class="logo-wip-badge">TRIO WIP</div>
+  </div>
+  <div class="g-nav-search">
+    <input type="text" placeholder="Search Trio" />
+    <div class="g-nav-search-div"></div>
+    <select class="g-nav-search-cat"><option>All</option></select>
+  </div>
+  <div class="g-nav-spacer"></div>
+  <div class="g-nav-user">
+    <div class="g-nav-avatar">JS</div>
+    <span class="g-nav-username">Jesse Szygiel</span>
+    <span class="material-icons g-nav-chevron">expand_more</span>
+  </div>
+</div>
+
+<!-- ─── Nav Bar ─── -->
+<div class="g-nav-bar">
+  <div class="g-nav-item">DASHBOARDS<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">NURSING/ALLIED<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">LOCUMS<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">PER DIEM<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">IRM<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">CLIENTS</div>
+  <div class="g-nav-item">AGENCIES</div>
+  <div class="g-nav-item">BILLING<span class="material-icons">keyboard_arrow_down</span></div>
+  <div class="g-nav-item">REPORTS</div>
+  <div class="g-nav-item active">ADMINISTRATION<span class="material-icons">keyboard_arrow_down</span></div>
+</div>
+
+<!-- ─── Page Canvas ─── -->
+<div class="page-canvas">
+<div class="page-card">
+
+  <!-- Page Header -->
+  <div class="page-header-bar">
+    <span class="page-title">Fee Management</span>
+    <button class="btn-outline" onclick="openFeeDefModal()">
+      <span class="material-icons">add</span>Add Fee Definition
+    </button>
+  </div>
+
+  <!-- AP / AR Tabs -->
+  <div class="page-tabs">
+    <div class="ptab active" onclick="selectTab('ap',this)">AP</div>
+    <div class="ptab" onclick="selectTab('ar',this)">AR</div>
+  </div>
+
+  <!-- Grid Toolbar -->
+  <div class="grid-toolbar">
+    <div class="gtabs">
+      <div class="gtab" onclick="setFilter('all',this)">All</div>
+      <div class="gtab-sep">|</div>
+      <div class="gtab" onclick="setFilter('past',this)">Past</div>
+      <div class="gtab-sep">|</div>
+      <div class="gtab active" onclick="setFilter('current',this)">Current</div>
+      <div class="gtab-sep">|</div>
+      <div class="gtab" onclick="setFilter('future',this)">Future</div>
+    </div>
+    <div class="gpagination">
+      <span class="gpagination-count" id="rowCount">—</span>
+      <div class="gpagination-actions">
+        <button class="gpagination-btn"><span class="material-icons">filter_alt</span></button>
+        <button class="gpagination-btn"><span class="material-icons">file_download</span></button>
+        <button class="gpagination-btn"><span class="material-icons">refresh</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hierarchical Grid -->
+  <div class="grid-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:44px;"></th>
+          <th>Name<span class="material-icons sort-icon">unfold_more</span></th>
+          <th style="width:130px;">Group<span class="material-icons sort-icon">unfold_more</span></th>
+          <th style="width:120px;">App Type<span class="material-icons sort-icon">unfold_more</span></th>
+          <th style="width:100px;">Required<span class="material-icons sort-icon">unfold_more</span></th>
+          <th style="width:80px;">Status<span class="material-icons sort-icon">unfold_more</span></th>
+          <th>Description</th>
+          <th style="width:80px; text-align:right;">Instances</th>
+        </tr>
+      </thead>
+      <tbody id="gridBody"></tbody>
+    </table>
+  </div>
+
+</div><!-- /.page-card -->
+</div><!-- /.page-canvas -->
+
+<!-- ─── Footer ─── -->
+<div class="page-footer">
+  <span>© 2017-2025 American Health Technology Group, LLC. Trio 23.15.0.0</span>
+  <div>
+    <a href="#">Terms of Use</a>
+    <a href="#">Privacy Policy</a>
+  </div>
+</div>
+
+<!-- ─── Add Instance Modal ─── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeOutside(event)">
+  <div class="modal-container" style="width:500px;">
+    <div class="modal-header">
+      <h2 id="modalTitle">Add Configuration Instance</h2>
+      <button class="modal-close" onclick="closeModal()"><span class="material-icons">close</span></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="field" id="mFeeValue-field">
+        <label>Fee Value Percentage <span class="req">*</span></label>
+        <input type="text" id="mFeeValue" />
+      </div>
+
+      <div class="field" id="mSegments-field">
+        <label>Segments <span class="req">*</span></label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="mSegments-lbl" class="select-placeholder">— Select —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item" onclick="selectD(this,'Non Clinical','mSegments')">Non Clinical</div>
+              <div class="select-menu-item" onclick="selectD(this,'Allied','mSegments')">Allied</div>
+              <div class="select-menu-item" onclick="selectD(this,'Nursing','mSegments')">Nursing</div>
+              <div class="select-menu-item" onclick="selectD(this,'Physician','mSegments')">Physician</div>
+              <div class="select-menu-item" onclick="selectD(this,'Per Diem','mSegments')">Per Diem</div>
+              <div class="select-menu-item" onclick="selectD(this,'Travel','mSegments')">Travel</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="mSegments" value="">
+      </div>
+
+      <div class="field" id="mClient-field">
+        <label>Client</label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="mClient-lbl" class="select-placeholder">— Any client —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item" onclick="selectD(this,'Atlas Healthcare','mClient')">Atlas Healthcare</div>
+              <div class="select-menu-item" onclick="selectD(this,'Valley Health Network','mClient')">Valley Health Network</div>
+              <div class="select-menu-item" onclick="selectD(this,'Sunrise Medical','mClient')">Sunrise Medical</div>
+              <div class="select-menu-item" onclick="selectD(this,'Apex Medical','mClient')">Apex Medical</div>
+              <div class="select-menu-item" onclick="selectD(this,'Coastal Providers','mClient')">Coastal Providers</div>
+              <div class="select-menu-item" onclick="selectD(this,'Pacific Health Partners','mClient')">Pacific Health Partners</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="mClient" value="">
+      </div>
+
+      <div class="field" id="mAgency-field">
+        <label>Agency</label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="mAgency-lbl" class="select-placeholder">— Any agency —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item" onclick="selectD(this,'Metro Clinical Group','mAgency')">Metro Clinical Group</div>
+              <div class="select-menu-item" onclick="selectD(this,'MedPro Solutions','mAgency')">MedPro Solutions</div>
+              <div class="select-menu-item" onclick="selectD(this,'National Staffing Co.','mAgency')">National Staffing Co.</div>
+              <div class="select-menu-item" onclick="selectD(this,'Global Staffing','mAgency')">Global Staffing</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="mAgency" value="">
+      </div>
+
+      <div class="field-row">
+        <div class="field" id="mStartDate-field">
+          <label>Start Date <span class="req">*</span></label>
+          <div class="date-wrap">
+            <input type="text" id="mStartDate" placeholder="MM/DD/YYYY" />
+            <span class="material-icons">calendar_today</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>End Date</label>
+          <div class="date-wrap">
+            <input type="text" id="mEndDate" placeholder="MM/DD/YYYY" />
+            <span class="material-icons">calendar_today</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Account Number</label>
+        <input type="text" id="mAccount" />
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-text" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Add Fee Definition Modal ─── -->
+<div class="modal-overlay" id="feeDefModalOverlay" onclick="closeFeeDefOutside(event)">
+  <div class="modal-container" style="width:540px;">
+    <div class="modal-header">
+      <h2>Add Fee Definition</h2>
+      <button class="modal-close" onclick="closeFeeDefModal()"><span class="material-icons">close</span></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="field">
+        <label>Name <span class="req">*</span></label>
+        <input type="text" id="fdName" placeholder="e.g. Agency Staffing Fee" />
+      </div>
+
+      <div class="field">
+        <label>Description</label>
+        <textarea id="fdDesc" rows="3" placeholder="Describe when and how this fee applies…" style="border:1px solid #BDBDBD;border-radius:4px;padding:8px 12px;font-family:Roboto,sans-serif;font-size:14px;color:#212121;background:#fff;outline:none;resize:vertical;line-height:1.5;height:auto;"></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Fee Type <span class="req">*</span></label>
+          <div class="select-wrapper">
+            <div class="select-control">
+              <div class="select-input" onclick="toggleMenu(this)">
+                <span id="fdFeeType-lbl" class="select-placeholder">— Select —</span>
+                <span class="material-icons select-icon">arrow_drop_down</span>
+              </div>
+              <div class="select-menu">
+                <div class="select-menu-item" onclick="selectD(this,'Percentage','fdFeeType')">Percentage</div>
+                <div class="select-menu-item" onclick="selectD(this,'Flat Rate','fdFeeType')">Flat Rate</div>
+                <div class="select-menu-item" onclick="selectD(this,'Differential','fdFeeType')">Differential</div>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="fdFeeType" value="">
+        </div>
+        <div class="field">
+          <label>Application Type <span class="req">*</span></label>
+          <div class="select-wrapper">
+            <div class="select-control">
+              <div class="select-input" onclick="toggleMenu(this)">
+                <span id="fdAppType-lbl" class="select-placeholder">— Select —</span>
+                <span class="material-icons select-icon">arrow_drop_down</span>
+              </div>
+              <div class="select-menu">
+                <div class="select-menu-item" onclick="selectD(this,'Deductive','fdAppType')">Deductive</div>
+                <div class="select-menu-item" onclick="selectD(this,'Additive','fdAppType')">Additive</div>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="fdAppType" value="">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Group</label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="fdGroup-lbl" class="select-placeholder">— Ungrouped —</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item" onclick="selectD(this,'Admin Fees','fdGroup')">Admin Fees</div>
+              <div class="select-menu-item" onclick="selectD(this,'Compliance','fdGroup')">Compliance</div>
+              <div class="select-menu-item" onclick="selectD(this,'Travel','fdGroup')">Travel</div>
+              <div class="select-menu-item" onclick="selectD(this,'Premium','fdGroup')">Premium</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="fdGroup" value="">
+      </div>
+
+      <div class="field">
+        <label>Required</label>
+        <div class="select-wrapper">
+          <div class="select-control">
+            <div class="select-input" onclick="toggleMenu(this)">
+              <span id="fdRequired-lbl">Required</span>
+              <span class="material-icons select-icon">arrow_drop_down</span>
+            </div>
+            <div class="select-menu">
+              <div class="select-menu-item selected" onclick="selectD(this,'Required','fdRequired')">Required</div>
+              <div class="select-menu-item" onclick="selectD(this,'Optional','fdRequired')">Optional</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="fdRequired" value="required">
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;padding:4px 0;">
+        <div class="toggle on" id="fdActiveToggle" onclick="toggleFdActive(this)"></div>
+        <span style="font-size:14px;color:#212121;" id="fdActiveLbl">Active</span>
+        <span style="font-size:12px;color:#9E9E9E;margin-left:4px;">Fee Type and Application Type cannot be changed after creation.</span>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-text" onclick="closeFeeDefModal()">Cancel</button>
+      <button class="btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── Data ─── */
+const fees = {
+  ap: [
+    { id:'factoring-fee',       name:'Factoring Fee',             group:'Admin Fees',  groupKey:'admin',      appType:'Deductive', required:true,  active:true,  desc:'Fee applied when an agency has engaged with a factoring company.' },
+    { id:'placement-fee',       name:'Placement Fee',             group:'Admin Fees',  groupKey:'admin',      appType:'Additive',  required:true,  active:true,  desc:'One-time fee charged per successful worker placement.' },
+    { id:'vendor-mgmt-fee',     name:'Vendor Management Fee',     group:'Admin Fees',  groupKey:'admin',      appType:'Deductive', required:true,  active:true,  desc:'Ongoing fee covering vendor oversight and credentialing coordination.' },
+    { id:'credentialing-fee',   name:'Credentialing Fee',         group:'Compliance',  groupKey:'compliance', appType:'Deductive', required:true,  active:true,  desc:'Fee to cover third-party credentialing verification services.' },
+    { id:'background-check',    name:'Background Check Fee',      group:'Compliance',  groupKey:'compliance', appType:'Deductive', required:false, active:true,  desc:'Fee covering mandatory pre-placement background screening.' },
+    { id:'drug-screen-fee',     name:'Drug Screening Fee',        group:'Compliance',  groupKey:'compliance', appType:'Deductive', required:true,  active:true,  desc:'Fee for pre-placement and random drug screening requirements.' },
+    { id:'occ-health-fee',      name:'Occupational Health Fee',   group:'Compliance',  groupKey:'compliance', appType:'Deductive', required:false, active:true,  desc:'Covers occupational health screenings including TB tests and titers.' },
+    { id:'travel-allowance',    name:'Travel Allowance',          group:'Travel',      groupKey:'travel',     appType:'Deductive', required:true,  active:true,  desc:'Per-trip reimbursement for workers traveling more than 50 miles.' },
+    { id:'housing-stipend',     name:'Housing Stipend',           group:'Travel',      groupKey:'travel',     appType:'Deductive', required:true,  active:false, desc:'Monthly housing stipend for travel workers on assignment.' },
+    { id:'mileage-reimb',       name:'Mileage Reimbursement',     group:'Travel',      groupKey:'travel',     appType:'Deductive', required:false, active:true,  desc:'Per-mile reimbursement for approved local travel during assignment.' },
+    { id:'holiday-diff',        name:'Holiday Differential',      group:'Premium',     groupKey:'premium',    appType:'Additive',  required:true,  active:true,  desc:'Premium rate applied to shifts worked on designated holidays.' },
+    { id:'on-call',             name:'On-Call Premium',           group:'Premium',     groupKey:'premium',    appType:'Additive',  required:true,  active:true,  desc:'Additional premium applied to workers assigned to on-call blocks.' },
+    { id:'weekend-diff',        name:'Weekend Differential',      group:'Premium',     groupKey:'premium',    appType:'Additive',  required:false, active:true,  desc:'Enhanced rate for shifts worked on Saturday or Sunday.' },
+  ],
+  ar: [
+    { id:'client-markup',       name:'Client Markup',             group:'Admin Fees',  groupKey:'admin',      appType:'Additive',  required:true,  active:true,  desc:'Standard markup applied to all client invoices on worker bill rate.' },
+    { id:'vms-admin-fee',       name:'VMS Admin Fee',             group:'Admin Fees',  groupKey:'admin',      appType:'Additive',  required:true,  active:true,  desc:'Administrative fee charged per placement to cover VMS platform costs.' },
+    { id:'msp-fee',             name:'MSP Service Fee',           group:'Admin Fees',  groupKey:'admin',      appType:'Additive',  required:true,  active:true,  desc:'Managed service provider fee billed to client for program oversight.' },
+    { id:'late-payment-fee',    name:'Late Payment Fee',          group:'Compliance',  groupKey:'compliance', appType:'Additive',  required:false, active:true,  desc:'Applied when client payment exceeds net-30 terms per the MSA.' },
+    { id:'markup-holiday',      name:'Holiday Bill Rate Markup',  group:'Premium',     groupKey:'premium',    appType:'Additive',  required:true,  active:true,  desc:'Client-facing markup adjustment for holiday-worked shifts.' },
+    { id:'rebill-fee',          name:'Rebill Processing Fee',     group:'Ungrouped',   groupKey:'ungrouped',  appType:'Additive',  required:false, active:true,  desc:'Fee applied when an invoice must be reissued due to client-requested changes.' },
+  ],
+};
+
+const instances = {
+  'factoring-fee': [
+    { feeValue:'1.6%', segments:'Non Clinical', client:'Atlas Healthcare',       agency:'Valley Health Network',  startDate:'10/09/2024', endDate:null,         account:'12345',     status:'current' },
+    { feeValue:'1.6%', segments:'Allied',       client:'Metro Clinical Group',   agency:'MedPro Solutions',       startDate:'07/14/2024', endDate:null,         account:'12345',     status:'current' },
+    { feeValue:'1.6%', segments:'Nursing',      client:'Sunrise Medical',        agency:'National Staffing Co',   startDate:'05/28/2024', endDate:null,         account:'12345',     status:'current' },
+    { feeValue:'1.6%', segments:'Per Diem',     client:'Apex Medical',           agency:'MedPro Solutions',       startDate:'06/08/2024', endDate:'05/20/2026', account:'12345',     status:'current' },
+    { feeValue:'1.6%', segments:'Allied',       client:'Valley Health Network',  agency:'Metro Clinical Group',   startDate:'04/24/2024', endDate:'10/06/2026', account:'$25,039.41',status:'current' },
+    { feeValue:'1.4%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'',          status:'past'    },
+    { feeValue:'1.8%', segments:'Travel',       client:'Pacific Health Partners',agency:'',                       startDate:'04/01/2026', endDate:'12/31/2026', account:'',          status:'future'  },
+  ],
+  'background-check': [
+    { feeValue:'$15.00', segments:'Allied',     client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'22345',     status:'past'    },
+    { feeValue:'$20.00', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2026', endDate:null,         account:'22345',     status:'current' },
+    { feeValue:'$22.00', segments:'Nursing',    client:'',                       agency:'',                       startDate:'01/01/2027', endDate:null,         account:'22345',     status:'future'  },
+  ],
+  'travel-allowance': [
+    { feeValue:'$0.67/mi', segments:'Travel',   client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',          status:'current' },
+    { feeValue:'$0.70/mi', segments:'Travel',   client:'Sunrise Medical',        agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'',          status:'current' },
+  ],
+  'client-markup': [
+    { feeValue:'25.0%',  segments:'RN',         client:'Atlas Healthcare',       agency:'Valley Health Network',  startDate:'01/01/2026', endDate:null,         account:'22345',     status:'current' },
+    { feeValue:'22.5%',  segments:'Allied',     client:'Apex Medical',           agency:'Metro Clinical Group',   startDate:'01/01/2026', endDate:'12/31/2026', account:'33345',     status:'current' },
+    { feeValue:'20.0%',  segments:'RN',         client:'',                       agency:'',                       startDate:'04/01/2026', endDate:null,         account:'',          status:'future'  },
+  ],
+};
+
+/* ─── State ─── */
+let tab = 'ap', filter = 'current';
+let expandedGroups = new Set(['factoring-fee']); // first one open by default
+
+/* ─── Helpers ─── */
+function getCategory(r) {
+  if (r.client && r.agency)  return 'Client + Agency';
+  if (r.client && !r.agency) return 'Client-specific';
+  if (!r.client && r.agency) return 'Agency-specific';
+  return 'Global';
+}
+function categoryChipClass(cat) {
+  return { 'Global':'cell-chip-gray','Client-specific':'cell-chip-blue','Agency-specific':'cell-chip-gray','Client + Agency':'cell-chip-blue' }[cat] || 'cell-chip-gray';
+}
+
+/* ─── Render ─── */
+function render() {
+  const tbody = document.getElementById('gridBody');
+  const currentFees = fees[tab];
+  const dash = `<span style="color:#BDBDBD">—</span>`;
+  let totalRows = 0;
+  let html = '';
+
+  currentFees.forEach(f => {
+    const isOpen = expandedGroups.has(f.id);
+    const allInst = instances[f.id] || [];
+    const filtered = allInst.filter(i => filter === 'all' || i.status === filter);
+
+    totalRows += filtered.length;
+
+    // ─── Outer definition row (8 columns) ───
+    const stripeClass = (fees[tab].indexOf(f) % 2 === 0) ? 'stripe-odd' : 'stripe-even';
+    html += `
+    <tr class="group-row ${stripeClass}" onclick="toggleGroup('${f.id}')">
+      <td><span class="material-icons group-chevron ${isOpen ? 'open' : ''}">expand_more</span></td>
+      <td class="group-name">${f.name}</td>
+      <td class="group-cell">${f.group}</td>
+      <td class="group-cell">${f.appType}</td>
+      <td class="group-cell">${f.required ? 'Required' : 'Optional'}</td>
+      <td class="group-cell">${f.active ? 'Active' : 'Inactive'}</td>
+      <td><span class="group-desc">${f.desc}</span></td>
+      <td class="group-count">${allInst.length}</td>
+    </tr>`;
+
+    // ─── Expanded detail row with nested instance grid ───
+    if (isOpen) {
+      // Build nested instance rows
+      let nestedRows = '';
+      if (!filtered.length) {
+        nestedRows = `<tr><td colspan="9" style="padding:16px;font-size:13px;color:#9E9E9E;font-style:italic;text-align:center;">No ${filter === 'all' ? '' : filter + ' '}instances for this fee definition.</td></tr>`;
+      } else {
+        filtered.forEach(r => {
+          const cat = getCategory(r);
+          nestedRows += `
+          <tr class="inst-row">
+            <td class="mono">${r.feeValue}</td>
+            <td>${r.segments}</td>
+            <td class="muted">${r.client || dash}</td>
+            <td class="muted">${r.agency || dash}</td>
+            <td><span class="cell-chip ${categoryChipClass(cat)}">${cat}</span></td>
+            <td class="muted">${r.startDate}</td>
+            <td class="muted">${r.endDate || '<span style="color:#9E9E9E">Open</span>'}</td>
+            <td class="muted">${r.account || dash}</td>
+            <td>
+              <div class="row-acts">
+                <button class="act-btn" title="Edit" ${r.status === 'past' ? 'disabled' : `onclick="openEditInst(${JSON.stringify(r).replace(/"/g,'&quot;')})"`}><span class="material-icons">edit</span></button>
+                <button class="act-btn danger" title="Delete" ${r.status !== 'future' ? 'disabled' : ''}><span class="material-icons">delete_outline</span></button>
+              </div>
+            </td>
+          </tr>`;
+        });
+      }
+
+      html += `
+      <tr class="detail-row">
+        <td colspan="8">
+          <div class="nested-container">
+            <div class="nested-toolbar">
+              <div class="nested-toolbar-left">Instances<span>${filtered.length} ${filter !== 'all' ? filter : ''}</span></div>
+              <button class="btn-text-sm" onclick="event.stopPropagation();openInstModal('${f.id}')">+ Add Instance</button>
+            </div>
+            <table class="nested-table">
+              <thead>
+                <tr>
+                  <th>Fee (%)<span class="material-icons sort-icon">unfold_more</span></th>
+                  <th>Segments<span class="material-icons sort-icon">unfold_more</span></th>
+                  <th>Client<span class="material-icons sort-icon">unfold_more</span></th>
+                  <th>Agency<span class="material-icons sort-icon">unfold_more</span></th>
+                  <th>Category<span class="material-icons sort-icon">unfold_more</span></th>
+                  <th>Start Date<span class="material-icons sort-icon">unfold_more</span></th>
+                  <th>End Date<span class="material-icons sort-icon">unfold_more</span></th>
+                  <th>Account<span class="material-icons sort-icon">unfold_more</span></th>
+                  <th style="width:64px;"></th>
+                </tr>
+              </thead>
+              <tbody>${nestedRows}</tbody>
+            </table>
+          </div>
+        </td>
+      </tr>`;
+    }
+  });
+
+  tbody.innerHTML = html;
+  document.getElementById('rowCount').textContent = totalRows;
+}
+
+/* ─── Interactions ─── */
+function selectTab(t, el) {
+  tab = t;
+  document.querySelectorAll('.ptab').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  expandedGroups = new Set([fees[t][0].id]);
+  render();
+}
+
+function setFilter(f, el) {
+  filter = f;
+  document.querySelectorAll('.gtab').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function toggleGroup(id) {
+  if (expandedGroups.has(id)) expandedGroups.delete(id);
+  else expandedGroups.add(id);
+  render();
+}
+
+/* ─── Instance Modal ─── */
+let activeFeeId = null;
+
+function openInstModal(feeId) {
+  activeFeeId = feeId;
+  document.getElementById('modalTitle').textContent = 'Add Configuration Instance';
+  ['mFeeValue','mStartDate','mEndDate','mAccount'].forEach(id => document.getElementById(id).value = '');
+  resetSelect('mSegments','— Select —');
+  resetSelect('mClient','— Any client —');
+  resetSelect('mAgency','— Any agency —');
+  setModalLock(['mFeeValue','mSegments','mClient','mAgency','mStartDate'], false);
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+function openEditInst(r) {
+  const isCurrent = r.status === 'current';
+  document.getElementById('modalTitle').textContent = 'Edit Instance';
+  document.getElementById('mFeeValue').value  = r.feeValue || '';
+  document.getElementById('mStartDate').value = r.startDate || '';
+  document.getElementById('mEndDate').value   = r.endDate || '';
+  document.getElementById('mAccount').value   = r.account || '';
+  if (r.segments) { document.getElementById('mSegments').value = r.segments; const l = document.getElementById('mSegments-lbl'); l.textContent = r.segments; l.classList.remove('select-placeholder'); }
+  else resetSelect('mSegments','— Select —');
+  if (r.client)   { document.getElementById('mClient').value = r.client;   const l = document.getElementById('mClient-lbl');   l.textContent = r.client;   l.classList.remove('select-placeholder'); }
+  else resetSelect('mClient','— Any client —');
+  if (r.agency)   { document.getElementById('mAgency').value = r.agency;   const l = document.getElementById('mAgency-lbl');   l.textContent = r.agency;   l.classList.remove('select-placeholder'); }
+  else resetSelect('mAgency','— Any agency —');
+  setModalLock(['mFeeValue','mSegments','mClient','mAgency','mStartDate'], isCurrent);
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+function setModalLock(ids, locked) {
+  ids.forEach(id => {
+    const field = document.getElementById(id + '-field');
+    if (field) field.classList.toggle('field-locked', locked);
+    const input = document.getElementById(id);
+    if (input) input.disabled = locked;
+  });
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+function closeOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+/* ─── Fee Def Modal ─── */
+function openFeeDefModal() {
+  document.getElementById('fdName').value = '';
+  document.getElementById('fdDesc').value = '';
+  resetSelect('fdFeeType','— Select —');
+  resetSelect('fdAppType','— Select —');
+  resetSelect('fdGroup','— Ungrouped —');
+  const tog = document.getElementById('fdActiveToggle');
+  tog.classList.add('on');
+  document.getElementById('fdActiveLbl').textContent = 'Active';
+  document.getElementById('feeDefModalOverlay').classList.add('active');
+}
+function closeFeeDefModal() { document.getElementById('feeDefModalOverlay').classList.remove('active'); }
+function closeFeeDefOutside(e) { if (e.target === document.getElementById('feeDefModalOverlay')) closeFeeDefModal(); }
+function toggleFdActive(el) {
+  el.classList.toggle('on');
+  document.getElementById('fdActiveLbl').textContent = el.classList.contains('on') ? 'Active' : 'Inactive';
+}
+
+/* ─── Custom Select ─── */
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.select-wrapper')) {
+    document.querySelectorAll('.select-menu.open').forEach(m => {
+      m.classList.remove('open');
+      m.parentElement.querySelector('.select-input').classList.remove('open');
+    });
+  }
+});
+
+function toggleMenu(trigger) {
+  if (trigger.classList.contains('disabled')) return;
+  const menu = trigger.parentElement.querySelector('.select-menu');
+  const isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.select-menu.open').forEach(m => {
+    if (m !== menu) { m.classList.remove('open'); m.parentElement.querySelector('.select-input').classList.remove('open'); }
+  });
+  if (isOpen) { menu.classList.remove('open'); trigger.classList.remove('open'); }
+  else        { menu.classList.add('open');    trigger.classList.add('open'); }
+}
+
+function selectD(item, value, id, callback) {
+  const menu = item.parentElement;
+  const trigger = menu.parentElement.querySelector('.select-input');
+  const lbl = trigger.querySelector('span:first-child');
+  menu.querySelectorAll('.select-menu-item').forEach(i => i.classList.remove('selected'));
+  item.classList.add('selected');
+  lbl.textContent = value;
+  lbl.classList.remove('select-placeholder');
+  menu.classList.remove('open');
+  trigger.classList.remove('open');
+  document.getElementById(id).value = value;
+  if (callback) callback();
+}
+
+function resetSelect(id, placeholder) {
+  const hidden = document.getElementById(id);
+  if (!hidden) return;
+  hidden.value = '';
+  const wrapper = hidden.previousElementSibling;
+  if (!wrapper) return;
+  const lbl = wrapper.querySelector('.select-input span:first-child');
+  if (lbl) { lbl.textContent = placeholder; lbl.className = 'select-placeholder'; }
+  wrapper.querySelectorAll('.select-menu-item').forEach(i => i.classList.remove('selected'));
+  const menu = wrapper.querySelector('.select-menu');
+  const inp  = wrapper.querySelector('.select-input');
+  if (menu) menu.classList.remove('open');
+  if (inp)  inp.classList.remove('open');
+}
+
+render();
+</script>
+</body>
+</html>

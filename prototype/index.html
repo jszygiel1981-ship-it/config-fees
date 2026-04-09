@@ -634,7 +634,7 @@
       </div>
 
       <div class="field" id="mFeeValue-field">
-        <label>Fee Value Percentage <span class="req">*</span></label>
+        <label>Fee Value <span class="req">*</span></label>
         <input type="text" id="mFeeValue" />
       </div>
 
@@ -1835,8 +1835,8 @@ render();
 
           <!-- Fee Value -->
           <div class="field">
-            <label>Fee Value % <span class="req">*</span></label>
-            <input type="text" id="bFeeValue" placeholder="e.g. 3.5" />
+            <label>Fee Value <span class="req">*</span></label>
+            <input type="text" id="bFeeValue" placeholder="e.g. 3.5% or $250.00" />
           </div>
           <div></div>
 
@@ -1897,6 +1897,13 @@ render();
               <span class="material-icons">calendar_today</span>
             </div>
           </div>
+
+          <!-- Account Number -->
+          <div class="field">
+            <label>Account Number</label>
+            <input type="text" id="bAccount" placeholder="" />
+          </div>
+          <div></div>
 
         </div>
       </div>
@@ -1968,23 +1975,30 @@ render();
             </div>
           </div>
         </div>
+        <div id="bDateSummary" style="display:flex;align-items:center;gap:20px;padding:10px 16px;margin-bottom:10px;background:#E3F2FD;border:1px solid #90CAF9;border-radius:4px;font-size:13px;color:#1565C0;flex-shrink:0;">
+          <span class="material-icons" style="font-size:16px;color:#2196F3;flex-shrink:0;">info</span>
+          <span><strong>Start:</strong> <span id="bSummaryStart" style="font-weight:500;">—</span></span>
+          <span style="color:#90CAF9;">|</span>
+          <span><strong>End:</strong> <span id="bSummaryEnd" style="font-weight:500;">—</span></span>
+          <span style="color:#90CAF9;">|</span>
+          <span><strong>Fee Value:</strong> <span id="bSummaryFeeVal" style="font-weight:500;">—</span></span>
+          <span style="margin-left:auto;font-size:12px;color:#1976D2;">Applied to all instances below</span>
+        </div>
         <div class="preview-table-wrap">
           <table class="preview-table">
             <colgroup>
-              <col style="width:15%">
-              <col style="width:22%">
-              <col style="width:22%">
-              <col style="width:14%">
-              <col style="width:14%">
-              <col style="width:13%">
+              <col style="width:40px">
+              <col style="width:18%">
+              <col style="width:26%">
+              <col style="width:26%">
+              <col style="width:18%">
             </colgroup>
             <thead>
               <tr>
+                <th style="padding:0 0 0 12px;"><input type="checkbox" id="bSelectAll" style="accent-color:#2196F3;width:15px;height:15px;cursor:pointer;" onchange="toggleBulkSelectAll(this)"></th>
                 <th>Segment</th>
                 <th>Client</th>
                 <th>Agency</th>
-                <th>Start Date</th>
-                <th>End Date</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -2001,7 +2015,7 @@ render();
       <div style="flex:1;"></div>
       <button class="btn-primary" id="bBtnPreview" onclick="generateBulkPreview()">Preview &#8594;</button>
       <button class="btn-text" id="bBtnCancelRight" style="display:none;" onclick="closeBulkModal()">Cancel</button>
-      <button class="btn-primary" id="bBtnSave" style="display:none;" onclick="saveBulkInstances()">Save</button>
+      <button class="btn-primary" id="bBtnSave" style="display:none;" onclick="saveBulkInstances()">Create</button>
     </div>
   </div>
 </div>
@@ -2249,12 +2263,14 @@ function generateBulkPreview() {
   document.getElementById('bCardModified').classList.toggle('mc-dim', adjustedCount === 0);
   document.getElementById('bCardBlocked').classList.toggle('mc-dim',  blockedCount  === 0);
 
-  // Save button label
-  const saveBtn = document.getElementById('bBtnSave');
-  saveBtn.textContent = blockedCount > 0 ? `Save ${saveCount} of ${instances.length}` : `Save all ${saveCount}`;
+  // Date / fee summary strip
+  document.getElementById('bSummaryStart').textContent   = start;
+  document.getElementById('bSummaryEnd').textContent     = end === 'No end date' ? 'No end date' : end;
+  document.getElementById('bSummaryFeeVal').textContent  = feeVal;
 
   // Build table rows
-  document.getElementById('bPreviewTbody').innerHTML = instances.map((inst) => {
+  document.getElementById('bPreviewTbody').innerHTML = instances.map((inst, i) => {
+    const isBlocked = inst.status === 'blocked';
     let statusCell;
     if (inst.status === 'clean') {
       statusCell = `<span class="chip chip-sm chip-success-outline"><span class="chip-label">Ready</span></span>`;
@@ -2265,9 +2281,18 @@ function generateBulkPreview() {
       const tip = inst.detail.replace(/"/g, '&quot;');
       statusCell = `<span class="tip-wrap" data-tip="${tip}"><span class="chip chip-sm chip-error-outline"><span class="chip-label">Blocked</span></span></span>`;
     }
-    return `<tr><td>${inst.seg}</td><td>${inst.client}</td><td>${inst.agency}</td><td>${inst.start}</td><td>${inst.end}</td><td>${statusCell}</td></tr>`;
+    const chk = isBlocked
+      ? `<input type="checkbox" class="bulk-row-chk" disabled style="accent-color:#2196F3;width:15px;height:15px;">`
+      : `<input type="checkbox" class="bulk-row-chk" checked style="accent-color:#2196F3;width:15px;height:15px;cursor:pointer;" onchange="updateBulkSaveBtn()">`;
+    const rowStyle = isBlocked ? ' style="opacity:0.5;"' : '';
+    return `<tr${rowStyle}><td style="padding:0 0 0 12px;">${chk}</td><td>${inst.seg}</td><td>${inst.client}</td><td>${inst.agency}</td><td>${statusCell}</td></tr>`;
   }).join('');
 
+  // Select-all state
+  const selectAll = document.getElementById('bSelectAll');
+  if (selectAll) { selectAll.checked = true; selectAll.indeterminate = false; }
+
+  updateBulkSaveBtn();
   showBulkStep(2);
 }
 
@@ -2276,6 +2301,27 @@ function prevDay(dateStr) {
   if (p.length !== 3) return dateStr;
   const d = new Date(p[2], p[0] - 1, p[1] - 1);
   return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+}
+
+function updateBulkSaveBtn() {
+  const allChk     = [...document.querySelectorAll('.bulk-row-chk:not(:disabled)')];
+  const checkedChk = allChk.filter(c => c.checked);
+  const total      = document.querySelectorAll('.bulk-row-chk').length;
+  const btn        = document.getElementById('bBtnSave');
+  const n          = checkedChk.length;
+  btn.textContent  = n < total ? `Create ${n} of ${total}` : `Create all ${n}`;
+  btn.disabled     = n === 0;
+
+  const selectAll = document.getElementById('bSelectAll');
+  if (selectAll) {
+    selectAll.checked       = checkedChk.length === allChk.length && allChk.length > 0;
+    selectAll.indeterminate = checkedChk.length > 0 && checkedChk.length < allChk.length;
+  }
+}
+
+function toggleBulkSelectAll(master) {
+  document.querySelectorAll('.bulk-row-chk:not(:disabled)').forEach(c => c.checked = master.checked);
+  updateBulkSaveBtn();
 }
 
 function saveBulkInstances() {

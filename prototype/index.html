@@ -225,9 +225,9 @@
     .inst-card-seg { font-size:12px; color:#757575; }
 
     /* ─── Modal buttons ─── */
-    .btn-text { background:transparent; border:none; color:#2196F3; font-family:Roboto,sans-serif; font-size:14px; font-weight:500; cursor:pointer; padding:0 12px; height:32px; border-radius:4px; }
+    .btn-text { background:transparent; border:none; color:#2196F3; font-family:Roboto,sans-serif; font-size:14px; font-weight:400; cursor:pointer; padding:0 12px; height:32px; border-radius:4px; }
     .btn-text:hover { background:rgba(33,150,243,0.08); }
-    .btn-primary { background:#2196F3; color:#fff; border:none; border-radius:4px; font-family:Roboto,sans-serif; font-size:14px; font-weight:500; padding:0 16px; height:32px; cursor:pointer; }
+    .btn-primary { background:#2196F3; color:#fff; border:none; border-radius:4px; font-family:Roboto,sans-serif; font-size:14px; font-weight:400; padding:0 16px; height:32px; cursor:pointer; min-width:72px; }
     .btn-primary:hover { background:#1E88E5; }
 
     /* ─── Footer ─── */
@@ -317,7 +317,7 @@
 
     /* ─── Bulk Create Modal ─── */
     /* Stepper — from design system Stepper component (stepper-showcase.html) */
-    .bulk-stepper { display:flex; align-items:center; padding:24px 40px 0; flex-shrink:0; }
+    .bulk-stepper { display:flex; align-items:center; padding:24px 40px 0; flex-shrink:0; max-width:500px; width:100%; margin-left:auto; margin-right:auto; }
     .step { display:flex; align-items:center; gap:8px; flex-shrink:0; }
     .step-circle { width:24px; height:24px; border-radius:999px; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:transparent; }
     .step-circle.active { background-color:#37636b; }
@@ -369,24 +369,24 @@
     .preview-table-wrap { flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; border:1px solid #E0E0E0; border-radius:4px; }
     .preview-table { width:100%; table-layout:fixed; border-collapse:collapse; font-size:13px; }
     .preview-table thead th { position:sticky; top:0; z-index:1; background:#F5F5F5; border-bottom:1px solid #E0E0E0; padding:0 12px; height:36px; text-align:left; font-size:11px; font-weight:500; color:#757575; white-space:nowrap; overflow:hidden; }
-    .preview-table tbody td { padding:0 12px; height:32px; border-bottom:1px solid #F0F0F0; color:#212121; vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .preview-table tbody td { padding:0 12px; height:40px; border-bottom:1px solid #F0F0F0; color:#212121; vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .preview-table tbody tr:last-child td { border-bottom:none; }
     /* ─── Metric Card (from design system MetricCard component) ─── */
-    .metric-group { display:flex; flex-direction:row; gap:16px; align-items:flex-start; flex-shrink:0; margin-bottom:16px; }
-    .metric-card { display:flex; flex-direction:column; flex:1; min-width:170px; height:140px; background:#FFFFFF; border:1px solid #E0E0E0; border-radius:4px; padding:16px; gap:8px; box-sizing:border-box; overflow:hidden; font-family:Roboto,sans-serif; }
-    .mc-label-row { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; height:24px; }
+    .metric-group { display:flex; flex-direction:row; gap:16px; align-items:stretch; flex-shrink:0; margin-bottom:16px; }
+    .metric-card { display:flex; flex-direction:column; flex:1; min-width:170px; background:#FFFFFF; border:1px solid #E0E0E0; border-radius:4px; padding:16px; gap:0; box-sizing:border-box; font-family:Roboto,sans-serif; }
+    .mc-label-row { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; margin-bottom:8px; }
     .mc-label-left { display:flex; align-items:center; gap:4px; min-width:0; overflow:hidden; }
     .mc-label-icon { font-size:16px; color:#757575; flex-shrink:0; }
-    .mc-label-text { font-size:14px; font-weight:500; line-height:24px; color:#757575; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .mc-metrics { display:flex; flex-direction:column; flex:1; gap:8px; min-height:0; }
-    .mc-row { display:flex; flex-direction:row; align-items:flex-start; flex:1; min-height:0; }
-    .mc-col { display:flex; flex-direction:column; justify-content:flex-start; align-items:center; flex:1; min-width:0; gap:8px; overflow:hidden; }
+    .mc-label-text { font-size:14px; font-weight:500; line-height:20px; color:#757575; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .mc-metrics { display:flex; flex-direction:column; }
+    .mc-row { display:flex; flex-direction:row; }
+    .mc-col { display:flex; flex-direction:column; align-items:center; flex:1; min-width:0; gap:2px; }
     .mc-value { font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
     .mc-value--lg { font-size:34px; line-height:41px; }
     .mc-sub-label { font-size:12px; font-weight:400; line-height:18px; color:#757575; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
-    .mc-icons-footer { display:flex; flex-direction:row; flex-shrink:0; height:18px; align-items:center; }
-    .mc-icon-segment { flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-    .mc-footer-icon { font-size:18px; color:#757575; }
+    .mc-icons-footer { display:flex; flex-direction:row; align-items:center; margin-top:12px; }
+    .mc-icon-segment { flex:1; display:flex; align-items:center; justify-content:center; }
+    .mc-footer-icon { font-size:20px; color:#757575; }
     .metric-card.mc-dim { opacity:0.4; }
 
     /* ─── Tooltip chip wrapper ─── */
@@ -2213,12 +2213,15 @@ function generateBulkPreview() {
     pairs.push({ client: '—', agency: '—' }); // global
   }
 
+  const sampleEndDates = ['12/31/2026', '06/30/2027', '03/31/2027', 'No end date', 'No end date', '09/30/2026'];
+
   // Build instances
   const instances = [];
   let idx = 0;
   for (const seg of bulkSelectedSegments) {
     for (const pair of pairs) {
       const hash = (seg.length + pair.client.length + pair.agency.length + idx) % 10;
+      const rowEnd = sampleEndDates[idx % sampleEndDates.length];
       let status, detail;
       if (hash < 6) {
         status = 'clean';
@@ -2229,7 +2232,7 @@ function generateBulkPreview() {
         status = 'blocked';
         detail = `Two future instances already exist for this scope — ${seg}. Dates cannot be auto-resolved. Adjust or delete existing instances first.`;
       }
-      instances.push({ seg, client: pair.client, agency: pair.agency, start, end, status, detail });
+      instances.push({ seg, client: pair.client, agency: pair.agency, start, end: rowEnd, status, detail });
       idx++;
     }
   }

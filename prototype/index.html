@@ -2060,10 +2060,12 @@ render();
           <table class="preview-table">
             <colgroup>
               <col style="width:40px">
+              <col style="width:14%">
               <col style="width:18%">
-              <col style="width:26%">
-              <col style="width:26%">
               <col style="width:18%">
+              <col style="width:12%">
+              <col style="width:12%">
+              <col style="width:12%">
             </colgroup>
             <thead>
               <tr>
@@ -2071,6 +2073,8 @@ render();
                 <th>Segment</th>
                 <th>Client</th>
                 <th>Agency</th>
+                <th>Orig. Fee %</th>
+                <th>Orig. End Date</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -2313,6 +2317,7 @@ function generateBulkPreview() {
   }
 
   const sampleEndDates = ['12/31/2026', '06/30/2027', '03/31/2027', 'No end date', 'No end date', '09/30/2026'];
+  const sampleOrigFees = ['6.0%', '5.5%', '6.25%', '4.75%', '6.0%', '5.0%'];
 
   // Build instances
   const instances = [];
@@ -2321,17 +2326,24 @@ function generateBulkPreview() {
     for (const pair of pairs) {
       const hash = (seg.length + pair.client.length + pair.agency.length + idx) % 10;
       const rowEnd = sampleEndDates[idx % sampleEndDates.length];
-      let status, detail;
+      const rowOrigFee = sampleOrigFees[idx % sampleOrigFees.length];
+      let status, detail, origFee, origEnd;
       if (hash < 6) {
         status = 'clean';
+        origFee = null; // new instance — no existing to compare
+        origEnd = null;
       } else if (hash < 8) {
         status = 'adjusted';
-        detail = `Existing instance (${pair.client !== '—' ? pair.client : pair.agency}) will end on ${prevDay(start)} instead of 12/31/2026 to avoid overlap.`;
+        origFee = rowOrigFee;
+        origEnd = rowEnd;
+        detail = `Existing instance (${pair.client !== '—' ? pair.client : pair.agency}) will end on ${prevDay(start)} instead of ${rowEnd} to avoid overlap.`;
       } else {
         status = 'blocked';
+        origFee = rowOrigFee;
+        origEnd = rowEnd;
         detail = `Two future instances already exist for this scope — ${seg}. Dates cannot be auto-resolved. Adjust or delete existing instances first.`;
       }
-      instances.push({ seg, client: pair.client, agency: pair.agency, start, end: rowEnd, status, detail });
+      instances.push({ seg, client: pair.client, agency: pair.agency, start, end: rowEnd, origFee, origEnd, status, detail });
       idx++;
     }
   }
@@ -2370,7 +2382,9 @@ function generateBulkPreview() {
       ? `<input type="checkbox" class="bulk-row-chk" disabled style="accent-color:#2196F3;width:15px;height:15px;">`
       : `<input type="checkbox" class="bulk-row-chk" checked style="accent-color:#2196F3;width:15px;height:15px;cursor:pointer;" onchange="updateBulkSaveBtn()">`;
     const rowStyle = isBlocked ? ' style="opacity:0.5;"' : '';
-    return `<tr${rowStyle}><td style="padding:0 0 0 12px;">${chk}</td><td>${inst.seg}</td><td>${inst.client}</td><td>${inst.agency}</td><td>${statusCell}</td></tr>`;
+    const origFeeDisplay = inst.origFee || '—';
+    const origEndDisplay = inst.origEnd ? (inst.origEnd === 'No end date' ? 'Open' : inst.origEnd) : '—';
+    return `<tr${rowStyle}><td style="padding:0 0 0 12px;">${chk}</td><td>${inst.seg}</td><td>${inst.client}</td><td>${inst.agency}</td><td class="muted">${origFeeDisplay}</td><td class="muted">${origEndDisplay}</td><td>${statusCell}</td></tr>`;
   }).join('');
 
   // Select-all state

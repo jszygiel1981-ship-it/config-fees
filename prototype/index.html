@@ -5,7 +5,68 @@
   <title>Fee Management — TRIO WFS</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-  <link rel="stylesheet" href="../../Trio-UI/design-system-shell.css" />
+  <style>
+/* design-system-shell.css — inlined for hosted deployment */
+:root {
+  --color-primary-main:        #2196F3;
+  --color-primary-dark:        #1976D2;
+  --color-primary-light:       #E3F2FD;
+  --color-secondary-main:      #F5F5F5;
+  --color-secondary-dark:      #616161;
+  --color-secondary-outline:   #E0E0E0;
+  --color-success-main:        #2e7d32;
+  --color-success-light:       #E8F5E9;
+  --color-success-dark:        #1b5e20;
+  --color-error-main:          #DB4537;
+  --color-error-light:         #FBEAED;
+  --color-error-dark:          #BB3430;
+  --color-warning-main:        #E17109;
+  --color-warning-light:       #FCF1E0;
+  --color-warning-dark:        #DA6207;
+  --color-info-main:           #54afca;
+  --color-info-light:          #E4F7FD;
+  --color-info-dark:           #4B9AB0;
+  --color-text-primary:        #212121;
+  --color-text-secondary:      #757575;
+  --color-text-disabled:       rgba(0, 0, 0, 0.4);
+  --color-background-default:  #F5F5F5;
+  --color-background-paper:    #FFFFFF;
+  --color-disabled-bg:         rgba(0, 0, 0, 0.12);
+  --font-family: 'Roboto', sans-serif;
+  --spacing-xs:  4px;
+  --spacing-sm:  8px;
+  --spacing-mid: 12px;
+  --spacing-md:  16px;
+  --spacing-lg:  24px;
+  --spacing-xl:  32px;
+  --spacing-xxl: 40px;
+  --border-radius: 4px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-family); background-color: var(--color-background-default); color: var(--color-text-primary); display: flex; min-height: 100vh; }
+.sidebar { width: 280px; background: var(--color-background-default); border-right: 1px solid var(--color-secondary-outline); position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+.sidebar-header { padding: var(--spacing-lg); border-bottom: 1px solid var(--color-secondary-outline); }
+.sidebar-header h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+.sidebar-header p { font-size: 12px; color: var(--color-text-secondary); }
+.nav-section { padding: var(--spacing-md) 0; border-bottom: 1px solid var(--color-secondary-outline); }
+.nav-section-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-secondary); padding: 0 var(--spacing-lg); margin-bottom: var(--spacing-sm); }
+.nav-item { display: flex; align-items: center; padding: var(--spacing-sm) var(--spacing-lg); color: var(--color-text-primary); text-decoration: none; font-size: 14px; transition: background 0.2s; cursor: pointer; }
+.nav-item:hover { background-color: rgba(0,0,0,0.04); }
+.nav-item.active { background-color: var(--color-primary-light); color: var(--color-primary-main); font-weight: 500; }
+.nav-item .material-icons { font-size: 18px; margin-right: var(--spacing-sm); }
+.nav-item-empty { padding: var(--spacing-sm) var(--spacing-lg); font-size: 13px; color: var(--color-text-disabled); font-style: italic; }
+.main-content { margin-left: 280px; flex: 1; padding: var(--spacing-xxl); max-width: 1400px; }
+.page-header { margin-bottom: var(--spacing-xxl); }
+.page-title { font-size: 32px; font-weight: 400; margin-bottom: var(--spacing-sm); }
+.page-subtitle { font-size: 16px; color: var(--color-text-secondary); line-height: 1.6; max-width: 800px; }
+.section { background: var(--color-background-paper); border-radius: var(--border-radius); padding: var(--spacing-xl); margin-bottom: var(--spacing-lg); }
+.section-title { font-size: 20px; font-weight: 500; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm); }
+.section-title .material-icons { font-size: 24px; color: var(--color-primary-main); }
+.section-description { font-size: 14px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-lg); }
+.card { background: var(--color-background-default); border: 1px solid var(--color-secondary-outline); border-radius: var(--border-radius); padding: var(--spacing-lg); }
+.warning-box { background: #FCF1E0; border-left: 4px solid var(--color-warning-main); padding: var(--spacing-md); margin: var(--spacing-lg) 0; border-radius: var(--border-radius); font-size: 14px; line-height: 1.6; }
+.warning-box strong { color: #DA6207; }
+  </style>
 
   <style>
     /* ─── Reset / Base ─── */
@@ -298,6 +359,34 @@
     /* ─── Disabled tabs ─── */
     .ptab-disabled { color:#BDBDBD !important; cursor:default; pointer-events:none; }
 
+    /* ─── Definition card three-dot menu ─── */
+    .dc-menu-wrap { position:relative; margin-left:auto; flex-shrink:0; }
+    .dc-more-btn { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; background:transparent; border:none; cursor:pointer; border-radius:2px; color:#BDBDBD; padding:0; }
+    .dc-more-btn:hover { color:#616161; }
+    .dc-more-btn .material-icons { font-size:18px; }
+    .dc-menu { display:none; position:absolute; top:calc(100% + 2px); right:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.1); z-index:400; min-width:140px; padding:4px 0; }
+    .dc-menu.open { display:block; }
+    .dc-menu-item { display:flex; align-items:center; gap:8px; padding:0 12px; height:34px; font-size:13px; color:#212121; cursor:pointer; white-space:nowrap; }
+    .dc-menu-item:hover { background:rgba(0,0,0,0.04); }
+    .dc-menu-item .material-icons { font-size:16px; color:#616161; }
+    .dc-menu-item.danger { color:#DB4537; }
+    .dc-menu-item.danger .material-icons { color:#DB4537; }
+    .dc-menu-divider { height:1px; background:#E0E0E0; margin:4px 0; }
+
+    /* ─── Inactivation modal ─── */
+    .inact-inst-row { display:flex; align-items:center; gap:12px; padding:10px 12px; border:1px solid #E0E0E0; border-radius:4px; background:#fff; }
+    .inact-inst-info { flex:1; min-width:0; }
+    .inact-inst-scope { font-size:13px; font-weight:500; color:#212121; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .inact-inst-meta { font-size:12px; color:#757575; margin-top:2px; }
+    .inact-inst-enddate { font-size:12px; color:#212121; white-space:nowrap; flex-shrink:0; text-align:right; }
+    .inact-inst-enddate .open-label { color:#9E9E9E; font-style:italic; }
+    .inact-toggle-group { display:flex; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden; flex-shrink:0; }
+    .inact-toggle-btn { height:28px; padding:0 10px; font-family:Roboto,sans-serif; font-size:12px; font-weight:500; background:#fff; border:none; cursor:pointer; color:#757575; white-space:nowrap; }
+    .inact-toggle-btn:first-child { border-right:1px solid #E0E0E0; }
+    .inact-toggle-btn.active-now { background:#DB4537; color:#fff; }
+    .inact-toggle-btn.active-expire { background:#2196F3; color:#fff; }
+    .inact-open-label { font-size:12px; color:#9E9E9E; font-style:italic; white-space:nowrap; flex-shrink:0; }
+
     /* ─── Collapsed panel gap fix ─── */
     #contentArea.panel-collapsed { gap:0; }
 
@@ -319,7 +408,8 @@
 
     /* ─── Bulk Create Modal ─── */
     /* Stepper — from design system Stepper component (stepper-showcase.html) */
-    .bulk-stepper { display:flex; align-items:center; padding:24px 40px 0; flex-shrink:0; max-width:500px; width:100%; margin-left:auto; margin-right:auto; }
+    .bulk-stepper { display:flex; align-items:center; padding:24px 40px 0; flex-shrink:0; max-width:500px; width:100%; margin-left:auto; margin-right:auto; margin-bottom:24px; }
+    .bulk-stepper-rule { border:none; border-top:1px solid #E0E0E0; margin:0; flex-shrink:0; }
     .step { display:flex; align-items:center; gap:8px; flex-shrink:0; }
     .step-circle { width:24px; height:24px; border-radius:999px; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:transparent; }
     .step-circle.active { background-color:#37636b; }
@@ -506,19 +596,13 @@
             <button class="split-btn-arrow" onclick="toggleAddInstMenu()"><span class="material-icons">arrow_drop_down</span></button>
           </div>
           <div class="add-inst-menu" id="addInstMenu">
-            <div class="add-inst-menu-item" onclick="panelCollapsed ? openModalCollapsed() : (closeAddInstMenu(), openModal())">
+            <div class="add-inst-menu-item" onclick="closeAddInstMenu();openCreateModal()">
               <span class="material-icons">add</span> Add Instance
             </div>
             <div class="add-inst-menu-item" onclick="openFeeDefModal(); closeAddInstMenu()">
               <span class="material-icons">library_add</span> Add Fee Definition
             </div>
             <div class="add-inst-menu-divider"></div>
-            <div class="add-inst-menu-item" onclick="openBulkModal()">
-              <span class="material-icons">playlist_add</span> Bulk Create Instances
-            </div>
-            <div class="add-inst-menu-item disabled" id="cloneMenuItem">
-              <span class="material-icons">content_copy</span> Clone Instances
-            </div>
           </div>
         </div>
       </div>
@@ -974,10 +1058,20 @@ function renderCards() {
         <span class="dc-group">${f.group}</span>
       </div>
       ${isSelected ? `<div class="dc-desc">${f.desc}</div>` : ''}
-      <div class="dc-chips">
+      <div class="dc-chips" style="align-items:center;">
         <span class="dc-chip">${f.appType}</span>
         <span class="dc-chip">${f.required ? 'Required' : 'Optional'}</span>
         <span class="dc-chip ${f.active ? 'dc-chip-green' : 'dc-chip-muted'}">${f.active ? 'Active' : 'Inactive'}</span>
+        ${isSelected && f.active ? `
+        <div class="dc-menu-wrap" id="dcMenuWrap_${f.id}">
+          <button class="dc-more-btn" onclick="event.stopPropagation();toggleDcMenu('${f.id}')"><span class="material-icons">more_vert</span></button>
+          <div class="dc-menu" id="dcMenu_${f.id}">
+            <div class="dc-menu-item" onclick="event.stopPropagation();closeDcMenu();openFeeDefEditModal('${f.id}')"><span class="material-icons">edit</span>Edit</div>
+            <div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();openInactivateModal('${f.id}')"><span class="material-icons">block</span>Inactivate</div>
+            <div class="dc-menu-divider"></div>
+            <div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();deleteDefinition('${f.id}')"><span class="material-icons">delete_outline</span>Delete Definition</div>
+          </div>
+        </div>` : ''}
       </div>
     </div>`;
   }).join('') || '<div style="padding:24px;text-align:center;font-size:13px;color:#9E9E9E;">No fee definitions match</div>';
@@ -999,8 +1093,8 @@ function renderInstances() {
     const parentFee = fees[tab].find(f => f.id === feeId);
     const parentActive = parentFee ? parentFee.active : true;
     rows = (instances[feeId] || [])
-      .filter(i => filter === 'all' || i.status === filter)
-      .map(i => ({ ...i, _feeActive: parentActive }));
+      .map((i, idx) => ({ ...i, _idx: idx, _feeActive: parentActive }))
+      .filter(i => filter === 'all' || i.status === filter);
   }
 
   // Quick search
@@ -1069,7 +1163,7 @@ function renderInstances() {
       <td>
         <div class="row-acts">
           <button class="act-btn" title="Edit" ${r.status === 'past' ? 'disabled' : `onclick="openEditModal(${JSON.stringify(r).replace(/"/g,'&quot;')})"`}><span class="material-icons">edit</span></button>
-          <button class="act-btn danger" title="Delete" ${r.status !== 'future' ? 'disabled' : ''}><span class="material-icons">delete_outline</span></button>
+          <button class="act-btn danger" title="Delete" ${r.status !== 'future' ? 'disabled' : `onclick="deleteFutureInstance('${feeId}',${r._idx})"`}><span class="material-icons">delete_outline</span></button>
         </div>
       </td>
     </tr>`;
@@ -1130,24 +1224,13 @@ function togglePanel() {
   render();
 }
 function handleAddInstance() {
-  if (panelCollapsed) { openModalCollapsed(); } else { openModal(); }
+  openCreateModal();
 }
 function toggleAddInstMenu() {
   document.getElementById('addInstMenu').classList.toggle('open');
 }
 function closeAddInstMenu() {
   document.getElementById('addInstMenu').classList.remove('open');
-}
-function openModalCollapsed() {
-  closeAddInstMenu();
-  // Populate fee definition select from current tab
-  const menu = document.getElementById('mFeeDefMenu');
-  menu.innerHTML = fees[tab]
-    .filter(f => f.active)
-    .map(f => `<div class="select-menu-item" onclick="selectD(this,'${f.name.replace(/'/g,"\\'")}','mFeeDef')">${f.name}</div>`)
-    .join('');
-  document.getElementById('mFeeDef-field').style.display = 'flex';
-  openModal(true);
 }
 document.addEventListener('click', e => {
   const wrap = document.querySelector('.add-inst-wrap');
@@ -1164,8 +1247,6 @@ function updateSelectAll() {
   const checked = all.filter(c => c.checked).length;
   chk.checked = checked === all.length && all.length > 0;
   chk.indeterminate = checked > 0 && checked < all.length;
-  const clone = document.getElementById('cloneMenuItem');
-  if (clone) clone.classList.toggle('disabled', checked === 0);
 }
 
 function setFilter(f, el) {
@@ -1210,6 +1291,19 @@ function renderActiveGroupChips() {
     </span>`).join('');
   btn.classList.toggle('has-filter', selectedGroups.size > 0);
 }
+/* ─── Definition card three-dot menu ─── */
+function toggleDcMenu(id) {
+  const menu = document.getElementById('dcMenu_' + id);
+  if (!menu) return;
+  const isOpen = menu.classList.contains('open');
+  closeDcMenu();
+  if (!isOpen) menu.classList.add('open');
+}
+function closeDcMenu() {
+  document.querySelectorAll('.dc-menu.open').forEach(m => m.classList.remove('open'));
+}
+document.addEventListener('click', () => closeDcMenu());
+
 function toggleInactive(el) {
   showInactive = !showInactive;
   el.classList.toggle('on', showInactive);
@@ -1252,24 +1346,6 @@ function setModalLock(fieldIds, locked) {
   });
 }
 
-function openModal(fromCollapsed) {
-  document.getElementById('modalTitle').textContent = 'Add Configuration Instance';
-  ['mFeeValue','mStartDate','mEndDate','mAccount'].forEach(id => document.getElementById(id).value = '');
-  resetSelect('mSegments', '— Select —');
-  resetSelect('mClient',   '— Any client —');
-  resetSelect('mAgency',   '— Any agency —');
-  if (!fromCollapsed) {
-    document.getElementById('mFeeDef-field').style.display = 'none';
-    document.getElementById('mFeeDef').value = '';
-    const lbl = document.getElementById('mFeeDef-lbl');
-    lbl.textContent = '— Select definition —';
-    lbl.className = 'select-placeholder';
-  }
-  setModalLock(['mFeeValue','mSegments','mClient','mAgency','mStartDate'], false);
-  document.getElementById('overlapSection').style.display = 'none';
-  document.getElementById('modalOverlay').classList.add('active');
-}
-
 function openEditModal(r) {
   const isCurrent = r.status === 'current';
   document.getElementById('modalTitle').textContent = isCurrent ? 'Edit Instance' : 'Edit Instance';
@@ -1300,23 +1376,110 @@ function closeOutside(e) { if (e.target === document.getElementById('modalOverla
 
 /* ─── Fee Definition Modal ─── */
 function openFeeDefModal() {
+  fdEditingId = null;
+  document.getElementById('feeDefModalTitle').textContent = 'Add Fee Definition';
   document.getElementById('fdName').value = '';
+  document.getElementById('fdName').disabled = false;
   document.getElementById('fdDesc').value = '';
   resetSelect('fdFeeType', '— Select —');
   resetSelect('fdAppType', '— Select —');
+  // Unlock Fee Type and App Type
+  ['fdFeeType', 'fdAppType'].forEach(id => {
+    const wrap = document.getElementById(id + '-field') || document.getElementById(id)?.closest('.field');
+    if (wrap) wrap.classList.remove('field-locked');
+  });
+  // Unlock the select inputs directly
+  document.querySelectorAll('#feeDefModalOverlay .select-input').forEach(el => {
+    el.style.pointerEvents = '';
+    el.style.background = '';
+    el.style.color = '';
+  });
   fdGroupValue = '';
   document.getElementById('fdGroupInput').value = '';
+  document.getElementById('fdGroupInput').disabled = false;
   document.getElementById('fdGroup').value = '';
   closeGroupAc();
-  document.getElementById('fdRequiredToggle').classList.add('on');
+  const reqToggle = document.getElementById('fdRequiredToggle');
+  reqToggle.classList.add('on');
+  reqToggle.style.pointerEvents = '';
+  reqToggle.style.opacity = '';
+  document.getElementById('fdTogglesSection').style.cursor = '';
   document.getElementById('fdRequiredLbl').textContent = 'Required';
   document.getElementById('fdRequired').value = 'required';
-  const tog = document.getElementById('fdActiveToggle');
-  tog.classList.add('on');
-  document.getElementById('fdActiveLbl').textContent = 'Active';
+  // Hide Active toggle — controlled from card menu only
+  document.getElementById('fdActiveRow').style.display = 'none';
+  document.getElementById('fdActiveDivider').style.display = 'none';
   document.getElementById('feeDefModalOverlay').classList.add('active');
 }
-function closeFeeDefModal() { document.getElementById('feeDefModalOverlay').classList.remove('active'); }
+
+function openFeeDefEditModal(id) {
+  const f = fees[tab].find(x => x.id === id);
+  if (!f) return;
+  document.getElementById('feeDefModalTitle').textContent = 'Edit Fee Definition';
+
+  // Locked fields — Name, Fee Type, App Type
+  const nameInput = document.getElementById('fdName');
+  nameInput.value = f.name;
+  nameInput.disabled = true;
+
+  // Description and Group — editable
+  document.getElementById('fdDesc').value = f.desc || '';
+  fdGroupValue = f.group || '';
+  document.getElementById('fdGroupInput').value = f.group || '';
+  document.getElementById('fdGroupInput').disabled = false;
+  document.getElementById('fdGroup').value = f.group || '';
+  closeGroupAc();
+
+  // Set locked selects to show values but disable interaction
+  const feeTypeWrapper = document.querySelector('#feeDefModalOverlay .field-row .field:first-child');
+  const appTypeWrapper = document.querySelector('#feeDefModalOverlay .field-row .field:last-child');
+  if (feeTypeWrapper) {
+    const lbl = feeTypeWrapper.querySelector('.select-input span:first-child');
+    if (lbl) { lbl.textContent = tab.toUpperCase(); lbl.classList.remove('select-placeholder'); }
+    const si = feeTypeWrapper.querySelector('.select-input');
+    if (si) { si.style.pointerEvents = 'none'; si.style.background = '#F5F5F5'; si.style.color = '#757575'; }
+  }
+  if (appTypeWrapper) {
+    const lbl = appTypeWrapper.querySelector('.select-input span:first-child');
+    if (lbl) { lbl.textContent = f.appType || '—'; lbl.classList.remove('select-placeholder'); }
+    const si = appTypeWrapper.querySelector('.select-input');
+    if (si) { si.style.pointerEvents = 'none'; si.style.background = '#F5F5F5'; si.style.color = '#757575'; }
+  }
+
+  // Required toggle — show current state, locked
+  const reqToggle = document.getElementById('fdRequiredToggle');
+  const isRequired = f.required !== false;
+  reqToggle.classList.toggle('on', isRequired);
+  document.getElementById('fdRequiredLbl').textContent = isRequired ? 'Required' : 'Optional';
+  reqToggle.style.pointerEvents = 'none';
+  reqToggle.style.opacity = '0.5';
+  document.getElementById('fdTogglesSection').style.cursor = 'default';
+
+  // Hide Active toggle — controlled from card menu only
+  document.getElementById('fdActiveRow').style.display = 'none';
+  document.getElementById('fdActiveDivider').style.display = 'none';
+
+  fdEditingId = id;
+  document.getElementById('feeDefModalOverlay').classList.add('active');
+}
+let fdEditingId = null;
+
+function saveFeeDefinition() {
+  if (!fdEditingId) { closeFeeDefModal(); return; }
+  const f = fees[tab].find(x => x.id === fdEditingId);
+  if (f) {
+    f.desc = document.getElementById('fdDesc').value;
+    f.group = document.getElementById('fdGroup').value || document.getElementById('fdGroupInput').value;
+    f.active = document.getElementById('fdActiveToggle').classList.contains('on');
+  }
+  closeFeeDefModal();
+  render();
+}
+
+function closeFeeDefModal() {
+  document.getElementById('feeDefModalOverlay').classList.remove('active');
+  fdEditingId = null;
+}
 function closeFeeDefOutside(e) { if (e.target === document.getElementById('feeDefModalOverlay')) closeFeeDefModal(); }
 function toggleFdRequired(el) {
   el.classList.toggle('on');
@@ -1453,6 +1616,104 @@ function resetSelect(id, placeholder) {
   if (inp)  inp.classList.remove('open');
 }
 
+/* ─── Delete definition ─── */
+function deleteDefinition(id) {
+  const hasInstances = (instances[id] || []).length > 0;
+  if (hasInstances) {
+    alert('This definition cannot be deleted because it has existing instances. Inactivate it instead.');
+    return;
+  }
+  fees[tab] = fees[tab].filter(f => f.id !== id);
+  feeId = fees[tab][0]?.id || null;
+  render();
+}
+
+/* ─── Delete future instance ─── */
+function deleteFutureInstance(id, idx) {
+  if (instances[id]) {
+    instances[id].splice(idx, 1);
+    renderInstances();
+  }
+}
+
+/* ─── Inactivation Modal ─── */
+let inactivateTargetId = null;
+let inactivateChoices = {}; // idx → 'now' | 'expire'
+
+function openInactivateModal(id) {
+  inactivateTargetId = id;
+  const f = fees[tab].find(x => x.id === id);
+  if (!f) return;
+
+  document.getElementById('inactivateFeeName').textContent = f.name;
+
+  // Default all active/future instances to 'expire'
+  const insts = (instances[id] || []).filter(i => i.status === 'current' || i.status === 'future');
+  inactivateChoices = {};
+  insts.forEach((inst, i) => { inactivateChoices[i] = inst.endDate ? 'expire' : 'now'; });
+
+  renderInactivateList(insts);
+  document.getElementById('inactivateModalOverlay').classList.add('active');
+}
+
+function renderInactivateList(insts) {
+  const list = document.getElementById('inactivateInstList');
+  if (!insts.length) {
+    list.innerHTML = '<div style="padding:16px;text-align:center;font-size:13px;color:#9E9E9E;">No active instances — the definition will be marked inactive.</div>';
+    return;
+  }
+  list.innerHTML = insts.map((inst, i) => {
+    const scope = [inst.segments, inst.client, inst.agency].filter(Boolean).join(' · ');
+    const isOpen = !inst.endDate;
+    const choice = inactivateChoices[i];
+    return `
+    <div class="inact-inst-row">
+      <div class="inact-inst-info">
+        <div class="inact-inst-scope">${scope}</div>
+        <div class="inact-inst-meta">Fee: ${inst.feeValue} &nbsp;·&nbsp; Started ${inst.startDate}</div>
+      </div>
+      <div class="inact-inst-enddate">
+        ${isOpen ? '<span class="open-label">Open-ended</span>' : `Ends ${inst.endDate}`}
+      </div>
+      ${isOpen
+        ? `<span class="inact-open-label">Closes on inactivation</span>`
+        : `<div class="inact-toggle-group">
+            <button class="inact-toggle-btn ${choice === 'now' ? 'active-now' : ''}" onclick="setInactivateChoice(${i},'now',this)">End now</button>
+            <button class="inact-toggle-btn ${choice === 'expire' ? 'active-expire' : ''}" onclick="setInactivateChoice(${i},'expire',this)">Let expire</button>
+          </div>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function setInactivateChoice(idx, val, btn) {
+  inactivateChoices[idx] = val;
+  const group = btn.closest('.inact-toggle-group');
+  group.querySelectorAll('.inact-toggle-btn').forEach(b => b.classList.remove('active-now','active-expire'));
+  btn.classList.add(val === 'now' ? 'active-now' : 'active-expire');
+}
+
+function setAllInactivateOpt(val) {
+  const id = inactivateTargetId;
+  const insts = (instances[id] || []).filter(i => i.status === 'current' || i.status === 'future');
+  insts.forEach((inst, i) => { if (inst.endDate) inactivateChoices[i] = val; });
+  renderInactivateList(insts);
+}
+
+function confirmInactivate() {
+  if (!inactivateTargetId) return;
+  const f = fees[tab].find(x => x.id === inactivateTargetId);
+  if (f) f.active = false;
+  closeInactivateModal();
+  render();
+}
+
+function closeInactivateModal() {
+  document.getElementById('inactivateModalOverlay').classList.remove('active');
+  inactivateTargetId = null;
+  inactivateChoices = {};
+}
+
 render();
 </script>
 
@@ -1460,7 +1721,7 @@ render();
 <div class="modal-overlay" id="feeDefModalOverlay" onclick="closeFeeDefOutside(event)">
   <div class="modal-container" style="width:540px;">
     <div class="modal-header">
-      <h2>Add Fee Definition</h2>
+      <h2 id="feeDefModalTitle">Add Fee Definition</h2>
       <button class="modal-close" onclick="closeFeeDefModal()"><span class="material-icons">close</span></button>
     </div>
     <div class="modal-body">
@@ -1530,13 +1791,13 @@ render();
 
       <span style="font-size:12px;color:#9E9E9E;line-height:1.5;">Fee Type and Application Type cannot be changed after creation.</span>
 
-      <div style="display:flex;flex-direction:column;width:100%;border:1px solid #E0E0E0;border-radius:4px;overflow:hidden;">
+      <div id="fdTogglesSection" style="display:flex;flex-direction:column;width:100%;border:1px solid #E0E0E0;border-radius:4px;overflow:hidden;">
         <div class="switch-row" onclick="toggleFdRequired(document.getElementById('fdRequiredToggle'))" style="cursor:pointer;padding:8px 12px;">
           <span class="switch-row-label" id="fdRequiredLbl">Required</span>
           <div class="toggle on" id="fdRequiredToggle"></div>
         </div>
-        <div style="height:1px;background:#E0E0E0;"></div>
-        <div class="switch-row" onclick="toggleFdActive(document.getElementById('fdActiveToggle'))" style="cursor:pointer;padding:8px 12px;">
+        <div id="fdActiveDivider" style="height:1px;background:#E0E0E0;"></div>
+        <div id="fdActiveRow" class="switch-row" onclick="toggleFdActive(document.getElementById('fdActiveToggle'))" style="cursor:pointer;padding:8px 12px;">
           <span class="switch-row-label" id="fdActiveLbl">Active</span>
           <div class="toggle on" id="fdActiveToggle"></div>
         </div>
@@ -1545,7 +1806,7 @@ render();
     </div>
     <div class="modal-footer">
       <button class="btn-text" onclick="closeFeeDefModal()">Cancel</button>
-      <button class="btn-primary">Save</button>
+      <button class="btn-primary" onclick="saveFeeDefinition()">Save</button>
     </div>
   </div>
 </div>
@@ -1573,11 +1834,40 @@ render();
   </div>
 </div>
 
+<!-- ─── Inactivate Fee Definition Modal ─── -->
+<div class="modal-overlay" id="inactivateModalOverlay" onclick="if(event.target===this)closeInactivateModal()">
+  <div class="modal-container" style="width:740px;max-height:90vh;">
+    <div class="modal-header">
+      <h2>Inactivate — <span id="inactivateFeeName"></span></h2>
+      <button class="modal-close" onclick="closeInactivateModal()"><span class="material-icons">close</span></button>
+    </div>
+    <div class="modal-body" style="gap:12px;padding-bottom:8px;">
+      <p style="margin:0;font-size:13px;color:#757575;line-height:1.5;">No new instances can be created after inactivation. Choose how to handle each active instance below.</p>
+
+      <!-- Bulk quick-actions -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#F5F5F5;border:1px solid #E0E0E0;border-radius:4px;">
+        <span style="font-size:12px;color:#757575;">Apply to all:</span>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-text" style="font-size:12px;height:28px;padding:0 10px;" onclick="setAllInactivateOpt('now')">End all now</button>
+          <button class="btn-text" style="font-size:12px;height:28px;padding:0 10px;" onclick="setAllInactivateOpt('expire')">Let all expire</button>
+        </div>
+      </div>
+
+      <!-- Instance rows -->
+      <div id="inactivateInstList" style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:340px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-text" onclick="closeInactivateModal()">Cancel</button>
+      <button class="btn-danger" onclick="confirmInactivate()">Inactivate Definition</button>
+    </div>
+  </div>
+</div>
+
 <!-- ─── Bulk Create Instances Modal ─── -->
 <div class="modal-overlay" id="bulkModalOverlay" onclick="closeBulkOutside(event)">
   <div class="modal-container" style="width:900px;">
     <div class="modal-header">
-      <h2>Bulk Create Instances</h2>
+      <h2>Create Instances</h2>
       <button class="modal-close" onclick="closeBulkModal()"><span class="material-icons">close</span></button>
     </div>
     <!-- Step indicator -->
@@ -1592,15 +1882,16 @@ render();
         <span class="step-label upcoming" id="bLabel2">Preview &amp; Confirm</span>
       </div>
     </div>
+    <hr class="bulk-stepper-rule">
     <!-- Body -->
     <div class="bulk-modal-body">
 
       <!-- Step 1: Configure -->
-      <div id="bStep1" style="flex:1;min-height:0;display:flex;flex-direction:column;gap:16px;overflow-y:auto;padding-top:16px;">
+      <div id="bStep1" style="flex:1;min-height:0;display:flex;flex-direction:column;gap:16px;overflow-y:auto;padding-top:0;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
 
           <!-- Fee Definition -->
-          <div class="field" style="grid-column:1/-1;">
+          <div class="field" id="bFeeDefField" style="grid-column:1/-1;">
             <label>Fee Definition <span class="req">*</span></label>
             <div class="select-wrapper">
               <div class="select-control">
@@ -1811,23 +2102,36 @@ let bulkSelectedSegments = new Set();
 let bulkSelectedClients  = new Set();
 let bulkSelectedAgencies = new Set();
 
-function openBulkModal() {
+function openCreateModal() {
   closeAddInstMenu();
   bulkSelectedSegments = new Set();
   bulkSelectedClients  = new Set();
   bulkSelectedAgencies = new Set();
-  document.getElementById('bFeeDefHidden').value = '';
-  document.getElementById('bFeeDefLbl').textContent = '— Select definition —';
-  document.getElementById('bFeeDefLbl').className = 'select-placeholder';
+
+  // Fee definition — pre-fill if a definition is selected in the left panel
+  const feeDefField = document.getElementById('bFeeDefField');
+  if (!panelCollapsed && feeId) {
+    const def = fees[tab].find(f => f.id === feeId);
+    if (def) {
+      document.getElementById('bFeeDefHidden').value = def.name;
+      document.getElementById('bFeeDefLbl').textContent = def.name;
+      document.getElementById('bFeeDefLbl').className = '';
+      feeDefField.style.display = 'none';
+    }
+  } else {
+    document.getElementById('bFeeDefHidden').value = '';
+    document.getElementById('bFeeDefLbl').textContent = '— Select definition —';
+    document.getElementById('bFeeDefLbl').className = 'select-placeholder';
+    feeDefField.style.display = '';
+    initBulkFeeDefMenu();
+  }
+
   document.getElementById('bFeeValue').value  = '';
   document.getElementById('bStartDate').value = '';
   document.getElementById('bEndDate').value   = '';
-  // reset scope hint to default state
-  document.getElementById('bScopeHint').style.background = '#F5F5F5';
+  document.getElementById('bAccount').value   = '';
+  document.getElementById('bScopeHint').style.background  = '#F5F5F5';
   document.getElementById('bScopeHint').style.borderColor = '#E0E0E0';
-  // Populate fee def menu from current tab
-  initBulkFeeDefMenu();
-  // Render multi-select dropdowns
   refreshBulkMultiSel();
   showBulkStep(1);
   document.getElementById('bulkModalOverlay').classList.add('active');

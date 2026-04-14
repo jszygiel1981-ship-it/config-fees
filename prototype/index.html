@@ -852,26 +852,26 @@ const fees = {
 const instances = {
   /* ── AP ── */
   'msp-fee': [
-    /* current — global standard 6% */
-    { feeValue:'6.0%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'10100', status:'current' },
-    { feeValue:'6.0%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'10100', status:'current' },
-    { feeValue:'6.0%', segments:'Non Clinical', client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'10100', status:'current' },
+    /* current — global standard 6%, staggered end dates */
+    { feeValue:'6.0%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'06/30/2026', account:'10100', status:'current' },
+    { feeValue:'6.0%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'06/30/2026', account:'10100', status:'current' },
+    { feeValue:'6.0%', segments:'Non Clinical', client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'09/30/2026', account:'10100', status:'current' },
     { feeValue:'6.0%', segments:'Per Diem',     client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'10100', status:'current' },
     { feeValue:'6.0%', segments:'Travel',       client:'',                       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'10100', status:'current' },
     /* client exceptions */
-    { feeValue:'5.0%', segments:'Nursing',      client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'10100', status:'current' },
-    { feeValue:'5.0%', segments:'Allied',       client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'12/31/2026', account:'10100', status:'current' },
+    { feeValue:'5.0%', segments:'Nursing',      client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'06/30/2026', account:'10100', status:'current' },
+    { feeValue:'5.0%', segments:'Allied',       client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2026', endDate:'09/30/2026', account:'10100', status:'current' },
     { feeValue:'5.5%', segments:'Nursing',      client:'Valley Health Network',  agency:'',                       startDate:'03/01/2026', endDate:null,         account:'10100', status:'current' },
     { feeValue:'5.5%', segments:'Allied',       client:'Valley Health Network',  agency:'',                       startDate:'03/01/2026', endDate:null,         account:'10100', status:'current' },
-    { feeValue:'4.5%', segments:'Nursing',      client:'Sunrise Medical',        agency:'MedPro Solutions',       startDate:'01/01/2026', endDate:'12/31/2026', account:'10100', status:'current' },
+    { feeValue:'4.5%', segments:'Nursing',      client:'Sunrise Medical',        agency:'MedPro Solutions',       startDate:'01/01/2026', endDate:'08/31/2026', account:'10100', status:'current' },
     { feeValue:'4.5%', segments:'Allied',       client:'Sunrise Medical',        agency:'MedPro Solutions',       startDate:'01/01/2026', endDate:'12/31/2026', account:'10100', status:'current' },
     { feeValue:'6.0%', segments:'Physician',    client:'Apex Medical',           agency:'',                       startDate:'01/01/2026', endDate:null,         account:'10100', status:'current' },
     { feeValue:'6.0%', segments:'Nursing',      client:'Coastal Providers',      agency:'National Staffing Co.',  startDate:'02/01/2026', endDate:null,         account:'10100', status:'current' },
     /* future — moving to 6.25% */
-    { feeValue:'6.25%', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'10100', status:'future'  },
+    { feeValue:'6.25%', segments:'Nursing',     client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'06/30/2027', account:'10100', status:'future'  },
     { feeValue:'6.25%', segments:'Allied',      client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'10100', status:'future'  },
-    { feeValue:'6.25%', segments:'Non Clinical',client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'10100', status:'future'  },
-    { feeValue:'5.25%', segments:'Nursing',     client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'10100', status:'future'  },
+    { feeValue:'6.25%', segments:'Non Clinical',client:'',                       agency:'',                       startDate:'07/01/2027', endDate:'12/31/2027', account:'10100', status:'future'  },
+    { feeValue:'5.25%', segments:'Nursing',     client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2027', endDate:'03/31/2027', account:'10100', status:'future'  },
     { feeValue:'5.75%', segments:'Nursing',     client:'Valley Health Network',  agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'10100', status:'future'  },
     { feeValue:'6.0%',  segments:'Per Diem',    client:'Pacific Health Partners',agency:'',                       startDate:'07/01/2026', endDate:null,         account:'10100', status:'future'  },
     /* past */
@@ -2026,7 +2026,7 @@ render();
       </div>
 
       <!-- Step 2: Preview & Confirm -->
-      <div id="bStep2" style="display:none;flex:1;min-height:0;flex-direction:column;gap:0;padding-top:0;">
+      <div id="bStep2" style="display:none;flex:1;min-height:0;flex-direction:column;gap:0;padding-top:0;overflow:hidden;">
         <div class="metric-group">
           <!-- Created -->
           <div class="metric-card" id="bCardCreated" onclick="toggleBulkFilter('clean')">

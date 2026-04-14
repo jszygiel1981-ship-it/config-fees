@@ -1872,7 +1872,7 @@ render();
       <h2>Inactivate — <span id="inactivateFeeName"></span></h2>
       <button class="modal-close" onclick="closeInactivateModal()"><span class="material-icons">close</span></button>
     </div>
-    <div class="modal-body" style="gap:12px;padding-bottom:8px;">
+    <div class="modal-body" style="gap:12px;padding-bottom:8px;flex:1;min-height:0;overflow:hidden;">
       <p style="margin:0;font-size:13px;color:#757575;line-height:1.5;">No new instances can be created after inactivation. Choose how to handle existing instances.</p>
 
       <!-- Option cards -->
@@ -1899,7 +1899,7 @@ render();
       </div>
 
       <!-- Instance grid -->
-      <div id="inactivateInstList" style="border:1px solid #E0E0E0;border-radius:4px;overflow:auto;max-height:300px;"></div>
+      <div id="inactivateInstList" style="border:1px solid #E0E0E0;border-radius:4px;overflow:auto;flex:1;min-height:0;"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-text" onclick="closeInactivateModal()">Cancel</button>
@@ -1910,7 +1910,7 @@ render();
 
 <!-- ─── Bulk Create Instances Modal ─── -->
 <div class="modal-overlay" id="bulkModalOverlay" onclick="closeBulkOutside(event)">
-  <div class="modal-container" style="width:900px;height:90vh;max-height:90vh;">
+  <div class="modal-container" style="width:900px;">
     <div class="modal-header">
       <h2>Create Instances</h2>
       <button class="modal-close" onclick="closeBulkModal()"><span class="material-icons">close</span></button>

@@ -466,7 +466,10 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .preview-table tbody tr:last-child td { border-bottom:none; }
     /* ─── Metric Card (from design system MetricCard component) ─── */
     .metric-group { display:flex; flex-direction:row; gap:16px; align-items:stretch; flex-shrink:0; margin-bottom:16px; }
-    .metric-card { display:flex; flex-direction:column; flex:1; min-width:170px; background:#FFFFFF; border:1px solid #E0E0E0; border-radius:4px; padding:16px; gap:0; box-sizing:border-box; font-family:Roboto,sans-serif; }
+    .metric-card { display:flex; flex-direction:column; flex:1; min-width:170px; height:150px; background:#FFFFFF; border:1px solid #E0E0E0; border-radius:4px; padding:16px 16px 8px 16px; gap:0; box-sizing:border-box; font-family:Roboto,sans-serif; cursor:pointer; transition:border-color .15s,background .15s; }
+    .metric-card:hover { border-color:#BDBDBD; }
+    .metric-card.mc-active { border-color:#2196F3; background:#E3F2FD; }
+    .metric-card.mc-active .mc-label-text { color:#1565C0; }
     .mc-label-row { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; margin-bottom:8px; }
     .mc-label-left { display:flex; align-items:center; gap:4px; min-width:0; overflow:hidden; }
     .mc-label-icon { font-size:16px; color:#757575; flex-shrink:0; }
@@ -1907,7 +1910,7 @@ render();
 
 <!-- ─── Bulk Create Instances Modal ─── -->
 <div class="modal-overlay" id="bulkModalOverlay" onclick="closeBulkOutside(event)">
-  <div class="modal-container" style="width:900px;">
+  <div class="modal-container" style="width:900px;height:90vh;max-height:90vh;">
     <div class="modal-header">
       <h2>Create Instances</h2>
       <button class="modal-close" onclick="closeBulkModal()"><span class="material-icons">close</span></button>
@@ -2023,10 +2026,10 @@ render();
       </div>
 
       <!-- Step 2: Preview & Confirm -->
-      <div id="bStep2" style="display:none;flex:1;min-height:0;flex-direction:column;gap:0;padding-top:12px;">
+      <div id="bStep2" style="display:none;flex:1;min-height:0;flex-direction:column;gap:0;padding-top:0;">
         <div class="metric-group">
           <!-- Created -->
-          <div class="metric-card">
+          <div class="metric-card" id="bCardCreated" onclick="toggleBulkFilter('clean')">
             <div class="mc-label-row">
               <div class="mc-label-left">
                 <span class="mc-label-text">Created</span>
@@ -2047,7 +2050,7 @@ render();
             </div>
           </div>
           <!-- Existing Modified -->
-          <div class="metric-card" id="bCardModified">
+          <div class="metric-card" id="bCardModified" onclick="toggleBulkFilter('adjusted')">
             <div class="mc-label-row">
               <div class="mc-label-left">
                 <span class="mc-label-text">Existing Modified</span>
@@ -2068,7 +2071,7 @@ render();
             </div>
           </div>
           <!-- Blocked -->
-          <div class="metric-card" id="bCardBlocked">
+          <div class="metric-card" id="bCardBlocked" onclick="toggleBulkFilter('blocked')">
             <div class="mc-label-row">
               <div class="mc-label-left">
                 <span class="mc-label-text">Blocked</span>
@@ -2190,6 +2193,10 @@ function closeBulkOutside(e) {
 }
 
 function showBulkStep(n) {
+  if (n === 1) {
+    bulkFilter = null;
+    ['bCardCreated','bCardModified','bCardBlocked'].forEach(id => document.getElementById(id)?.classList.remove('mc-active'));
+  }
   document.getElementById('bStep1').style.display       = n === 1 ? 'flex' : 'none';
   document.getElementById('bStep2').style.display       = n === 2 ? 'flex' : 'none';
   document.getElementById('bBtnCancel').style.display   = n === 1 ? '' : 'none';
@@ -2424,7 +2431,7 @@ function generateBulkPreview() {
     const origEndDisplay = inst.origEnd ? (inst.origEnd === 'No end date' ? 'Open' : inst.origEnd) : '—';
     const feeCellStyle  = (isChanged && inst.origFee) ? ' style="background:#FFF3E0;font-weight:500;"' : ' class="muted"';
     const endCellStyle  = (isChanged && inst.origEnd) ? ' style="background:#FFF3E0;font-weight:500;"' : ' class="muted"';
-    return `<tr${rowStyle}><td>${inst.seg}</td><td>${inst.client}</td><td>${inst.agency}</td><td${feeCellStyle}>${origFeeDisplay}</td><td${endCellStyle}>${origEndDisplay}</td><td>${statusCell}</td></tr>`;
+    return `<tr${rowStyle} data-status="${inst.status}"><td>${inst.seg}</td><td>${inst.client}</td><td>${inst.agency}</td><td${feeCellStyle}>${origFeeDisplay}</td><td${endCellStyle}>${origEndDisplay}</td><td>${statusCell}</td></tr>`;
   }).join('');
 
   updateBulkSaveBtn();
@@ -2436,6 +2443,19 @@ function prevDay(dateStr) {
   if (p.length !== 3) return dateStr;
   const d = new Date(p[2], p[0] - 1, p[1] - 1);
   return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+}
+
+let bulkFilter = null;
+
+function toggleBulkFilter(status) {
+  bulkFilter = (bulkFilter === status) ? null : status;
+  ['bCardCreated','bCardModified','bCardBlocked'].forEach(id => document.getElementById(id).classList.remove('mc-active'));
+  if (bulkFilter === 'clean')    document.getElementById('bCardCreated').classList.add('mc-active');
+  if (bulkFilter === 'adjusted') document.getElementById('bCardModified').classList.add('mc-active');
+  if (bulkFilter === 'blocked')  document.getElementById('bCardBlocked').classList.add('mc-active');
+  document.querySelectorAll('#bPreviewTbody tr').forEach(tr => {
+    tr.style.display = (!bulkFilter || tr.dataset.status === bulkFilter) ? '' : 'none';
+  });
 }
 
 function updateBulkSaveBtn() {

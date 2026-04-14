@@ -540,9 +540,9 @@ body { font-family: var(--font-family); background-color: var(--color-background
 <!-- ─── AP / AR Tabs ─── -->
 <div class="page-tabs">
   <div class="ptab active" onclick="selectTab('ap',this)">AP</div>
-  <div class="ptab" onclick="selectTab('ar',this)">AR</div>
-  <div class="ptab" onclick="selectTab('tenant',this)">Tenant</div>
-  <div class="ptab" onclick="selectTab('expenses',this)">Expenses</div>
+  <div class="ptab ptab-disabled">AR</div>
+  <div class="ptab ptab-disabled">Tenant</div>
+  <div class="ptab ptab-disabled">Expenses</div>
 </div>
 
 <!-- ─── Content ─── -->
@@ -599,10 +599,6 @@ body { font-family: var(--font-family); background-color: var(--color-background
             <div class="add-inst-menu-item" onclick="closeAddInstMenu();openCreateModal()">
               <span class="material-icons">add</span> Add Instance
             </div>
-            <div class="add-inst-menu-item" onclick="openFeeDefModal(); closeAddInstMenu()">
-              <span class="material-icons">library_add</span> Add Fee Definition
-            </div>
-            <div class="add-inst-menu-divider"></div>
           </div>
         </div>
       </div>
@@ -1397,8 +1393,11 @@ function openFeeDefModal() {
   fdGroupValue = '';
   document.getElementById('fdGroupInput').value = '';
   document.getElementById('fdGroupInput').disabled = false;
+  document.getElementById('fdGroupInput').style.background = '';
+  document.getElementById('fdGroupInput').style.color = '';
   document.getElementById('fdGroup').value = '';
   closeGroupAc();
+  document.getElementById('fdEditBanner').style.display = 'none';
   const reqToggle = document.getElementById('fdRequiredToggle');
   reqToggle.classList.add('on');
   reqToggle.style.pointerEvents = '';
@@ -1422,13 +1421,16 @@ function openFeeDefEditModal(id) {
   nameInput.value = f.name;
   nameInput.disabled = true;
 
-  // Description and Group — editable
+  // Description editable; Group locked
   document.getElementById('fdDesc').value = f.desc || '';
   fdGroupValue = f.group || '';
   document.getElementById('fdGroupInput').value = f.group || '';
-  document.getElementById('fdGroupInput').disabled = false;
+  document.getElementById('fdGroupInput').disabled = true;
+  document.getElementById('fdGroupInput').style.background = '#F5F5F5';
+  document.getElementById('fdGroupInput').style.color = '#757575';
   document.getElementById('fdGroup').value = f.group || '';
   closeGroupAc();
+  document.getElementById('fdEditBanner').style.display = '';
 
   // Set locked selects to show values but disable interaction
   const feeTypeWrapper = document.querySelector('#feeDefModalOverlay .field-row .field:first-child');
@@ -1725,6 +1727,10 @@ render();
       <button class="modal-close" onclick="closeFeeDefModal()"><span class="material-icons">close</span></button>
     </div>
     <div class="modal-body">
+
+      <div id="fdEditBanner" style="display:none;background:#E3F2FD;border:1px solid #90CAF9;border-radius:4px;padding:8px 12px;font-size:13px;color:#1565C0;margin-bottom:16px;">
+        <span class="material-icons" style="font-size:16px;vertical-align:-3px;margin-right:6px;">info</span>Only description can be edited.
+      </div>
 
       <div class="field">
         <label>Name <span class="req">*</span></label>
@@ -2059,17 +2065,15 @@ render();
         <div class="preview-table-wrap">
           <table class="preview-table">
             <colgroup>
-              <col style="width:40px">
+              <col style="width:16%">
+              <col style="width:20%">
+              <col style="width:20%">
               <col style="width:14%">
-              <col style="width:18%">
-              <col style="width:18%">
-              <col style="width:12%">
-              <col style="width:12%">
-              <col style="width:12%">
+              <col style="width:14%">
+              <col style="width:16%">
             </colgroup>
             <thead>
               <tr>
-                <th style="padding:0 0 0 12px;"><input type="checkbox" id="bSelectAll" style="accent-color:#2196F3;width:15px;height:15px;cursor:pointer;" onchange="toggleBulkSelectAll(this)"></th>
                 <th>Segment</th>
                 <th>Client</th>
                 <th>Agency</th>
@@ -2378,18 +2382,14 @@ function generateBulkPreview() {
       const tip = inst.detail.replace(/"/g, '&quot;');
       statusCell = `<span class="tip-wrap" data-tip="${tip}"><span class="chip chip-sm chip-error-outline"><span class="chip-label">Blocked</span></span></span>`;
     }
-    const chk = isBlocked
-      ? `<input type="checkbox" class="bulk-row-chk" disabled style="accent-color:#2196F3;width:15px;height:15px;">`
-      : `<input type="checkbox" class="bulk-row-chk" checked style="accent-color:#2196F3;width:15px;height:15px;cursor:pointer;" onchange="updateBulkSaveBtn()">`;
     const rowStyle = isBlocked ? ' style="opacity:0.5;"' : '';
+    const isChanged = inst.status === 'adjusted' || inst.status === 'blocked';
     const origFeeDisplay = inst.origFee || '—';
     const origEndDisplay = inst.origEnd ? (inst.origEnd === 'No end date' ? 'Open' : inst.origEnd) : '—';
-    return `<tr${rowStyle}><td style="padding:0 0 0 12px;">${chk}</td><td>${inst.seg}</td><td>${inst.client}</td><td>${inst.agency}</td><td class="muted">${origFeeDisplay}</td><td class="muted">${origEndDisplay}</td><td>${statusCell}</td></tr>`;
+    const feeCellStyle  = (isChanged && inst.origFee) ? ' style="background:#FFF3E0;font-weight:500;"' : ' class="muted"';
+    const endCellStyle  = (isChanged && inst.origEnd) ? ' style="background:#FFF3E0;font-weight:500;"' : ' class="muted"';
+    return `<tr${rowStyle}><td>${inst.seg}</td><td>${inst.client}</td><td>${inst.agency}</td><td${feeCellStyle}>${origFeeDisplay}</td><td${endCellStyle}>${origEndDisplay}</td><td>${statusCell}</td></tr>`;
   }).join('');
-
-  // Select-all state
-  const selectAll = document.getElementById('bSelectAll');
-  if (selectAll) { selectAll.checked = true; selectAll.indeterminate = false; }
 
   updateBulkSaveBtn();
   showBulkStep(2);
@@ -2403,24 +2403,13 @@ function prevDay(dateStr) {
 }
 
 function updateBulkSaveBtn() {
-  const allChk     = [...document.querySelectorAll('.bulk-row-chk:not(:disabled)')];
-  const checkedChk = allChk.filter(c => c.checked);
-  const total      = document.querySelectorAll('.bulk-row-chk').length;
-  const btn        = document.getElementById('bBtnSave');
-  const n          = checkedChk.length;
-  btn.textContent  = n < total ? `Create ${n} of ${total}` : `Create all ${n}`;
-  btn.disabled     = n === 0;
-
-  const selectAll = document.getElementById('bSelectAll');
-  if (selectAll) {
-    selectAll.checked       = checkedChk.length === allChk.length && allChk.length > 0;
-    selectAll.indeterminate = checkedChk.length > 0 && checkedChk.length < allChk.length;
-  }
-}
-
-function toggleBulkSelectAll(master) {
-  document.querySelectorAll('.bulk-row-chk:not(:disabled)').forEach(c => c.checked = master.checked);
-  updateBulkSaveBtn();
+  const btn   = document.getElementById('bBtnSave');
+  const rows  = [...document.querySelectorAll('#bPreviewTbody tr')];
+  const total = rows.length;
+  const blocked = rows.filter(r => r.style.opacity === '0.5').length;
+  const n = total - blocked;
+  btn.textContent = `Create ${n} instance${n !== 1 ? 's' : ''}`;
+  btn.disabled    = n === 0;
 }
 
 function saveBulkInstances() {

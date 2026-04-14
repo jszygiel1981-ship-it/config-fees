@@ -870,6 +870,7 @@ const instances = {
     { feeValue:'6.25%', segments:'Non Clinical',client:'',                       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'10100', status:'future'  },
     { feeValue:'5.25%', segments:'Nursing',     client:'Atlas Healthcare',       agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'10100', status:'future'  },
     { feeValue:'5.75%', segments:'Nursing',     client:'Valley Health Network',  agency:'',                       startDate:'01/01/2027', endDate:'12/31/2027', account:'10100', status:'future'  },
+    { feeValue:'6.0%',  segments:'Per Diem',    client:'Pacific Health Partners',agency:'',                       startDate:'07/01/2026', endDate:null,         account:'10100', status:'future'  },
     /* past */
     { feeValue:'5.5%', segments:'Nursing',      client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'10100', status:'past'    },
     { feeValue:'5.5%', segments:'Allied',       client:'',                       agency:'',                       startDate:'01/01/2025', endDate:'12/31/2025', account:'10100', status:'past'    },
@@ -1689,17 +1690,14 @@ function renderInactivateList(insts) {
 
   const rows = insts.map((inst) => {
     const isOpen = !inst.endDate;
-    let outcomeLabel;
+    let endDisplay;
     if (inactivateMode === 'now') {
-      outcomeLabel = `<span style="color:#DB4537;font-weight:500;">Ends today</span>`;
+      endDisplay = `<span style="color:#DB4537;font-weight:500;">Today</span>`;
     } else {
-      outcomeLabel = isOpen
-        ? `<span style="color:#DB4537;font-weight:500;">Closes today</span>`
-        : `<span style="color:#4CAF50;font-weight:500;">${inst.endDate}</span>`;
+      endDisplay = isOpen
+        ? `<span style="color:#DB4537;font-style:italic;">Open-ended</span>`
+        : `<span style="color:#212121;">${inst.endDate}</span>`;
     }
-    const endDisplay = isOpen
-      ? `<span style="color:#9E9E9E;font-style:italic;">Open-ended</span>`
-      : inst.endDate;
     return `<tr style="border-bottom:1px solid #F0F0F0;">
       <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;color:#212121;">${inst.segments || '—'}</td>
       <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;color:#212121;">${inst.client || '—'}</td>
@@ -1707,7 +1705,6 @@ function renderInactivateList(insts) {
       <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;color:#212121;font-variant-numeric:tabular-nums;">${inst.feeValue}</td>
       <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;color:#757575;">${inst.startDate}</td>
       <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;">${endDisplay}</td>
-      <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;">${outcomeLabel}</td>
     </tr>`;
   }).join('');
 
@@ -1721,7 +1718,6 @@ function renderInactivateList(insts) {
           <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Fee Value</th>
           <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Start Date</th>
           <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">End Date</th>
-          <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Outcome</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>

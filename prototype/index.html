@@ -1680,7 +1680,7 @@ function renderInactivateList(insts) {
   }
 
   const openCount = insts.filter(i => !i.endDate).length;
-  if (openCount > 0) {
+  if (inactivateMode === 'expire' && openCount > 0) {
     banner.style.display = '';
     document.getElementById('inactOpenEndedMsg').textContent =
       `${openCount} open-ended instance${openCount !== 1 ? 's have' : ' has'} no end date and will close today. Add an end date to any instance before inactivating if you'd like it to run longer.`;

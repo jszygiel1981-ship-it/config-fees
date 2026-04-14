@@ -378,14 +378,15 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .inact-inst-info { flex:1; min-width:0; }
     .inact-inst-scope { font-size:13px; font-weight:500; color:#212121; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .inact-inst-meta { font-size:12px; color:#757575; margin-top:2px; }
-    .inact-inst-enddate { font-size:12px; color:#212121; white-space:nowrap; flex-shrink:0; text-align:right; }
-    .inact-inst-enddate .open-label { color:#9E9E9E; font-style:italic; }
-    .inact-toggle-group { display:flex; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden; flex-shrink:0; }
-    .inact-toggle-btn { height:28px; padding:0 10px; font-family:Roboto,sans-serif; font-size:12px; font-weight:500; background:#fff; border:none; cursor:pointer; color:#757575; white-space:nowrap; }
-    .inact-toggle-btn:first-child { border-right:1px solid #E0E0E0; }
-    .inact-toggle-btn.active-now { background:#DB4537; color:#fff; }
-    .inact-toggle-btn.active-expire { background:#2196F3; color:#fff; }
-    .inact-open-label { font-size:12px; color:#9E9E9E; font-style:italic; white-space:nowrap; flex-shrink:0; }
+    .inact-inst-enddate { font-size:12px; color:#212121; white-space:nowrap; flex-shrink:0; text-align:right; display:flex; align-items:center; gap:6px; }
+    /* ─── Inactivation option cards ─── */
+    .inact-option-card { display:flex; align-items:flex-start; gap:12px; padding:12px 14px; border:2px solid #E0E0E0; border-radius:4px; cursor:pointer; background:#fff; user-select:none; transition:border-color .15s,background .15s; }
+    .inact-option-card.selected { border-color:#2196F3; background:#E3F2FD; }
+    .inact-option-card-radio { width:18px; height:18px; border-radius:50%; border:2px solid #BDBDBD; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; transition:border-color .15s; }
+    .inact-option-card.selected .inact-option-card-radio { border-color:#2196F3; }
+    .inact-option-card.selected .inact-option-card-radio::after { content:''; width:8px; height:8px; border-radius:50%; background:#2196F3; display:block; }
+    .inact-option-card-label { font-size:14px; font-weight:500; color:#212121; line-height:1.4; }
+    .inact-option-card-desc { font-size:12px; color:#757575; margin-top:2px; line-height:1.5; }
 
     /* ─── Collapsed panel gap fix ─── */
     #contentArea.panel-collapsed { gap:0; }
@@ -1642,34 +1643,66 @@ function deleteFutureInstance(id, idx) {
 
 /* ─── Inactivation Modal ─── */
 let inactivateTargetId = null;
-let inactivateChoices = {}; // idx → 'now' | 'expire'
+let inactivateMode = 'expire'; // 'now' | 'expire'
 
 function openInactivateModal(id) {
   inactivateTargetId = id;
+  inactivateMode = 'expire';
   const f = fees[tab].find(x => x.id === id);
   if (!f) return;
 
   document.getElementById('inactivateFeeName').textContent = f.name;
+  document.getElementById('inactOptNow').classList.remove('selected');
+  document.getElementById('inactOptExpire').classList.add('selected');
 
-  // Default all active/future instances to 'expire'
   const insts = (instances[id] || []).filter(i => i.status === 'current' || i.status === 'future');
-  inactivateChoices = {};
-  insts.forEach((inst, i) => { inactivateChoices[i] = inst.endDate ? 'expire' : 'now'; });
-
   renderInactivateList(insts);
   document.getElementById('inactivateModalOverlay').classList.add('active');
 }
 
+function setInactivateMode(mode) {
+  inactivateMode = mode;
+  document.getElementById('inactOptNow').classList.toggle('selected', mode === 'now');
+  document.getElementById('inactOptExpire').classList.toggle('selected', mode === 'expire');
+  const insts = (instances[inactivateTargetId] || []).filter(i => i.status === 'current' || i.status === 'future');
+  renderInactivateList(insts);
+}
+
 function renderInactivateList(insts) {
   const list = document.getElementById('inactivateInstList');
+  const banner = document.getElementById('inactOpenEndedBanner');
+
   if (!insts.length) {
     list.innerHTML = '<div style="padding:16px;text-align:center;font-size:13px;color:#9E9E9E;">No active instances — the definition will be marked inactive.</div>';
+    banner.style.display = 'none';
     return;
   }
-  list.innerHTML = insts.map((inst, i) => {
+
+  const openCount = insts.filter(i => !i.endDate).length;
+  if (inactivateMode === 'expire' && openCount > 0) {
+    banner.style.display = '';
+    document.getElementById('inactOpenEndedMsg').textContent =
+      `${openCount} open-ended instance${openCount !== 1 ? 's have' : ' has'} no end date and will close today. Add an end date to any instance before inactivating if you'd like it to run longer.`;
+  } else {
+    banner.style.display = 'none';
+  }
+
+  list.innerHTML = insts.map((inst) => {
     const scope = [inst.segments, inst.client, inst.agency].filter(Boolean).join(' · ');
     const isOpen = !inst.endDate;
-    const choice = inactivateChoices[i];
+    const currentLabel = isOpen
+      ? `<span style="color:#9E9E9E;font-style:italic;">Open-ended</span>`
+      : `<span style="color:#757575;">Ends ${inst.endDate}</span>`;
+
+    let outcomeLabel;
+    if (inactivateMode === 'now') {
+      outcomeLabel = `<span style="color:#DB4537;font-weight:500;">Ends today</span>`;
+    } else {
+      outcomeLabel = isOpen
+        ? `<span style="color:#DB4537;font-weight:500;">Closes today</span>`
+        : `<span style="color:#4CAF50;font-weight:500;">Runs to ${inst.endDate}</span>`;
+    }
+
     return `
     <div class="inact-inst-row">
       <div class="inact-inst-info">
@@ -1677,31 +1710,12 @@ function renderInactivateList(insts) {
         <div class="inact-inst-meta">Fee: ${inst.feeValue} &nbsp;·&nbsp; Started ${inst.startDate}</div>
       </div>
       <div class="inact-inst-enddate">
-        ${isOpen ? '<span class="open-label">Open-ended</span>' : `Ends ${inst.endDate}`}
+        ${currentLabel}
+        <span class="material-icons" style="font-size:14px;color:#BDBDBD;">arrow_forward</span>
+        ${outcomeLabel}
       </div>
-      ${isOpen
-        ? `<span class="inact-open-label">Closes on inactivation</span>`
-        : `<div class="inact-toggle-group">
-            <button class="inact-toggle-btn ${choice === 'now' ? 'active-now' : ''}" onclick="setInactivateChoice(${i},'now',this)">End now</button>
-            <button class="inact-toggle-btn ${choice === 'expire' ? 'active-expire' : ''}" onclick="setInactivateChoice(${i},'expire',this)">Let expire</button>
-          </div>`
-      }
     </div>`;
   }).join('');
-}
-
-function setInactivateChoice(idx, val, btn) {
-  inactivateChoices[idx] = val;
-  const group = btn.closest('.inact-toggle-group');
-  group.querySelectorAll('.inact-toggle-btn').forEach(b => b.classList.remove('active-now','active-expire'));
-  btn.classList.add(val === 'now' ? 'active-now' : 'active-expire');
-}
-
-function setAllInactivateOpt(val) {
-  const id = inactivateTargetId;
-  const insts = (instances[id] || []).filter(i => i.status === 'current' || i.status === 'future');
-  insts.forEach((inst, i) => { if (inst.endDate) inactivateChoices[i] = val; });
-  renderInactivateList(insts);
 }
 
 function confirmInactivate() {
@@ -1715,7 +1729,7 @@ function confirmInactivate() {
 function closeInactivateModal() {
   document.getElementById('inactivateModalOverlay').classList.remove('active');
   inactivateTargetId = null;
-  inactivateChoices = {};
+  inactivateMode = 'expire';
 }
 
 render();
@@ -1850,19 +1864,33 @@ render();
       <button class="modal-close" onclick="closeInactivateModal()"><span class="material-icons">close</span></button>
     </div>
     <div class="modal-body" style="gap:12px;padding-bottom:8px;">
-      <p style="margin:0;font-size:13px;color:#757575;line-height:1.5;">No new instances can be created after inactivation. Choose how to handle each active instance below.</p>
+      <p style="margin:0;font-size:13px;color:#757575;line-height:1.5;">No new instances can be created after inactivation. Choose how to handle existing instances.</p>
 
-      <!-- Bulk quick-actions -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#F5F5F5;border:1px solid #E0E0E0;border-radius:4px;">
-        <span style="font-size:12px;color:#757575;">Apply to all:</span>
-        <div style="display:flex;gap:8px;">
-          <button class="btn-text" style="font-size:12px;height:28px;padding:0 10px;" onclick="setAllInactivateOpt('now')">End all now</button>
-          <button class="btn-text" style="font-size:12px;height:28px;padding:0 10px;" onclick="setAllInactivateOpt('expire')">Let all expire</button>
+      <!-- Option cards -->
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="inact-option-card" id="inactOptNow" onclick="setInactivateMode('now')">
+          <div class="inact-option-card-radio"></div>
+          <div>
+            <div class="inact-option-card-label">End all immediately</div>
+            <div class="inact-option-card-desc">All active and future instances will end today.</div>
+          </div>
+        </div>
+        <div class="inact-option-card selected" id="inactOptExpire" onclick="setInactivateMode('expire')">
+          <div class="inact-option-card-radio"></div>
+          <div>
+            <div class="inact-option-card-label">Let existing instances expire</div>
+            <div class="inact-option-card-desc">Instances with end dates will run to those dates. No new instances can be created.</div>
+          </div>
         </div>
       </div>
 
+      <!-- Open-ended warning banner -->
+      <div id="inactOpenEndedBanner" style="display:none;background:#FFF3E0;border:1px solid #FFB74D;border-radius:4px;padding:8px 12px;font-size:13px;color:#E65100;line-height:1.5;">
+        <span class="material-icons" style="font-size:16px;vertical-align:-3px;margin-right:6px;">warning_amber</span><span id="inactOpenEndedMsg"></span>
+      </div>
+
       <!-- Instance rows -->
-      <div id="inactivateInstList" style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:340px;"></div>
+      <div id="inactivateInstList" style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:300px;"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-text" onclick="closeInactivateModal()">Cancel</button>

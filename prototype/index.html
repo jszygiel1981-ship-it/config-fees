@@ -1403,6 +1403,7 @@ function openFeeDefModal() {
   reqToggle.style.pointerEvents = '';
   reqToggle.style.opacity = '';
   document.getElementById('fdTogglesSection').style.cursor = '';
+  document.getElementById('fdTogglesSection').style.pointerEvents = '';
   document.getElementById('fdRequiredLbl').textContent = 'Required';
   document.getElementById('fdRequired').value = 'required';
   // Hide Active toggle — controlled from card menu only
@@ -1456,6 +1457,7 @@ function openFeeDefEditModal(id) {
   reqToggle.style.pointerEvents = 'none';
   reqToggle.style.opacity = '0.5';
   document.getElementById('fdTogglesSection').style.cursor = 'default';
+  document.getElementById('fdTogglesSection').style.pointerEvents = 'none';
 
   // Hide Active toggle — controlled from card menu only
   document.getElementById('fdActiveRow').style.display = 'none';

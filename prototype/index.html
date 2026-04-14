@@ -1969,34 +1969,40 @@ render();
             </div>
           </div>
 
-          <!-- Scope constraint note — always visible above Clients and Agencies -->
-          <div id="bScopeHint" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;padding:8px 12px;border-radius:4px;background:#F5F5F5;border:1px solid #E0E0E0;">
-            <span class="material-icons" id="bScopeIcon" style="font-size:16px;color:#757575;flex-shrink:0;margin-top:1px;">info_outline</span>
-            <span id="bScopeTxt" style="font-size:12px;color:#757575;line-height:1.5;">You can select <strong>multiple clients with a single agency</strong>, or <strong>multiple agencies with a single client</strong> — not multiples of both at once.</span>
-          </div>
+          <!-- Client / Agency scope group -->
+          <div style="grid-column:1/-1;border:1px solid #E0E0E0;border-radius:4px;padding:16px;position:relative;display:flex;flex-direction:column;gap:12px;">
+            <span style="position:absolute;top:-9px;left:12px;background:#fff;padding:0 6px;font-size:11px;font-weight:500;color:#757575;letter-spacing:0.4px;text-transform:uppercase;">Client / Agency</span>
 
-          <!-- Clients -->
-          <div class="field" style="grid-column:1/-1;">
-            <label>Clients</label>
-            <div class="multi-sel-wrap">
-              <div class="multi-sel-trigger" id="bClientTrigger" onclick="toggleMultiSel('bClientTrigger','bClientMenu')">
-                <span class="multi-sel-placeholder">— Any client —</span>
-                <span class="material-icons multi-sel-arrow">arrow_drop_down</span>
-              </div>
-              <div class="multi-sel-menu" id="bClientMenu" data-trigger="bClientTrigger"></div>
+            <!-- Scope constraint banner -->
+            <div id="bScopeHint" style="display:flex;align-items:flex-start;gap:6px;padding:8px 12px;border-radius:4px;background:#F5F5F5;border:1px solid #E0E0E0;">
+              <span class="material-icons" id="bScopeIcon" style="font-size:16px;color:#757575;flex-shrink:0;margin-top:1px;">info_outline</span>
+              <span id="bScopeTxt" style="font-size:12px;color:#757575;line-height:1.5;">You can select <strong>multiple clients with a single agency</strong>, or <strong>multiple agencies with a single client</strong> — not multiples of both at once.</span>
             </div>
-          </div>
 
-          <!-- Agencies -->
-          <div class="field" style="grid-column:1/-1;">
-            <label>Agencies</label>
-            <div class="multi-sel-wrap">
-              <div class="multi-sel-trigger" id="bAgencyTrigger" onclick="toggleMultiSel('bAgencyTrigger','bAgencyMenu')">
-                <span class="multi-sel-placeholder">— Any agency —</span>
-                <span class="material-icons multi-sel-arrow">arrow_drop_down</span>
+            <!-- Clients -->
+            <div class="field">
+              <label>Clients</label>
+              <div class="multi-sel-wrap">
+                <div class="multi-sel-trigger" id="bClientTrigger" onclick="toggleMultiSel('bClientTrigger','bClientMenu')">
+                  <span class="multi-sel-placeholder">— Any client —</span>
+                  <span class="material-icons multi-sel-arrow">arrow_drop_down</span>
+                </div>
+                <div class="multi-sel-menu" id="bClientMenu" data-trigger="bClientTrigger"></div>
               </div>
-              <div class="multi-sel-menu" id="bAgencyMenu" data-trigger="bAgencyTrigger"></div>
             </div>
+
+            <!-- Agencies -->
+            <div class="field">
+              <label>Agencies</label>
+              <div class="multi-sel-wrap">
+                <div class="multi-sel-trigger" id="bAgencyTrigger" onclick="toggleMultiSel('bAgencyTrigger','bAgencyMenu')">
+                  <span class="multi-sel-placeholder">— Any agency —</span>
+                  <span class="material-icons multi-sel-arrow">arrow_drop_down</span>
+                </div>
+                <div class="multi-sel-menu" id="bAgencyMenu" data-trigger="bAgencyTrigger"></div>
+              </div>
+            </div>
+
           </div>
 
           <!-- Dates -->

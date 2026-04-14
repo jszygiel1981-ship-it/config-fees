@@ -1687,35 +1687,45 @@ function renderInactivateList(insts) {
     banner.style.display = 'none';
   }
 
-  list.innerHTML = insts.map((inst) => {
-    const scope = [inst.segments, inst.client, inst.agency].filter(Boolean).join(' · ');
+  const rows = insts.map((inst) => {
     const isOpen = !inst.endDate;
-    const currentLabel = isOpen
-      ? `<span style="color:#9E9E9E;font-style:italic;">Open-ended</span>`
-      : `<span style="color:#757575;">Ends ${inst.endDate}</span>`;
-
     let outcomeLabel;
     if (inactivateMode === 'now') {
       outcomeLabel = `<span style="color:#DB4537;font-weight:500;">Ends today</span>`;
     } else {
       outcomeLabel = isOpen
         ? `<span style="color:#DB4537;font-weight:500;">Closes today</span>`
-        : `<span style="color:#4CAF50;font-weight:500;">Runs to ${inst.endDate}</span>`;
+        : `<span style="color:#4CAF50;font-weight:500;">${inst.endDate}</span>`;
     }
-
-    return `
-    <div class="inact-inst-row">
-      <div class="inact-inst-info">
-        <div class="inact-inst-scope">${scope}</div>
-        <div class="inact-inst-meta">Fee: ${inst.feeValue} &nbsp;·&nbsp; Started ${inst.startDate}</div>
-      </div>
-      <div class="inact-inst-enddate">
-        ${currentLabel}
-        <span class="material-icons" style="font-size:14px;color:#BDBDBD;">arrow_forward</span>
-        ${outcomeLabel}
-      </div>
-    </div>`;
+    const endDisplay = isOpen
+      ? `<span style="color:#9E9E9E;font-style:italic;">Open-ended</span>`
+      : inst.endDate;
+    return `<tr style="border-bottom:1px solid #F0F0F0;">
+      <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;color:#212121;">${inst.segments || '—'}</td>
+      <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;color:#212121;">${inst.client || '—'}</td>
+      <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;color:#212121;">${inst.agency || '—'}</td>
+      <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;color:#212121;font-variant-numeric:tabular-nums;">${inst.feeValue}</td>
+      <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;color:#757575;">${inst.startDate}</td>
+      <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;">${endDisplay}</td>
+      <td style="padding:0 12px;height:40px;vertical-align:middle;font-size:13px;">${outcomeLabel}</td>
+    </tr>`;
   }).join('');
+
+  list.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr>
+          <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Segment</th>
+          <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Client</th>
+          <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Agency</th>
+          <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Fee Value</th>
+          <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Start Date</th>
+          <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">End Date</th>
+          <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Outcome</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
 }
 
 function confirmInactivate() {
@@ -1889,8 +1899,8 @@ render();
         <span class="material-icons" style="font-size:16px;vertical-align:-3px;margin-right:6px;">warning_amber</span><span id="inactOpenEndedMsg"></span>
       </div>
 
-      <!-- Instance rows -->
-      <div id="inactivateInstList" style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:300px;"></div>
+      <!-- Instance grid -->
+      <div id="inactivateInstList" style="border:1px solid #E0E0E0;border-radius:4px;overflow:auto;max-height:300px;"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-text" onclick="closeInactivateModal()">Cancel</button>

@@ -169,9 +169,17 @@ body { font-family: var(--font-family); background-color: var(--color-background
 
     /* ─── Fee Definition Cards ─── */
     .lp-cards { flex:1; overflow-y:auto; padding:8px 12px; display:flex; flex-direction:column; gap:6px; }
-    .def-card { border:1px solid #E0E0E0; border-radius:4px; padding:12px; cursor:pointer; background:#fff; transition:border-color .15s, background .15s; }
+    .def-card { border:1px solid #E0E0E0; border-radius:4px; padding:12px; cursor:pointer; background:#fff; transition:border-color .2s ease, background .2s ease, box-shadow .2s ease; }
     .def-card:hover:not(.selected) { border-color:#BDBDBD; background:#FAFAFA; }
-    .def-card.selected { background:rgba(33,150,243,0.08); border-color:#64B5F6; }
+    .def-card.selected { background:rgba(33,150,243,0.08); border-color:#64B5F6; box-shadow:0 1px 4px rgba(33,150,243,0.1); }
+    /* Description expand animation */
+    .dc-desc-wrap { display:grid; grid-template-rows:0fr; transition:grid-template-rows .2s ease; }
+    .dc-desc-wrap > .dc-desc { overflow:hidden; min-height:0; padding-bottom:0; transition:padding-bottom .2s ease; }
+    .def-card.selected .dc-desc-wrap > .dc-desc { padding-bottom:8px; }
+    .def-card.selected .dc-desc-wrap { grid-template-rows:1fr; }
+    /* Kebab menu: only visible when selected */
+    .dc-menu-wrap { display:none; }
+    .def-card.selected .dc-menu-wrap { display:flex; }
     .def-card.disabled-card { background:#F0F0F0; cursor:pointer; }
     .def-card.disabled-card.selected { background:#E8E8E8; border-color:#BDBDBD; }
     .dc-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
@@ -246,8 +254,8 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .cell-chip { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:999px; font-size:11px; font-weight:400; white-space:nowrap; background:transparent; border:1px solid; }
     .cell-chip-gray   { border-color:#E0E0E0; color:#212121; }
     .cell-chip-blue   { border-color:#2196F3; color:#2196F3; }
-    .cell-chip-green  { border-color:#4CAF50; color:#4CAF50; }
-    .cell-chip-orange { border-color:#E17109; color:#E17109; }
+    .cell-chip-green  { border-color:#4CAF50; background:#4CAF50; color:#fff; }
+    .cell-chip-orange { border-color:#E17109; background:#FCF1E0; color:#E17109; }
     .cell-chip-red    { border-color:#DB4537; color:#DB4537; }
 
     /* ─── Empty State ─── */
@@ -356,6 +364,9 @@ body { font-family: var(--font-family); background-color: var(--color-background
     tr.row-inactive .cell-chip { border-color:rgba(0,0,0,0.1) !important; color:#BDBDBD !important; }
     .col-check { width:40px; padding:0 0 0 12px !important; flex-shrink:0; }
     .col-check input[type=checkbox] { accent-color:#2196F3; width:15px; height:15px; cursor:pointer; display:block; margin:0; }
+    .col-client { width:180px; min-width:180px; }
+    .col-agency { width:160px; min-width:160px; }
+    .col-account { width:72px; min-width:72px; }
     tr.row-inactive .act-btn { color:#BDBDBD !important; }
 
     /* ─── Disabled tabs ─── */
@@ -635,13 +646,13 @@ body { font-family: var(--font-family); background-color: var(--color-background
             <th class="col-feedef">Fee Definition<span class="material-icons sort-icon">unfold_more</span></th>
             <th>Fee %<span class="material-icons sort-icon">unfold_more</span></th>
             <th>Segments<span class="material-icons sort-icon">unfold_more</span></th>
-            <th>Client<span class="material-icons sort-icon">unfold_more</span></th>
-            <th>Agency<span class="material-icons sort-icon">unfold_more</span></th>
+            <th class="col-client">Client<span class="material-icons sort-icon">unfold_more</span></th>
+            <th class="col-agency">Agency<span class="material-icons sort-icon">unfold_more</span></th>
             <th>Start Date<span class="material-icons sort-icon">unfold_more</span></th>
             <th>End Date<span class="material-icons sort-icon">unfold_more</span></th>
             <th class="col-feedef">Group<span class="material-icons sort-icon">unfold_more</span></th>
             <th>Category<span class="material-icons sort-icon">unfold_more</span></th>
-            <th>Account<span class="material-icons sort-icon">unfold_more</span></th>
+            <th class="col-account">Account<span class="material-icons sort-icon">unfold_more</span></th>
             <th class="col-feedef">App Type<span class="material-icons sort-icon">unfold_more</span></th>
             <th>Status<span class="material-icons sort-icon">unfold_more</span></th>
             <th style="width:64px"></th>
@@ -650,13 +661,13 @@ body { font-family: var(--font-family); background-color: var(--color-background
             <th class="col-feedef"></th>
             <th><input class="col-filter-input" placeholder="%…" oninput="setColFilter('feeValue',this.value)" /></th>
             <th><input class="col-filter-input" placeholder="Segment…" oninput="setColFilter('segments',this.value)" /></th>
-            <th><input class="col-filter-input" placeholder="Client…" oninput="setColFilter('client',this.value)" /></th>
-            <th><input class="col-filter-input" placeholder="Agency…" oninput="setColFilter('agency',this.value)" /></th>
+            <th class="col-client"><input class="col-filter-input" placeholder="Client…" oninput="setColFilter('client',this.value)" /></th>
+            <th class="col-agency"><input class="col-filter-input" placeholder="Agency…" oninput="setColFilter('agency',this.value)" /></th>
             <th></th>
             <th></th>
             <th class="col-feedef"></th>
             <th><input class="col-filter-input" placeholder="Category…" oninput="setColFilter('category',this.value)" /></th>
-            <th><input class="col-filter-input" placeholder="Acct…" oninput="setColFilter('account',this.value)" /></th>
+            <th class="col-account"><input class="col-filter-input" placeholder="Acct…" oninput="setColFilter('account',this.value)" /></th>
             <th class="col-feedef"></th>
             <th></th>
             <th style="width:64px"></th>
@@ -1042,17 +1053,17 @@ function renderCards() {
     const isSelected = f.id === feeId;
     const isDisabled = !f.active;
     return `
-    <div class="def-card ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled-card' : ''}" onclick="selectFee('${f.id}')">
+    <div class="def-card ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled-card' : ''}" data-feeid="${f.id}" onclick="selectFee('${f.id}')">
       <div class="dc-header">
         <span class="dc-name">${f.name}</span>
         <span class="dc-group">${f.group}</span>
       </div>
-      ${isSelected ? `<div class="dc-desc">${f.desc}</div>` : ''}
+      <div class="dc-desc-wrap"><div class="dc-desc">${f.desc}</div></div>
       <div class="dc-chips" style="align-items:center;">
         <span class="dc-chip">${f.appType}</span>
         <span class="dc-chip">${f.required ? 'Required' : 'Optional'}</span>
         <span class="dc-chip ${f.active ? 'dc-chip-green' : 'dc-chip-muted'}">${f.active ? 'Active' : 'Inactive'}</span>
-        ${isSelected && f.active ? `
+        ${f.active ? `
         <div class="dc-menu-wrap" id="dcMenuWrap_${f.id}">
           <button class="dc-more-btn" onclick="event.stopPropagation();toggleDcMenu('${f.id}')"><span class="material-icons">more_vert</span></button>
           <div class="dc-menu" id="dcMenu_${f.id}">
@@ -1129,7 +1140,7 @@ function renderInstances() {
     const instStatus = !r._feeActive
       ? { label:'Inactive', cls:'cell-chip-gray' }
       : r.status === 'past'   ? { label:'Inactive', cls:'cell-chip-gray' }
-      : r.status === 'future' ? { label:'Upcoming', cls:'cell-chip-blue' }
+      : r.status === 'future' ? { label:'Upcoming', cls:'cell-chip-orange' }
       :                         { label:'Active',   cls:'cell-chip-green' };
     const trClass = (!r._feeActive || r.status === 'past') ? 'row-inactive' : '';
     const appTypeChip = r._feeAppType === 'Additive'
@@ -1140,13 +1151,13 @@ function renderInstances() {
       <td class="col-feedef" style="font-weight:500;">${r._feeName || ''}</td>
       <td class="mono">${r.feeValue}</td>
       <td>${r.segments}</td>
-      <td class="muted">${r.client || dash}</td>
-      <td class="muted">${r.agency || dash}</td>
+      <td class="muted col-client">${r.client || dash}</td>
+      <td class="muted col-agency">${r.agency || dash}</td>
       <td class="muted">${r.startDate}</td>
       <td class="muted">${r.endDate || '<span style="color:#9E9E9E">Open</span>'}</td>
       <td class="col-feedef muted">${r._feeGroup || ''}</td>
-      <td><span class="cell-chip ${categoryChipClass(cat)}">${cat}</span></td>
-      <td class="muted">${r.account || dash}</td>
+      <td class="muted">${cat}</td>
+      <td class="muted col-account">${r.account || dash}</td>
       <td class="col-feedef">${r._feeAppType ? appTypeChip : ''}</td>
       <td><span class="cell-chip ${instStatus.cls}">${instStatus.label}</span></td>
       <td>
@@ -1204,7 +1215,15 @@ function selectTab(t, el) {
   el.classList.add('active');
   render();
 }
-function selectFee(id) { feeId = id; render(); }
+function selectFee(id) {
+  feeId = id;
+  // Toggle selected class in-place so CSS transition fires cleanly
+  document.querySelectorAll('#feeCards .def-card').forEach(el => {
+    el.classList.toggle('selected', el.dataset.feeid === id);
+  });
+  renderInstances();
+  renderHeader();
+}
 function togglePanel() {
   panelCollapsed = !panelCollapsed;
   document.getElementById('contentArea').classList.toggle('panel-collapsed', panelCollapsed);
@@ -1900,14 +1919,14 @@ render();
 <div class="modal-overlay" id="bulkModalOverlay" onclick="closeBulkOutside(event)">
   <div class="modal-container" style="width:900px;">
     <div class="modal-header">
-      <h2>Create Instances</h2>
+      <h2>Add Configuration Instance</h2>
       <button class="modal-close" onclick="closeBulkModal()"><span class="material-icons">close</span></button>
     </div>
     <!-- Step indicator -->
     <div class="bulk-stepper">
       <div class="step" id="bStepInd1">
         <div class="step-circle active" id="bCircle1"><span class="step-number active" id="bNum1">1</span></div>
-        <span class="step-label active" id="bLabel1">Configure</span>
+        <span class="step-label active" id="bLabel1">Configuration</span>
       </div>
       <div class="connector upcoming" id="bStepConnector"></div>
       <div class="step" id="bStepInd2">
@@ -2045,14 +2064,14 @@ render();
           <div class="metric-card" id="bCardModified" onclick="toggleBulkFilter('adjusted')">
             <div class="mc-label-row">
               <div class="mc-label-left">
-                <span class="mc-label-text">Modified</span>
+                <span class="mc-label-text">Adjusted</span>
               </div>
             </div>
             <div class="mc-metrics">
               <div class="mc-row">
                 <div class="mc-col">
                   <span class="mc-value mc-value--lg" id="bMetricModified" style="color:#E17109">—</span>
-                  <span class="mc-sub-label">End date adjusted</span>
+                  <span class="mc-sub-label">End date adjustments</span>
                 </div>
               </div>
               <div class="mc-icons-footer">
@@ -2101,7 +2120,7 @@ render();
       <div style="flex:1;"></div>
       <button class="btn-primary" id="bBtnPreview" onclick="generateBulkPreview()">Preview &#8594;</button>
       <button class="btn-text" id="bBtnCancelRight" style="display:none;" onclick="closeBulkModal()">Cancel</button>
-      <button class="btn-primary" id="bBtnSave" style="display:none;" onclick="saveBulkInstances()">Create</button>
+      <button class="btn-primary" id="bBtnSave" style="display:none;" onclick="saveBulkInstances()">Save</button>
     </div>
   </div>
 </div>
@@ -2422,13 +2441,13 @@ function updateBulkBanner() {
     banner.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 16px;margin-bottom:10px;border:1px solid #E17109;border-radius:4px;font-size:13px;flex-shrink:0;background:#FCF1E0;color:#7B3A00;';
     banner.innerHTML = `
       <span class="material-icons" style="font-size:16px;color:#E17109;flex-shrink:0;">info_outline</span>
-      <span>To create the instances you requested, these existing instances will have their <strong>end dates adjusted</strong> to avoid date overlap. Fee percentages are not changed.</span>`;
+      <span>These existing instances overlap with the new start date you selected. To avoid conflicts, TRIO will automatically <strong>shift their end dates</strong> to the day before your new instances begin. Fee percentages are not affected.</span>`;
   } else if (bulkFilter === 'blocked') {
     banner.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 16px;margin-bottom:10px;border:1px solid #DB4537;border-radius:4px;font-size:13px;flex-shrink:0;background:#FBEAED;color:#7B1A12;';
     banner.innerHTML = `
       <span class="material-icons" style="font-size:16px;color:#DB4537;flex-shrink:0;">block</span>
-      <span>These instances could not be created due to conflicting future instances. Resolve those first, then retry.</span>
-      <button onclick="downloadBlockedInstances()" style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;background:#fff;border:1px solid #DB4537;border-radius:4px;color:#DB4537;font-family:Roboto,sans-serif;font-size:12px;cursor:pointer;flex-shrink:0;white-space:nowrap;"><span class="material-icons" style="font-size:14px;">download</span>Download</button>`;
+      <span>These instances could not be created due to future conflicting instances.</span>
+      <a onclick="downloadBlockedInstances()" style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#DB4537;text-decoration:underline;cursor:pointer;flex-shrink:0;white-space:nowrap;"><span class="material-icons" style="font-size:14px;">download</span>Download List</a>`;
   }
 }
 
@@ -2444,7 +2463,7 @@ function updateBulkTable() {
       ? filtered.map(i => `<tr><td>${i.seg}</td><td class="muted">${i.client}</td><td class="muted">${i.agency}</td></tr>`).join('')
       : `<tr><td colspan="3" style="text-align:center;color:#9E9E9E;padding:24px 0;">No instances to create</td></tr>`;
   } else if (bulkFilter === 'adjusted') {
-    thead.innerHTML = `<tr><th>Segment</th><th>Client</th><th>Agency</th><th>Fee %</th><th>Original End Date</th><th>New End Date</th></tr>`;
+    thead.innerHTML = `<tr><th>Segment</th><th>Client</th><th>Agency</th><th>Fee %</th><th>Start Date</th><th>Orig. End Date</th><th>New End Date</th></tr>`;
     tbody.innerHTML = filtered.length
       ? filtered.map(i => {
           const origEnd = i.origEnd ? (i.origEnd === 'No end date' ? 'Open' : i.origEnd) : dash;
@@ -2454,28 +2473,28 @@ function updateBulkTable() {
             <td class="muted">${i.client}</td>
             <td class="muted">${i.agency}</td>
             <td class="mono">${i.origFee || dash}</td>
+            <td class="muted">${i.start}</td>
             <td class="muted">${origEnd}</td>
-            <td class="mono" style="color:#E17109;font-weight:500;">${newEnd}</td>
+            <td class="mono" style="font-weight:600;">${newEnd}</td>
           </tr>`;
         }).join('')
-      : `<tr><td colspan="6" style="text-align:center;color:#9E9E9E;padding:24px 0;">No existing instances will be modified</td></tr>`;
+      : `<tr><td colspan="7" style="text-align:center;color:#9E9E9E;padding:24px 0;">No existing instances will be modified</td></tr>`;
   } else if (bulkFilter === 'blocked') {
-    thead.innerHTML = `<tr><th>Segment</th><th>Client</th><th>Agency</th><th>Reason</th></tr>`;
+    thead.innerHTML = `<tr><th>Segment</th><th>Client</th><th>Agency</th></tr>`;
     tbody.innerHTML = filtered.length
       ? filtered.map(i => `<tr style="opacity:0.7;">
           <td>${i.seg}</td>
           <td class="muted">${i.client}</td>
           <td class="muted">${i.agency}</td>
-          <td style="font-size:12px;color:#757575;">${i.detail}</td>
         </tr>`).join('')
-      : `<tr><td colspan="4" style="text-align:center;color:#9E9E9E;padding:24px 0;">No blocked instances</td></tr>`;
+      : `<tr><td colspan="3" style="text-align:center;color:#9E9E9E;padding:24px 0;">No blocked instances</td></tr>`;
   }
 }
 
 function updateBulkSaveBtn() {
   const btn = document.getElementById('bBtnSave');
   const n   = bulkInstances.filter(i => i.status === 'clean').length;
-  btn.textContent = `Create ${n} instance${n !== 1 ? 's' : ''}`;
+  btn.textContent = 'Save';
   btn.disabled    = n === 0;
 }
 

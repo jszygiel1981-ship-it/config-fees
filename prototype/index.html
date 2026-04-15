@@ -477,6 +477,14 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .preview-table thead th { position:sticky; top:0; z-index:1; background:#F5F5F5; border-bottom:1px solid #E0E0E0; padding:0 12px; height:36px; text-align:left; font-size:11px; font-weight:500; color:#757575; white-space:nowrap; overflow:hidden; }
     .preview-table tbody td { padding:0 12px; height:40px; border-bottom:1px solid #F0F0F0; color:#212121; vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .preview-table tbody tr:last-child td { border-bottom:none; }
+    /* ─── Reason popover ─── */
+    .reason-cell { display:flex; align-items:center; gap:4px; overflow:hidden; }
+    .reason-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
+    .reason-info-wrap { position:relative; flex-shrink:0; display:flex; align-items:center; }
+    .reason-info-wrap .material-icons { font-size:14px; color:#9E9E9E; cursor:default; }
+    .reason-info-wrap:hover .material-icons { color:#757575; }
+    .reason-popover { display:none; position:absolute; bottom:calc(100% + 6px); right:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.14); padding:8px 12px; font-size:12px; color:#212121; line-height:1.6; white-space:normal; width:280px; z-index:200; }
+    .reason-info-wrap:hover .reason-popover { display:block; }
     /* ─── Metric Card (from design system MetricCard component) ─── */
     .metric-group { display:flex; flex-direction:row; gap:16px; align-items:stretch; flex-shrink:0; margin-bottom:16px; }
     .metric-card { display:flex; flex-direction:column; flex:1; min-width:170px; height:150px; background:#FFFFFF; border:1px solid #E0E0E0; border-radius:4px; padding:16px 16px 8px 16px; gap:0; box-sizing:border-box; font-family:Roboto,sans-serif; cursor:pointer; transition:border-color .15s,background .15s; }
@@ -2477,14 +2485,24 @@ function updateBulkTable() {
         }).join('')
       : `<tr><td colspan="7" style="text-align:center;color:#9E9E9E;padding:24px 0;">No existing instances will be modified</td></tr>`;
   } else if (bulkFilter === 'blocked') {
-    thead.innerHTML = `<tr><th>Segment</th><th>Client</th><th>Agency</th></tr>`;
+    thead.innerHTML = `<tr><th>Segment</th><th>Client</th><th>Agency</th><th>Fee %</th><th>Reason</th></tr>`;
     tbody.innerHTML = filtered.length
-      ? filtered.map(i => `<tr style="opacity:0.7;">
+      ? filtered.map(i => `<tr style="opacity:0.75;">
           <td>${i.seg}</td>
           <td class="muted">${i.client}</td>
           <td class="muted">${i.agency}</td>
+          <td class="mono">${i.origFee || dash}</td>
+          <td>
+            <div class="reason-cell">
+              <span class="reason-text muted">${i.detail}</span>
+              <div class="reason-info-wrap">
+                <span class="material-icons">info_outline</span>
+                <div class="reason-popover">${i.detail}</div>
+              </div>
+            </div>
+          </td>
         </tr>`).join('')
-      : `<tr><td colspan="3" style="text-align:center;color:#9E9E9E;padding:24px 0;">No blocked instances</td></tr>`;
+      : `<tr><td colspan="5" style="text-align:center;color:#9E9E9E;padding:24px 0;">No blocked instances</td></tr>`;
   }
 }
 

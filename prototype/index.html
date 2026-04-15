@@ -254,8 +254,8 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .cell-chip { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:999px; font-size:11px; font-weight:400; white-space:nowrap; background:transparent; border:1px solid; }
     .cell-chip-gray   { border-color:#E0E0E0; color:#212121; }
     .cell-chip-blue   { border-color:#2196F3; color:#2196F3; }
-    .cell-chip-green  { border-color:#4CAF50; background:#4CAF50; color:#fff; }
-    .cell-chip-orange { border-color:#E17109; background:#FCF1E0; color:#E17109; }
+    .cell-chip-green  { border-color:#4CAF50; color:#4CAF50; }
+    .cell-chip-orange { border-color:#E17109; color:#E17109; }
     .cell-chip-red    { border-color:#DB4537; color:#DB4537; }
 
     /* ─── Empty State ─── */
@@ -1140,7 +1140,7 @@ function renderInstances() {
     const instStatus = !r._feeActive
       ? { label:'Inactive', cls:'cell-chip-gray' }
       : r.status === 'past'   ? { label:'Inactive', cls:'cell-chip-gray' }
-      : r.status === 'future' ? { label:'Upcoming', cls:'cell-chip-orange' }
+      : r.status === 'future' ? { label:'Upcoming', cls:'cell-chip-blue' }
       :                         { label:'Active',   cls:'cell-chip-green' };
     const trClass = (!r._feeActive || r.status === 'past') ? 'row-inactive' : '';
     const appTypeChip = r._feeAppType === 'Additive'
@@ -1156,7 +1156,7 @@ function renderInstances() {
       <td class="muted">${r.startDate}</td>
       <td class="muted">${r.endDate || '<span style="color:#9E9E9E">Open</span>'}</td>
       <td class="col-feedef muted">${r._feeGroup || ''}</td>
-      <td class="muted">${cat}</td>
+      <td><span class="cell-chip cell-chip-gray">${cat}</span></td>
       <td class="muted col-account">${r.account || dash}</td>
       <td class="col-feedef">${r._feeAppType ? appTypeChip : ''}</td>
       <td><span class="cell-chip ${instStatus.cls}">${instStatus.label}</span></td>
@@ -2432,20 +2432,16 @@ function updateBulkBanner() {
     banner.style.cssText = 'display:flex;align-items:center;gap:16px;padding:10px 16px;margin-bottom:10px;border:1px solid #90CAF9;border-radius:4px;font-size:13px;flex-shrink:0;background:#E3F2FD;color:#1565C0;';
     banner.innerHTML = `
       <span class="material-icons" style="font-size:16px;color:#2196F3;flex-shrink:0;">info</span>
-      <span><strong>Start:</strong> ${bulkSummary.start}</span>${sep}
-      <span><strong>End:</strong> ${bulkSummary.end}</span>${sep}
-      <span><strong>Fee %:</strong> ${bulkSummary.fee}</span>${sep}
-      <span><strong>Account:</strong> ${bulkSummary.account}</span>
-      <span style="margin-left:auto;font-size:12px;color:#1976D2;">Applied to all instances below</span>`;
+      <span>Start: ${bulkSummary.start} – End: ${bulkSummary.end} | Fee %: ${bulkSummary.fee} | Account: ${bulkSummary.account || '—'}</span>`;
   } else if (bulkFilter === 'adjusted') {
     banner.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 16px;margin-bottom:10px;border:1px solid #E17109;border-radius:4px;font-size:13px;flex-shrink:0;background:#FCF1E0;color:#7B3A00;';
     banner.innerHTML = `
-      <span class="material-icons" style="font-size:16px;color:#E17109;flex-shrink:0;">info_outline</span>
-      <span>These existing instances overlap with the new start date you selected. To avoid conflicts, TRIO will automatically <strong>shift their end dates</strong> to the day before your new instances begin. Fee percentages are not affected.</span>`;
+      <span class="material-icons" style="font-size:16px;color:#E17109;flex-shrink:0;">warning</span>
+      <span>To create the instances you requested, these existing instances will have their end dates adjusted to avoid date overlap.</span>`;
   } else if (bulkFilter === 'blocked') {
     banner.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 16px;margin-bottom:10px;border:1px solid #DB4537;border-radius:4px;font-size:13px;flex-shrink:0;background:#FBEAED;color:#7B1A12;';
     banner.innerHTML = `
-      <span class="material-icons" style="font-size:16px;color:#DB4537;flex-shrink:0;">block</span>
+      <span class="material-icons" style="font-size:16px;color:#DB4537;flex-shrink:0;">error_outline</span>
       <span>These instances could not be created due to future conflicting instances.</span>
       <a onclick="downloadBlockedInstances()" style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#DB4537;text-decoration:underline;cursor:pointer;flex-shrink:0;white-space:nowrap;"><span class="material-icons" style="font-size:14px;">download</span>Download List</a>`;
   }

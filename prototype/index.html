@@ -384,6 +384,8 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .dc-menu-item .material-icons { font-size:16px; color:#616161; }
     .dc-menu-item.danger { color:#DB4537; }
     .dc-menu-item.danger .material-icons { color:#DB4537; }
+    .dc-menu-item.disabled { color:#BDBDBD; cursor:default; pointer-events:none; }
+    .dc-menu-item.disabled .material-icons { color:#BDBDBD; }
     .dc-menu-divider { height:1px; background:#E0E0E0; margin:4px 0; }
 
     /* ─── Inactivation modal ─── */
@@ -1078,7 +1080,9 @@ function renderCards() {
             <div class="dc-menu-item" onclick="event.stopPropagation();closeDcMenu();openFeeDefEditModal('${f.id}')"><span class="material-icons">edit</span>Edit</div>
             <div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();openInactivateModal('${f.id}')"><span class="material-icons">block</span>Inactivate</div>
             <div class="dc-menu-divider"></div>
-            <div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();deleteDefinition('${f.id}')"><span class="material-icons">delete_outline</span>Delete Definition</div>
+            ${(instances[f.id] || []).length === 0
+              ? `<div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();deleteDefinition('${f.id}')"><span class="material-icons">delete_outline</span>Delete Definition</div>`
+              : `<div class="dc-menu-item disabled" title="Cannot delete — this definition has existing instances"><span class="material-icons">delete_outline</span>Delete Definition</div>`}
           </div>
         </div>` : ''}
       </div>

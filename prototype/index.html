@@ -2103,7 +2103,7 @@ render();
             </div>
           </div>
         </div>
-        <div id="bDateSummary" style="display:flex;align-items:center;gap:16px;padding:10px 16px;margin-bottom:10px;border:1px solid #90CAF9;border-radius:4px;font-size:13px;flex-shrink:0;background:#E3F2FD;color:#1565C0;"></div>
+        <div id="bDateSummary" style="display:flex;align-items:center;gap:12px;padding:16px;margin-bottom:10px;border-radius:4px;font-size:12px;flex-shrink:0;background:#E3F2FD;color:#2196F3;"></div>
         <div class="preview-table-wrap">
           <table class="preview-table">
             <thead id="bPreviewThead"></thead>
@@ -2428,22 +2428,23 @@ function toggleBulkFilter(status) {
 function updateBulkBanner() {
   const banner = document.getElementById('bDateSummary');
   const sep = `<span style="opacity:0.4;">|</span>`;
+  const base = 'display:flex;align-items:center;gap:12px;padding:16px;margin-bottom:10px;border-radius:4px;font-size:12px;flex-shrink:0;line-height:18px;';
   if (bulkFilter === 'clean') {
-    banner.style.cssText = 'display:flex;align-items:center;gap:16px;padding:10px 16px;margin-bottom:10px;border:1px solid #90CAF9;border-radius:4px;font-size:13px;flex-shrink:0;background:#E3F2FD;color:#1565C0;';
+    banner.style.cssText = base + 'background:#E3F2FD;color:#2196F3;';
     banner.innerHTML = `
-      <span class="material-icons" style="font-size:16px;color:#2196F3;flex-shrink:0;">info</span>
+      <span class="material-icons" style="font-size:24px;flex-shrink:0;">info</span>
       <span>Start: ${bulkSummary.start} – End: ${bulkSummary.end} | Fee %: ${bulkSummary.fee} | Account: ${bulkSummary.account || '—'}</span>`;
   } else if (bulkFilter === 'adjusted') {
-    banner.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 16px;margin-bottom:10px;border:1px solid #E17109;border-radius:4px;font-size:13px;flex-shrink:0;background:#FCF1E0;color:#7B3A00;';
+    banner.style.cssText = base + 'background:#FCF1E0;color:#E17109;';
     banner.innerHTML = `
-      <span class="material-icons" style="font-size:16px;color:#E17109;flex-shrink:0;">warning</span>
+      <span class="material-icons" style="font-size:24px;flex-shrink:0;">warning_amber</span>
       <span>To create the instances you requested, these existing instances will have their end dates adjusted to avoid date overlap.</span>`;
   } else if (bulkFilter === 'blocked') {
-    banner.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 16px;margin-bottom:10px;border:1px solid #DB4537;border-radius:4px;font-size:13px;flex-shrink:0;background:#FBEAED;color:#7B1A12;';
+    banner.style.cssText = base + 'background:#FBEAED;color:#DB4537;';
     banner.innerHTML = `
-      <span class="material-icons" style="font-size:16px;color:#DB4537;flex-shrink:0;">error_outline</span>
+      <span class="material-icons" style="font-size:24px;flex-shrink:0;">error_outline</span>
       <span>These instances could not be created due to future conflicting instances.</span>
-      <a onclick="downloadBlockedInstances()" style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#DB4537;text-decoration:underline;cursor:pointer;flex-shrink:0;white-space:nowrap;"><span class="material-icons" style="font-size:14px;">download</span>Download List</a>`;
+      <a onclick="downloadBlockedInstances()" style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;color:#DB4537;text-decoration:underline;cursor:pointer;flex-shrink:0;white-space:nowrap;"><span class="material-icons" style="font-size:14px;">download</span>Download List</a>`;
   }
 }
 

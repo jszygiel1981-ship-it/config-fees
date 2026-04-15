@@ -116,7 +116,7 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .ptab:hover:not(.active) { color:#212121; }
 
     /* ─── Content Area ─── */
-    .content { flex:1; display:flex; gap:16px; padding:16px; background:#F5F5F5; overflow:hidden; }
+    .content { flex:1; display:flex; gap:16px; padding:16px; background:#FAFAFA; overflow:hidden; }
 
     /* ─── Left Panel ─── */
     .left-panel { width:395px; flex-shrink:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; display:flex; flex-direction:column; overflow:hidden; transition:width .2s ease, opacity .15s ease, border .2s ease, margin .2s ease; }
@@ -292,6 +292,8 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .btn-text:hover { background:rgba(33,150,243,0.08); }
     .btn-primary { background:#2196F3; color:#fff; border:none; border-radius:4px; font-family:Roboto,sans-serif; font-size:14px; font-weight:400; padding:0 16px; height:32px; cursor:pointer; min-width:72px; }
     .btn-primary:hover { background:#1E88E5; }
+    .btn-secondary { background:#fff; color:#212121; border:1px solid #E0E0E0; border-radius:4px; font-family:Roboto,sans-serif; font-size:13px; font-weight:400; padding:0 14px; height:32px; cursor:pointer; }
+    .btn-secondary:hover { background:#F5F5F5; }
 
     /* ─── Footer ─── */
     .page-footer { background:#fff; border-top:1px solid #E0E0E0; height:36px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; flex-shrink:0; }
@@ -593,18 +595,7 @@ body { font-family: var(--font-family); background-color: var(--color-background
           <span class="toggle-label">Show Inactive</span>
           <div class="toggle" id="inactiveToggle" onclick="toggleInactive(this)"></div>
         </div>
-        <div class="add-inst-wrap">
-          <div class="split-btn">
-            <button class="split-btn-main" onclick="handleAddInstance()">Add Instance</button>
-            <div class="split-btn-divider"></div>
-            <button class="split-btn-arrow" onclick="toggleAddInstMenu()"><span class="material-icons">arrow_drop_down</span></button>
-          </div>
-          <div class="add-inst-menu" id="addInstMenu">
-            <div class="add-inst-menu-item" onclick="closeAddInstMenu();openCreateModal()">
-              <span class="material-icons">add</span> Add Instance
-            </div>
-          </div>
-        </div>
+        <button class="btn-secondary" onclick="openCreateModal()">Add Instance</button>
       </div>
     </div>
 
@@ -641,9 +632,8 @@ body { font-family: var(--font-family); background-color: var(--color-background
       <table>
         <thead>
           <tr>
-            <th class="col-check"><input type="checkbox" id="selectAllChk" onchange="toggleSelectAll(this)" title="Select all"></th>
             <th class="col-feedef">Fee Definition<span class="material-icons sort-icon">unfold_more</span></th>
-            <th>Fee Value<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Fee %<span class="material-icons sort-icon">unfold_more</span></th>
             <th>Segments<span class="material-icons sort-icon">unfold_more</span></th>
             <th>Client<span class="material-icons sort-icon">unfold_more</span></th>
             <th>Agency<span class="material-icons sort-icon">unfold_more</span></th>
@@ -657,9 +647,8 @@ body { font-family: var(--font-family); background-color: var(--color-background
             <th style="width:64px"></th>
           </tr>
           <tr class="col-filter-row">
-            <th class="col-check"></th>
             <th class="col-feedef"></th>
-            <th><input class="col-filter-input" placeholder="Value…" oninput="setColFilter('feeValue',this.value)" /></th>
+            <th><input class="col-filter-input" placeholder="%…" oninput="setColFilter('feeValue',this.value)" /></th>
             <th><input class="col-filter-input" placeholder="Segment…" oninput="setColFilter('segments',this.value)" /></th>
             <th><input class="col-filter-input" placeholder="Client…" oninput="setColFilter('client',this.value)" /></th>
             <th><input class="col-filter-input" placeholder="Agency…" oninput="setColFilter('agency',this.value)" /></th>
@@ -720,8 +709,8 @@ body { font-family: var(--font-family); background-color: var(--color-background
       </div>
 
       <div class="field" id="mFeeValue-field">
-        <label>Fee Value <span class="req">*</span></label>
-        <input type="text" id="mFeeValue" />
+        <label>Fee % <span class="req">*</span></label>
+        <input type="text" id="mFeeValue" placeholder="e.g. 3.5%" />
       </div>
 
       <div class="field" id="mSegments-field">
@@ -1148,7 +1137,6 @@ function renderInstances() {
       : `<span class="cell-chip cell-chip-gray">${r._feeAppType}</span>`;
     return `
     <tr class="${trClass}">
-      <td class="col-check"><input type="checkbox" class="row-chk" onchange="updateSelectAll()"></td>
       <td class="col-feedef" style="font-weight:500;">${r._feeName || ''}</td>
       <td class="mono">${r.feeValue}</td>
       <td>${r.segments}</td>
@@ -1228,10 +1216,10 @@ function handleAddInstance() {
   openCreateModal();
 }
 function toggleAddInstMenu() {
-  document.getElementById('addInstMenu').classList.toggle('open');
+  document.getElementById('addInstMenu')?.classList.toggle('open');
 }
 function closeAddInstMenu() {
-  document.getElementById('addInstMenu').classList.remove('open');
+  document.getElementById('addInstMenu')?.classList.remove('open');
 }
 document.addEventListener('click', e => {
   const wrap = document.querySelector('.add-inst-wrap');
@@ -1718,7 +1706,7 @@ function renderInactivateList(insts) {
           <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Segment</th>
           <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Client</th>
           <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Agency</th>
-          <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Fee Value</th>
+          <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Fee %</th>
           <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">Start Date</th>
           <th style="position:sticky;top:0;background:#FAFAFA;border-bottom:1px solid #E0E0E0;padding:0 12px;height:36px;text-align:left;font-size:12px;font-weight:500;color:#757575;white-space:nowrap;">End Date</th>
         </tr>
@@ -1952,8 +1940,8 @@ render();
 
           <!-- Fee Value -->
           <div class="field">
-            <label>Fee Value <span class="req">*</span></label>
-            <input type="text" id="bFeeValue" placeholder="e.g. 3.5% or $250.00" />
+            <label>Fee % <span class="req">*</span></label>
+            <input type="text" id="bFeeValue" placeholder="e.g. 3.5%" />
           </div>
           <div></div>
 
@@ -2057,7 +2045,7 @@ render();
           <div class="metric-card" id="bCardModified" onclick="toggleBulkFilter('adjusted')">
             <div class="mc-label-row">
               <div class="mc-label-left">
-                <span class="mc-label-text">Existing Modified</span>
+                <span class="mc-label-text">Modified</span>
               </div>
             </div>
             <div class="mc-metrics">
@@ -2096,35 +2084,10 @@ render();
             </div>
           </div>
         </div>
-        <div id="bDateSummary" style="display:flex;align-items:center;gap:20px;padding:10px 16px;margin-bottom:10px;background:#E3F2FD;border:1px solid #90CAF9;border-radius:4px;font-size:13px;color:#1565C0;flex-shrink:0;">
-          <span class="material-icons" style="font-size:16px;color:#2196F3;flex-shrink:0;">info</span>
-          <span><strong>Start:</strong> <span id="bSummaryStart" style="font-weight:500;">—</span></span>
-          <span style="color:#90CAF9;">|</span>
-          <span><strong>End:</strong> <span id="bSummaryEnd" style="font-weight:500;">—</span></span>
-          <span style="color:#90CAF9;">|</span>
-          <span><strong>Fee Value:</strong> <span id="bSummaryFeeVal" style="font-weight:500;">—</span></span>
-          <span style="margin-left:auto;font-size:12px;color:#1976D2;">Applied to all instances below</span>
-        </div>
+        <div id="bDateSummary" style="display:flex;align-items:center;gap:16px;padding:10px 16px;margin-bottom:10px;border:1px solid #90CAF9;border-radius:4px;font-size:13px;flex-shrink:0;background:#E3F2FD;color:#1565C0;"></div>
         <div class="preview-table-wrap">
           <table class="preview-table">
-            <colgroup>
-              <col style="width:16%">
-              <col style="width:20%">
-              <col style="width:20%">
-              <col style="width:14%">
-              <col style="width:14%">
-              <col style="width:16%">
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Segment</th>
-                <th>Client</th>
-                <th>Agency</th>
-                <th>Orig. Fee %</th>
-                <th>Orig. End Date</th>
-                <th>Status</th>
-              </tr>
-            </thead>
+            <thead id="bPreviewThead"></thead>
             <tbody id="bPreviewTbody"></tbody>
           </table>
         </div>
@@ -2379,22 +2342,24 @@ function generateBulkPreview() {
       const rowEnd = sampleEndDates[idx % sampleEndDates.length];
       const rowOrigFee = sampleOrigFees[idx % sampleOrigFees.length];
       let status, detail, origFee, origEnd;
+      let newEnd = null;
       if (hash < 6) {
         status = 'clean';
-        origFee = null; // new instance — no existing to compare
+        origFee = null;
         origEnd = null;
       } else if (hash < 8) {
         status = 'adjusted';
         origFee = rowOrigFee;
         origEnd = rowEnd;
-        detail = `Existing instance (${pair.client !== '—' ? pair.client : pair.agency}) will end on ${prevDay(start)} instead of ${rowEnd} to avoid overlap.`;
+        newEnd  = prevDay(start);
+        detail = `Existing instance end date will change from ${rowEnd} to ${prevDay(start)} to avoid overlap.`;
       } else {
         status = 'blocked';
         origFee = rowOrigFee;
         origEnd = rowEnd;
-        detail = `Two future instances already exist for this scope — ${seg}. Dates cannot be auto-resolved. Adjust or delete existing instances first.`;
+        detail = `A future instance already exists for ${seg} (${pair.client !== '—' ? pair.client : pair.agency !== '—' ? pair.agency : 'Global'}). Resolve that instance first.`;
       }
-      instances.push({ seg, client: pair.client, agency: pair.agency, start, end: rowEnd, origFee, origEnd, status, detail });
+      instances.push({ seg, client: pair.client, agency: pair.agency, start, end: rowEnd, origFee, origEnd, newEnd, status, detail });
       idx++;
     }
   }
@@ -2402,44 +2367,21 @@ function generateBulkPreview() {
   const cleanCount    = instances.filter(i => i.status === 'clean').length;
   const adjustedCount = instances.filter(i => i.status === 'adjusted').length;
   const blockedCount  = instances.filter(i => i.status === 'blocked').length;
-  const saveCount     = cleanCount + adjustedCount;
+
+  // Store globally for re-render on tab switch
+  bulkInstances = instances;
+  bulkSummary = { start, end: end === 'No end date' ? 'No end date' : end, fee: feeVal, account: document.getElementById('bAccount').value.trim() || '—' };
 
   // Metric cards
-  document.getElementById('bMetricCreated').textContent  = saveCount;
+  document.getElementById('bMetricCreated').textContent  = cleanCount;
   document.getElementById('bMetricModified').textContent = adjustedCount;
   document.getElementById('bMetricBlocked').textContent  = blockedCount;
   document.getElementById('bCardModified').classList.toggle('mc-dim', adjustedCount === 0);
   document.getElementById('bCardBlocked').classList.toggle('mc-dim',  blockedCount  === 0);
 
-  // Date / fee summary strip
-  document.getElementById('bSummaryStart').textContent   = start;
-  document.getElementById('bSummaryEnd').textContent     = end === 'No end date' ? 'No end date' : end;
-  document.getElementById('bSummaryFeeVal').textContent  = feeVal;
-
-  // Build table rows
-  document.getElementById('bPreviewTbody').innerHTML = instances.map((inst, i) => {
-    const isBlocked = inst.status === 'blocked';
-    let statusCell;
-    if (inst.status === 'clean') {
-      statusCell = `<span class="chip chip-sm chip-success-outline"><span class="chip-label">Ready</span></span>`;
-    } else if (inst.status === 'adjusted') {
-      const tip = inst.detail.replace(/"/g, '&quot;');
-      statusCell = `<span class="tip-wrap" data-tip="${tip}"><span class="chip chip-sm chip-warning-outline"><span class="chip-label">Adjusted</span></span></span>`;
-    } else {
-      const tip = inst.detail.replace(/"/g, '&quot;');
-      statusCell = `<span class="tip-wrap" data-tip="${tip}"><span class="chip chip-sm chip-error-outline"><span class="chip-label">Blocked</span></span></span>`;
-    }
-    const rowStyle = isBlocked ? ' style="opacity:0.5;"' : '';
-    const isChanged = inst.status === 'adjusted' || inst.status === 'blocked';
-    const origFeeDisplay = inst.origFee || '—';
-    const origEndDisplay = inst.origEnd ? (inst.origEnd === 'No end date' ? 'Open' : inst.origEnd) : '—';
-    const feeCellStyle  = (isChanged && inst.origFee) ? ' style="background:#FFF3E0;font-weight:500;"' : ' class="muted"';
-    const endCellStyle  = (isChanged && inst.origEnd) ? ' style="background:#FFF3E0;font-weight:500;"' : ' class="muted"';
-    return `<tr${rowStyle} data-status="${inst.status}"><td>${inst.seg}</td><td>${inst.client}</td><td>${inst.agency}</td><td${feeCellStyle}>${origFeeDisplay}</td><td${endCellStyle}>${origEndDisplay}</td><td>${statusCell}</td></tr>`;
-  }).join('');
-
-  updateBulkSaveBtn();
   showBulkStep(2);
+  // Default to Modified — the unexpected changes are most important to review first
+  toggleBulkFilter('adjusted');
 }
 
 function prevDay(dateStr) {
@@ -2449,30 +2391,111 @@ function prevDay(dateStr) {
   return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
 }
 
-let bulkFilter = null;
+let bulkFilter = 'adjusted';
+let bulkInstances = [];
+let bulkSummary = { start: '', end: '', fee: '', account: '' };
 
 function toggleBulkFilter(status) {
-  bulkFilter = (bulkFilter === status) ? null : status;
+  bulkFilter = status;
   ['bCardCreated','bCardModified','bCardBlocked'].forEach(id => document.getElementById(id).classList.remove('mc-active'));
   if (bulkFilter === 'clean')    document.getElementById('bCardCreated').classList.add('mc-active');
   if (bulkFilter === 'adjusted') document.getElementById('bCardModified').classList.add('mc-active');
   if (bulkFilter === 'blocked')  document.getElementById('bCardBlocked').classList.add('mc-active');
-  document.querySelectorAll('#bPreviewTbody tr').forEach(tr => {
-    tr.style.display = (!bulkFilter || tr.dataset.status === bulkFilter) ? '' : 'none';
-  });
+  updateBulkBanner();
+  updateBulkTable();
+  updateBulkSaveBtn();
+}
+
+function updateBulkBanner() {
+  const banner = document.getElementById('bDateSummary');
+  const sep = `<span style="opacity:0.4;">|</span>`;
+  if (bulkFilter === 'clean') {
+    banner.style.cssText = 'display:flex;align-items:center;gap:16px;padding:10px 16px;margin-bottom:10px;border:1px solid #90CAF9;border-radius:4px;font-size:13px;flex-shrink:0;background:#E3F2FD;color:#1565C0;';
+    banner.innerHTML = `
+      <span class="material-icons" style="font-size:16px;color:#2196F3;flex-shrink:0;">info</span>
+      <span><strong>Start:</strong> ${bulkSummary.start}</span>${sep}
+      <span><strong>End:</strong> ${bulkSummary.end}</span>${sep}
+      <span><strong>Fee %:</strong> ${bulkSummary.fee}</span>${sep}
+      <span><strong>Account:</strong> ${bulkSummary.account}</span>
+      <span style="margin-left:auto;font-size:12px;color:#1976D2;">Applied to all instances below</span>`;
+  } else if (bulkFilter === 'adjusted') {
+    banner.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 16px;margin-bottom:10px;border:1px solid #E17109;border-radius:4px;font-size:13px;flex-shrink:0;background:#FCF1E0;color:#7B3A00;';
+    banner.innerHTML = `
+      <span class="material-icons" style="font-size:16px;color:#E17109;flex-shrink:0;">info_outline</span>
+      <span>To create the instances you requested, these existing instances will have their <strong>end dates adjusted</strong> to avoid date overlap. Fee percentages are not changed.</span>`;
+  } else if (bulkFilter === 'blocked') {
+    banner.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 16px;margin-bottom:10px;border:1px solid #DB4537;border-radius:4px;font-size:13px;flex-shrink:0;background:#FBEAED;color:#7B1A12;';
+    banner.innerHTML = `
+      <span class="material-icons" style="font-size:16px;color:#DB4537;flex-shrink:0;">block</span>
+      <span>These instances could not be created due to conflicting future instances. Resolve those first, then retry.</span>
+      <button onclick="downloadBlockedInstances()" style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;background:#fff;border:1px solid #DB4537;border-radius:4px;color:#DB4537;font-family:Roboto,sans-serif;font-size:12px;cursor:pointer;flex-shrink:0;white-space:nowrap;"><span class="material-icons" style="font-size:14px;">download</span>Download</button>`;
+  }
+}
+
+function updateBulkTable() {
+  const thead = document.getElementById('bPreviewThead');
+  const tbody = document.getElementById('bPreviewTbody');
+  const filtered = bulkInstances.filter(i => i.status === bulkFilter);
+  const dash = '—';
+
+  if (bulkFilter === 'clean') {
+    thead.innerHTML = `<tr><th>Segment</th><th>Client</th><th>Agency</th></tr>`;
+    tbody.innerHTML = filtered.length
+      ? filtered.map(i => `<tr><td>${i.seg}</td><td class="muted">${i.client}</td><td class="muted">${i.agency}</td></tr>`).join('')
+      : `<tr><td colspan="3" style="text-align:center;color:#9E9E9E;padding:24px 0;">No instances to create</td></tr>`;
+  } else if (bulkFilter === 'adjusted') {
+    thead.innerHTML = `<tr><th>Segment</th><th>Client</th><th>Agency</th><th>Fee %</th><th>Original End Date</th><th>New End Date</th></tr>`;
+    tbody.innerHTML = filtered.length
+      ? filtered.map(i => {
+          const origEnd = i.origEnd ? (i.origEnd === 'No end date' ? 'Open' : i.origEnd) : dash;
+          const newEnd  = i.newEnd  || dash;
+          return `<tr>
+            <td>${i.seg}</td>
+            <td class="muted">${i.client}</td>
+            <td class="muted">${i.agency}</td>
+            <td class="mono">${i.origFee || dash}</td>
+            <td class="muted">${origEnd}</td>
+            <td class="mono" style="color:#E17109;font-weight:500;">${newEnd}</td>
+          </tr>`;
+        }).join('')
+      : `<tr><td colspan="6" style="text-align:center;color:#9E9E9E;padding:24px 0;">No existing instances will be modified</td></tr>`;
+  } else if (bulkFilter === 'blocked') {
+    thead.innerHTML = `<tr><th>Segment</th><th>Client</th><th>Agency</th><th>Reason</th></tr>`;
+    tbody.innerHTML = filtered.length
+      ? filtered.map(i => `<tr style="opacity:0.7;">
+          <td>${i.seg}</td>
+          <td class="muted">${i.client}</td>
+          <td class="muted">${i.agency}</td>
+          <td style="font-size:12px;color:#757575;">${i.detail}</td>
+        </tr>`).join('')
+      : `<tr><td colspan="4" style="text-align:center;color:#9E9E9E;padding:24px 0;">No blocked instances</td></tr>`;
+  }
 }
 
 function updateBulkSaveBtn() {
-  const btn   = document.getElementById('bBtnSave');
-  const rows  = [...document.querySelectorAll('#bPreviewTbody tr')];
-  const total = rows.length;
-  const blocked = rows.filter(r => r.style.opacity === '0.5').length;
-  const n = total - blocked;
+  const btn = document.getElementById('bBtnSave');
+  const n   = bulkInstances.filter(i => i.status === 'clean').length;
   btn.textContent = `Create ${n} instance${n !== 1 ? 's' : ''}`;
   btn.disabled    = n === 0;
 }
 
+function downloadBlockedInstances() {
+  const rows = bulkInstances.filter(i => i.status === 'blocked');
+  if (!rows.length) return;
+  const csv = ['Segment,Client,Agency,Reason', ...rows.map(i => `"${i.seg}","${i.client}","${i.agency}","${i.detail}"`)].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'blocked-instances.csv';
+  a.click();
+}
+
 function saveBulkInstances() {
+  const blocked = bulkInstances.filter(i => i.status === 'blocked');
+  if (blocked.length > 0) {
+    if (confirm(`${blocked.length} instance${blocked.length !== 1 ? 's were' : ' was'} blocked and could not be created. Download a record of blocked instances?`)) {
+      downloadBlockedInstances();
+    }
+  }
   closeBulkModal();
 }
 

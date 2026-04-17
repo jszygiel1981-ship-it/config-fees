@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Instance Overlap Logic — TRIO WFS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Roboto, sans-serif; background: #F5F5F5; color: #212121; min-height: 100vh; padding: 40px; }
+
+    h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #757575; margin-bottom: 40px; }
+
+    .map { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+    /* ── Nodes ── */
+    .node { border-radius: 4px; font-size: 13px; font-weight: 400; text-align: center; position: relative; }
+
+    .node-input {
+      background: #607D8B; color: #fff;
+      padding: 14px 24px; border-radius: 4px;
+      width: 340px; font-size: 14px; font-weight: 500;
+    }
+    .node-input .sub { font-size: 11px; font-weight: 400; opacity: 0.8; margin-top: 4px; }
+
+    .node-check {
+      background: #fff; border: 2px solid #2196F3; color: #1565C0;
+      padding: 12px 20px; border-radius: 999px;
+      width: 320px; font-size: 13px; font-weight: 500;
+    }
+
+    .node-result {
+      padding: 14px 20px; border-radius: 4px;
+      width: 220px; font-size: 13px; font-weight: 500;
+      display: flex; flex-direction: column; gap: 6px; align-items: center;
+    }
+    .node-result .label { font-size: 16px; font-weight: 700; letter-spacing: 0.3px; }
+    .node-result .desc { font-size: 11px; font-weight: 400; line-height: 1.5; text-align: center; }
+
+    .result-created  { background: #E8F5E9; border: 2px solid #4CAF50; color: #1B5E20; }
+    .result-modified { background: #FCF1E0; border: 2px solid #E17109; color: #7B3A00; }
+    .result-blocked  { background: #FBEAED; border: 2px solid #DB4537; color: #7B1A12; }
+
+    /* ── Connectors ── */
+    .arrow { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .arrow-line { width: 2px; background: #BDBDBD; flex-shrink: 0; }
+    .arrow-head { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #BDBDBD; }
+    .arrow-label { font-size: 11px; color: #757575; background: #F5F5F5; padding: 0 6px; position: relative; z-index: 1; white-space: nowrap; }
+
+    /* ── Branch layout ── */
+    .branch-row { display: flex; align-items: flex-start; gap: 0; position: relative; }
+    .branch-col { display: flex; flex-direction: column; align-items: center; }
+
+    /* Horizontal line connecting branches */
+    .h-line { height: 2px; background: #BDBDBD; }
+
+    /* ── Legend ── */
+    .legend { margin-top: 48px; display: flex; gap: 24px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #616161; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+
+    /* ── Context note ── */
+    .note { background: #fff; border: 1px solid #E0E0E0; border-radius: 4px; padding: 16px 20px; max-width: 720px; margin-top: 40px; font-size: 13px; line-height: 1.7; color: #424242; }
+    .note strong { color: #212121; }
+    .note .note-title { font-size: 12px; font-weight: 500; color: #757575; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>Instance Overlap Resolution Logic</h1>
+  <p class="subtitle">How TRIO determines Created, Modified, and Blocked outcomes when bulk-creating fee instances</p>
+
+  <div class="map">
+
+    <!-- INPUT -->
+    <div class="node node-input">
+      User submits new fee instance(s)
+      <div class="sub">Segment · Client · Agency · Fee % · Start Date · End Date</div>
+    </div>
+
+    <!-- Arrow -->
+    <div class="arrow">
+      <div class="arrow-line" style="height:24px;"></div>
+      <div class="arrow-head"></div>
+    </div>
+
+    <!-- CHECK 1 -->
+    <div class="node node-check">Does an existing instance match this scope?</div>
+    <div style="font-size:11px;color:#757575;margin-top:4px;">Same Segment + Client + Agency combination</div>
+
+    <!-- Branch: No → Created | Yes → next check -->
+    <div style="display:flex;align-items:flex-start;margin-top:0;">
+
+      <!-- NO branch (left) -->
+      <div class="branch-col" style="align-items:flex-end;">
+        <div class="arrow" style="align-items:flex-end;">
+          <div class="arrow-line" style="height:24px;"></div>
+        </div>
+        <div style="display:flex;align-items:center;">
+          <div class="h-line" style="width:80px;"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="arrow-label" style="margin-bottom:4px;">No match</div>
+            <div class="arrow-head"></div>
+          </div>
+        </div>
+        <div class="node node-result result-created" style="margin-top:8px;">
+          <span class="label">✓ Created</span>
+          <span class="desc">New instance added with the dates and fee % provided. No existing records affected.</span>
+        </div>
+      </div>
+
+      <!-- YES branch (right — continues down) -->
+      <div class="branch-col" style="align-items:flex-start;margin-left:0;">
+        <div class="arrow">
+          <div class="arrow-line" style="height:24px;"></div>
+          <div style="display:flex;align-items:center;">
+            <div class="h-line" style="width:80px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <div class="arrow-label" style="margin-bottom:4px;">Match found</div>
+              <div class="arrow-head"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHECK 2 -->
+        <div class="node node-check" style="margin-top:8px;">Do the dates overlap?</div>
+        <div style="font-size:11px;color:#757575;margin-top:4px;text-align:center;">Existing end date ≥ new start date, or no end date set</div>
+
+        <!-- Branch: No overlap → Created | Overlap → next check -->
+        <div style="display:flex;align-items:flex-start;margin-top:0;">
+
+          <!-- NO overlap (left) -->
+          <div class="branch-col" style="align-items:flex-end;">
+            <div class="arrow" style="align-items:flex-end;">
+              <div class="arrow-line" style="height:24px;"></div>
+            </div>
+            <div style="display:flex;align-items:center;">
+              <div class="h-line" style="width:80px;"></div>
+              <div style="display:flex;flex-direction:column;align-items:center;">
+                <div class="arrow-label" style="margin-bottom:4px;">No overlap</div>
+                <div class="arrow-head"></div>
+              </div>
+            </div>
+            <div class="node node-result result-created" style="margin-top:8px;">
+              <span class="label">✓ Created</span>
+              <span class="desc">Dates don't conflict. New instance added alongside the existing one.</span>
+            </div>
+          </div>
+
+          <!-- YES overlap (right — continues down) -->
+          <div class="branch-col" style="align-items:flex-start;">
+            <div class="arrow">
+              <div class="arrow-line" style="height:24px;"></div>
+              <div style="display:flex;align-items:center;">
+                <div class="h-line" style="width:80px;"></div>
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                  <div class="arrow-label" style="margin-bottom:4px;">Overlap exists</div>
+                  <div class="arrow-head"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CHECK 3 -->
+            <div class="node node-check" style="margin-top:8px;">Is the conflicting instance a future instance?</div>
+            <div style="font-size:11px;color:#757575;margin-top:4px;text-align:center;">Start date &gt; today — it hasn't gone into effect yet</div>
+
+            <!-- Final branch: No → Modified | Yes → Blocked -->
+            <div style="display:flex;gap:40px;margin-top:0;align-items:flex-start;justify-content:center;">
+
+              <!-- NO → Modified -->
+              <div class="branch-col">
+                <div class="arrow">
+                  <div class="arrow-line" style="height:24px;"></div>
+                  <div style="display:flex;align-items:center;">
+                    <div class="h-line" style="width:60px;"></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                      <div class="arrow-label" style="margin-bottom:4px;">Current or open-ended</div>
+                      <div class="arrow-head"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="node node-result result-modified" style="margin-top:8px;">
+                  <span class="label">~ Modified</span>
+                  <span class="desc">TRIO shifts the existing instance's end date to the day before your new start date. Fee % is unchanged. New instance is created.</span>
+                </div>
+              </div>
+
+              <!-- YES → Blocked -->
+              <div class="branch-col">
+                <div class="arrow">
+                  <div class="arrow-line" style="height:24px;"></div>
+                  <div style="display:flex;align-items:center;">
+                    <div class="h-line" style="width:60px;"></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                      <div class="arrow-label" style="margin-bottom:4px;">Future instance</div>
+                      <div class="arrow-head"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="node node-result result-blocked" style="margin-top:8px;">
+                  <span class="label">✕ Blocked</span>
+                  <span class="desc">TRIO won't auto-modify a future instance. You must edit or remove the conflicting future instance first, then retry.</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Context note -->
+  <div class="note" style="max-width:760px;">
+    <div class="note-title">Why the distinction matters</div>
+    <strong>Modified (auto-resolved)</strong> — The conflicting instance is already active or has no end date. Shifting its end date is safe because any timecards tied to it have already been processed up to today. TRIO can confidently close it out without disrupting historical data.<br><br>
+    <strong>Blocked (manual required)</strong> — The conflicting instance is a future one — it was intentionally scheduled but hasn't started yet. TRIO won't assume it's safe to modify because the intent behind that future instance isn't known. You may have scheduled it for a reason. The decision to change it should be yours.
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#4CAF50;"></div> Created — new instance, no conflicts</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#E17109;"></div> Modified — existing instance end date auto-adjusted</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#DB4537;"></div> Blocked — future instance conflict, manual resolution required</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2196F3;border-radius:999px;"></div> Decision point</div>
+  </div>
+
+</body>
+</html>

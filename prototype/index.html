@@ -5,6 +5,7 @@
   <title>Fee Management — TRIO WFS</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
   <style>
 /* design-system-shell.css — inlined for hosted deployment */
 :root {
@@ -98,43 +99,40 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .g-nav-item.active::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:#212121; }
     .g-nav-item .material-icons { font-size:16px; }
 
-    /* ─── Page Canvas + Card ─── */
-    .page-canvas { flex:1; background:#F5F5F5; padding:16px; overflow:hidden; display:flex; flex-direction:column; }
-    .page-card { flex:1; background:#fff; border-radius:4px; border:1px solid #E0E0E0; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
+    /* ─── Page Canvas ─── */
+    .page-canvas { flex:1; background:#F5F5F5; overflow:hidden; display:flex; flex-direction:column; }
 
     /* ─── Page Header Bar ─── */
     .page-header-bar { background:#fff; border-bottom:1px solid #E0E0E0; padding:0 24px; height:52px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
     .page-title { font-size:16px; font-weight:500; color:#212121; }
-    .btn-add-def { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 14px; background:#FAFAFA; border:1px solid #E0E0E0; border-radius:4px; font-family:Roboto,sans-serif; font-size:13px; color:#424242; cursor:pointer; }
-    .btn-add-def:hover { background:#F5F5F5; }
-    .btn-add-def .material-icons { font-size:16px; }
 
     /* ─── AP / AR Tabs ─── */
-    .page-tabs { background:#F5F5F5; border-bottom:1px solid #E0E0E0; padding:0 24px; display:flex; align-items:flex-end; flex-shrink:0; }
-    .ptab { position:relative; height:36px; display:inline-flex; align-items:center; padding:0 4px; margin-right:16px; font-size:14px; font-weight:400; color:#757575; cursor:pointer; border-bottom:2px solid transparent; user-select:none; }
+    .page-tabs { background:#fff; border-bottom:1px solid #E0E0E0; padding:0 24px; display:flex; align-items:flex-end; flex-shrink:0; }
+    .ptab { position:relative; height:40px; display:inline-flex; align-items:center; padding:0 4px; margin-right:16px; font-size:14px; font-weight:400; color:#757575; cursor:pointer; border-bottom:2px solid transparent; user-select:none; }
     .ptab.active { color:#2196F3; font-weight:500; border-bottom-color:#2196F3; }
     .ptab:hover:not(.active) { color:#212121; }
 
     /* ─── Content Area ─── */
-    .content { flex:1; display:flex; gap:16px; padding:16px; background:#FAFAFA; overflow:hidden; }
+    .content { flex:1; display:flex; gap:16px; padding:16px; background:#F5F5F5; overflow:hidden; }
 
     /* ─── Left Panel ─── */
     .left-panel { width:395px; flex-shrink:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; display:flex; flex-direction:column; overflow:hidden; transition:width .2s ease, opacity .15s ease, border .2s ease, margin .2s ease; }
     .left-panel.collapsed { width:0; border-width:0; opacity:0; margin-right:0; }
     .col-feedef { display:none; }
     .panel-collapsed .col-feedef { display:table-cell; }
-    .lp-header { display:flex; align-items:center; justify-content:space-between; padding:0 12px; height:48px; border-bottom:1px solid #E0E0E0; flex-shrink:0; background:#F5F5F5; }
+    .lp-header { display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:48px; border-bottom:1px solid #E0E0E0; flex-shrink:0; background:#F5F5F5; }
     .lp-title { font-size:14px; font-weight:500; color:#212121; }
     .lp-actions { display:flex; gap:4px; }
     .iBtn { width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; background:#FAFAFA; border:1px solid #E0E0E0; border-radius:4px; cursor:pointer; color:#616161; }
     .iBtn:hover { background:#F0F0F0; }
     .iBtn .material-icons { font-size:16px; }
 
-    .lp-controls { padding:12px 12px 8px; border-bottom:1px solid #E0E0E0; flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
+    .lp-controls { padding:16px 16px 8px; border-bottom:1px solid #E0E0E0; flex-shrink:0; display:flex; flex-direction:column; gap:16px; }
     .lp-search-row { display:flex; align-items:center; gap:8px; }
-    .lp-search { flex:1; display:flex; align-items:center; gap:6px; border:1px solid #BDBDBD; border-radius:4px; height:32px; padding:0 8px; background:#fff; }
-    .lp-search .material-icons { font-size:15px; color:#757575; }
-    .lp-search input { border:none; outline:none; font-family:Roboto,sans-serif; font-size:13px; color:#212121; width:100%; background:transparent; }
+    .lp-search { flex:1; display:flex; align-items:center; gap:8px; border:1px solid #9E9E9E; border-radius:4px; height:38px; padding:0 12px; background:#fff; transition:border-color .15s; }
+    .lp-search:focus-within { border-color:#2196F3; border-width:2px; padding:0 11px; }
+    .lp-search .material-icons { font-size:18px; color:#757575; flex-shrink:0; }
+    .lp-search input { border:none; outline:none; font-family:Roboto,sans-serif; font-size:14px; color:#212121; width:100%; background:transparent; }
     .lp-search input::placeholder { color:#9E9E9E; }
     .toggle-row { display:flex; align-items:center; gap:8px; }
     .toggle-label { font-size:12px; color:#757575; white-space:nowrap; }
@@ -168,7 +166,7 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .grp-drop-check .material-icons { font-size:16px; }
 
     /* ─── Fee Definition Cards ─── */
-    .lp-cards { flex:1; overflow-y:auto; padding:8px 12px; display:flex; flex-direction:column; gap:6px; }
+    .lp-cards { flex:1; overflow-y:auto; padding:8px 16px; display:flex; flex-direction:column; gap:8px; }
     .def-card { border:1px solid #E0E0E0; border-radius:4px; padding:12px; cursor:pointer; background:#fff; transition:border-color .2s ease, background .2s ease, box-shadow .2s ease; }
     .def-card:hover:not(.selected) { border-color:#BDBDBD; background:#FAFAFA; }
     .def-card.selected { background:rgba(33,150,243,0.08); border-color:#64B5F6; box-shadow:0 1px 4px rgba(33,150,243,0.1); }
@@ -193,7 +191,7 @@ body { font-family: var(--font-family); background-color: var(--color-background
 
     /* ─── Right Panel ─── */
     .right-panel { flex:1; background:#fff; border:1px solid #E0E0E0; border-radius:4px; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
-    .rp-header { background:#F5F5F5; display:flex; align-items:center; justify-content:space-between; padding:0 12px; height:48px; border-bottom:1px solid #E0E0E0; flex-shrink:0; }
+    .rp-header { background:#F5F5F5; display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:48px; border-bottom:1px solid #E0E0E0; flex-shrink:0; }
     .rp-title { font-size:15px; font-weight:500; color:#212121; }
     .add-inst-wrap { position:relative; display:inline-flex; }
     .split-btn { display:inline-flex; align-items:stretch; background:#F5F5F5; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden; height:32px; }
@@ -219,10 +217,11 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .rp-context.hidden { display:none; }
     .grid-toolbar { background:#F5F5F5; display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:40px; border-bottom:1px solid #E0E0E0; flex-shrink:0; }
     .gtabs { display:flex; align-items:center; height:100%; gap:0; }
-    .gtab { display:inline-flex; align-items:center; height:100%; padding:0 12px; font-size:14px; font-weight:400; color:#757575; cursor:pointer; position:relative; border-bottom:2px solid transparent; user-select:none; }
-    .gtab:hover { color:#212121; background:rgba(0,0,0,0.02); }
-    .gtab.active { color:#2196F3; font-weight:500; border-bottom-color:#2196F3; }
-    .gtab-sep { color:#BDBDBD; font-size:12px; height:100%; display:flex; align-items:center; user-select:none; }
+    .gtab { display:inline-flex; align-items:center; height:100%; padding:0 8px; font-size:13px; font-weight:400; color:#2196F3; cursor:pointer; position:relative; user-select:none; text-decoration:none; }
+    .gtab:hover { text-decoration:underline; }
+    .gtab.active { color:#212121; font-weight:500; }
+    .gtab.active:hover { text-decoration:none; }
+    .gtab-sep { color:#BDBDBD; font-size:13px; height:100%; display:flex; align-items:center; user-select:none; padding:0 2px; }
     .gpagination { display:flex; align-items:center; gap:4px; font-size:13px; color:#757575; }
     .gpagination-count { font-variant-numeric:tabular-nums; }
     .gpagination-actions { display:flex; align-items:stretch; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden; }
@@ -253,9 +252,11 @@ body { font-family: var(--font-family); background-color: var(--color-background
     /* ─── Chip (table cell) — outline variant ─── */
     .cell-chip { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:999px; font-size:11px; font-weight:400; white-space:nowrap; background:transparent; border:1px solid; }
     .cell-chip-gray   { border-color:#E0E0E0; color:#212121; }
-    .cell-chip-blue   { border-color:#2196F3; color:#2196F3; }
+    .cell-chip-blue   { border-color:#54afca; color:#54afca; }
     .cell-chip-green  { border-color:#4CAF50; color:#4CAF50; }
     .cell-chip-orange { border-color:#E17109; color:#E17109; }
+    /* Status column — hide when a specific tab is selected */
+    .hide-status-col .col-status { display:none; }
     .cell-chip-red    { border-color:#DB4537; color:#DB4537; }
 
     /* ─── Empty State ─── */
@@ -340,8 +341,8 @@ body { font-family: var(--font-family); background-color: var(--color-background
 
     /* ─── Group Autocomplete ─── */
     .autocomplete-wrap { position:relative; }
-    .ac-input { width:100%; height:40px; border:1px solid #BDBDBD; border-radius:4px; padding:0 40px 0 12px; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#fff; outline:none; transition:border-color .15s; box-sizing:border-box; }
-    .ac-input:focus { border-color:#2196F3; border-width:2px; padding:0 39px 0 11px; }
+    .ac-input { width:100%; height:40px; border:1px solid #9E9E9E; border-radius:4px; padding:0 56px 0 12px; font-family:Roboto,sans-serif; font-size:14px; color:#212121; background:#fff; outline:none; transition:border-color .15s; box-sizing:border-box; }
+    .ac-input:focus { border-color:#2196F3; border-width:2px; padding:0 55px 0 11px; }
     .ac-arrow { position:absolute; right:8px; top:50%; transform:translateY(-50%); color:#757575; pointer-events:none; font-size:20px !important; }
     .ac-dropdown { display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.08); z-index:1200; max-height:220px; overflow-y:auto; padding:4px 0; }
     .ac-dropdown.open { display:block; }
@@ -480,16 +481,16 @@ body { font-family: var(--font-family); background-color: var(--color-background
     .preview-table tbody td { padding:0 12px; height:40px; border-bottom:1px solid #F0F0F0; color:#212121; vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .preview-table tbody tr:last-child td { border-bottom:none; }
     /* ─── Reason popover ─── */
-    .reason-cell { display:flex; align-items:center; gap:4px; overflow:hidden; }
+    .reason-cell { display:flex; align-items:center; gap:4px; }
     .reason-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
-    .reason-info-wrap { position:relative; flex-shrink:0; display:flex; align-items:center; }
-    .reason-info-wrap .material-icons { font-size:14px; color:#9E9E9E; cursor:default; }
+    .reason-info-wrap { flex-shrink:0; display:inline-flex; align-items:center; }
+    .reason-info-wrap .material-icons { font-size:14px; color:#9E9E9E; cursor:pointer; }
     .reason-info-wrap:hover .material-icons { color:#757575; }
-    .reason-popover { display:none; position:absolute; bottom:calc(100% + 6px); right:0; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.14); padding:8px 12px; font-size:12px; color:#212121; line-height:1.6; white-space:normal; width:280px; z-index:200; }
-    .reason-info-wrap:hover .reason-popover { display:block; }
+    /* Fixed tooltip rendered to body — positioned via JS */
+    .reason-tooltip { position:fixed; background:#fff; border:1px solid #E0E0E0; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.14); padding:8px 12px; font-size:12px; color:#212121; line-height:1.6; white-space:normal; width:280px; z-index:9999; pointer-events:none; }
     /* ─── Metric Card (from design system MetricCard component) ─── */
     .metric-group { display:flex; flex-direction:row; gap:16px; align-items:stretch; flex-shrink:0; margin-bottom:16px; }
-    .metric-card { display:flex; flex-direction:column; flex:1; min-width:170px; height:150px; background:#FFFFFF; border:1px solid #E0E0E0; border-radius:4px; padding:16px 16px 8px 16px; gap:0; box-sizing:border-box; font-family:Roboto,sans-serif; cursor:pointer; transition:border-color .15s,background .15s; }
+    .metric-card { display:flex; flex-direction:column; flex:1; min-width:170px; background:#FFFFFF; border:1px solid #E0E0E0; border-radius:4px; padding:16px 16px 8px 16px; gap:0; box-sizing:border-box; font-family:Roboto,sans-serif; cursor:pointer; transition:border-color .15s,background .15s; }
     .metric-card:hover { border-color:#BDBDBD; }
     .metric-card.mc-active { border-color:#2196F3; background:#E3F2FD; }
     .metric-card.mc-active .mc-label-text { color:#1565C0; }
@@ -557,11 +558,18 @@ body { font-family: var(--font-family); background-color: var(--color-background
 
 <!-- ─── Page Canvas ─── -->
 <div class="page-canvas">
-<div class="page-card">
 
 <!-- ─── Page Header Bar ─── -->
 <div class="page-header-bar">
   <span class="page-title">Fee Management</span>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+    <span style="font-size:11px;color:#757575;font-weight:400;">Empty state:</span>
+    <select id="emptyStateToggle" onchange="setEmptyStateMode(this.value)" style="height:28px;padding:0 8px;border:1px solid #E0E0E0;border-radius:4px;font-family:Roboto,sans-serif;font-size:11px;color:#757575;background:#fff;cursor:pointer;">
+      <option value="off">Normal view</option>
+      <option value="no-definitions">No definitions</option>
+      <option value="no-instances">No instances</option>
+    </select>
+  </div>
 </div>
 
 <!-- ─── AP / AR Tabs ─── -->
@@ -592,10 +600,9 @@ body { font-family: var(--font-family); background-color: var(--color-background
         </div>
       </div>
       <div class="lp-groupings">
-        <span class="grp-label">Groupings</span>
         <div class="grp-filter-wrap">
           <button class="grp-all-btn" id="grpAllBtn" onclick="toggleGroupDropdown()">
-            All <span class="material-icons">arrow_drop_down</span>
+            All Groups <span class="material-icons">expand_more</span>
           </button>
           <div id="grpActiveChips"></div>
           <div class="grp-dropdown" id="grpDropdown"></div>
@@ -623,11 +630,11 @@ body { font-family: var(--font-family); background-color: var(--color-background
     <div class="grid-toolbar">
       <div class="gtabs">
         <div class="gtab active" onclick="setFilter('all',this)">All</div>
-        <div class="gtab-sep">|</div>
+        <div class="gtab-sep">/</div>
         <div class="gtab" onclick="setFilter('past',this)">Past</div>
-        <div class="gtab-sep">|</div>
+        <div class="gtab-sep">/</div>
         <div class="gtab" onclick="setFilter('current',this)">Current</div>
-        <div class="gtab-sep">|</div>
+        <div class="gtab-sep">/</div>
         <div class="gtab" onclick="setFilter('future',this)">Future</div>
       </div>
       <div class="gpagination">
@@ -664,7 +671,7 @@ body { font-family: var(--font-family); background-color: var(--color-background
             <th>Category<span class="material-icons sort-icon">unfold_more</span></th>
             <th class="col-account">Account<span class="material-icons sort-icon">unfold_more</span></th>
             <th class="col-feedef">App Type<span class="material-icons sort-icon">unfold_more</span></th>
-            <th>Status<span class="material-icons sort-icon">unfold_more</span></th>
+            <th class="col-status">Status<span class="material-icons sort-icon">unfold_more</span></th>
             <th style="width:64px"></th>
           </tr>
           <tr class="col-filter-row">
@@ -679,7 +686,7 @@ body { font-family: var(--font-family); background-color: var(--color-background
             <th><input class="col-filter-input" placeholder="Category…" oninput="setColFilter('category',this.value)" /></th>
             <th class="col-account"><input class="col-filter-input" placeholder="Acct…" oninput="setColFilter('account',this.value)" /></th>
             <th class="col-feedef"></th>
-            <th></th>
+            <th class="col-status"></th>
             <th style="width:64px"></th>
           </tr>
         </thead>
@@ -694,7 +701,6 @@ body { font-family: var(--font-family); background-color: var(--color-background
   </div>
 
 </div><!-- /.content -->
-</div><!-- /.page-card -->
 </div><!-- /.page-canvas -->
 
 <!-- ─── Footer ─── -->
@@ -1039,6 +1045,7 @@ let groups = tabGroups['ap'];
 let fdGroupValue = '';
 let instQuickSearch = '';
 const colFilters = { feeValue:'', segments:'', client:'', agency:'', category:'', account:'' };
+let emptyStateMode = 'off'; // 'off' | 'no-definitions' | 'no-instances'
 
 /* ─── Category derivation ─── */
 function getCategory(r) {
@@ -1053,12 +1060,21 @@ function categoryChipClass(cat) {
 
 /* ─── Left panel cards ─── */
 function renderCards() {
+  if (emptyStateMode === 'no-definitions') {
+    document.getElementById('feeCards').innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;color:#757575;gap:8px;flex:1;">
+        <span class="material-icons" style="font-size:40px;color:#E0E0E0;">playlist_add</span>
+        <div style="font-size:14px;font-weight:500;color:#212121;">No fee definitions</div>
+        <div style="font-size:13px;line-height:1.5;">Click <strong>+</strong> to create your first fee definition.</div>
+      </div>`;
+    return;
+  }
   const q = (document.getElementById('searchInput').value || '').toLowerCase();
   const list = fees[tab].filter(f => {
     if (q && !f.name.toLowerCase().includes(q)) return false;
     if (selectedGroups.size > 0 && !selectedGroups.has(f.group)) return false;
     return true;
-  }).sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0));
+  }).sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0) || a.name.localeCompare(b.name));
   document.getElementById('feeCards').innerHTML = list.map(f => {
     const isSelected = f.id === feeId;
     const isDisabled = !f.active;
@@ -1072,13 +1088,13 @@ function renderCards() {
       <div class="dc-chips" style="align-items:center;">
         <span class="dc-chip">${f.appType}</span>
         <span class="dc-chip">${f.required ? 'Required' : 'Optional'}</span>
-        <span class="dc-chip ${f.active ? 'dc-chip-green' : 'dc-chip-muted'}">${f.active ? 'Active' : 'Inactive'}</span>
+        <span class="dc-chip ${f.active ? '' : 'dc-chip-muted'}">${f.active ? 'Active' : 'Inactive'}</span>
         ${f.active ? `
         <div class="dc-menu-wrap" id="dcMenuWrap_${f.id}">
           <button class="dc-more-btn" onclick="event.stopPropagation();toggleDcMenu('${f.id}')"><span class="material-icons">more_vert</span></button>
           <div class="dc-menu" id="dcMenu_${f.id}">
             <div class="dc-menu-item" onclick="event.stopPropagation();closeDcMenu();openFeeDefEditModal('${f.id}')"><span class="material-icons">edit</span>Edit</div>
-            <div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();openInactivateModal('${f.id}')"><span class="material-icons">block</span>Inactivate</div>
+            <div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();openInactivateModal('${f.id}')"><span class="material-icons">block</span>Disable Definition</div>
             <div class="dc-menu-divider"></div>
             ${(instances[f.id] || []).length === 0
               ? `<div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();deleteDefinition('${f.id}')"><span class="material-icons">delete_outline</span>Delete Definition</div>`
@@ -1092,6 +1108,26 @@ function renderCards() {
 
 /* ─── Right panel ─── */
 function renderInstances() {
+  const tbody = document.getElementById('instanceBody');
+  const empty = document.getElementById('emptyState');
+
+  if (emptyStateMode === 'no-definitions') {
+    tbody.innerHTML = '';
+    document.getElementById('emptyTitle').textContent = 'No fee definitions';
+    document.getElementById('emptySub').textContent   = 'Create a fee definition to start adding instances.';
+    empty.style.display = 'flex';
+    document.getElementById('rowCount').textContent = '0';
+    return;
+  }
+  if (emptyStateMode === 'no-instances') {
+    tbody.innerHTML = '';
+    document.getElementById('emptyTitle').textContent = 'No instances';
+    document.getElementById('emptySub').textContent   = 'Click Add Instance to create the first instance for this definition.';
+    empty.style.display = 'flex';
+    document.getElementById('rowCount').textContent = '0';
+    return;
+  }
+
   let rows;
   if (panelCollapsed) {
     // Aggregate all instances across all fee definitions in the current tab; inactive definitions sort to bottom
@@ -1128,8 +1164,6 @@ function renderInstances() {
   if (colFilters.category)  rows = rows.filter(r => getCategory(r).toLowerCase().includes(colFilters.category.toLowerCase()));
   if (colFilters.account)   rows = rows.filter(r => (r.account||'').toLowerCase().includes(colFilters.account.toLowerCase()));
 
-  const tbody = document.getElementById('instanceBody');
-  const empty = document.getElementById('emptyState');
   document.getElementById('rowCount').textContent = rows.length;
 
   if (!rows.length) {
@@ -1160,7 +1194,7 @@ function renderInstances() {
       : `<span class="cell-chip cell-chip-gray">${r._feeAppType}</span>`;
     return `
     <tr class="${trClass}">
-      <td class="col-feedef" style="font-weight:500;">${r._feeName || ''}</td>
+      <td class="col-feedef">${r._feeName || ''}</td>
       <td class="mono">${r.feeValue}</td>
       <td>${r.segments}</td>
       <td class="muted col-client">${r.client || dash}</td>
@@ -1171,7 +1205,7 @@ function renderInstances() {
       <td><span class="cell-chip cell-chip-gray">${cat}</span></td>
       <td class="muted col-account">${r.account || dash}</td>
       <td class="col-feedef">${r._feeAppType ? appTypeChip : ''}</td>
-      <td><span class="cell-chip ${instStatus.cls}">${instStatus.label}</span></td>
+      <td class="col-status"><span class="cell-chip ${instStatus.cls}">${instStatus.label}</span></td>
       <td>
         <div class="row-acts">
           <button class="act-btn" title="Edit" ${r.status === 'past' ? 'disabled' : `onclick="openEditModal(${JSON.stringify(r).replace(/"/g,'&quot;')})"`}><span class="material-icons">edit</span></button>
@@ -1187,11 +1221,17 @@ function renderHeader() {
     document.getElementById('rpTitle').textContent = 'Fee Definitions & Instances';
   } else {
     const def = fees[tab].find(f => f.id === feeId);
-    document.getElementById('rpTitle').textContent = def ? `${def.name} — Instances` : 'Instances';
+    document.getElementById('rpTitle').textContent = def ? `${def.name} – Instances` : 'Instances';
   }
 }
 
 function render() { renderCards(); renderInstances(); renderHeader(); }
+
+/* ─── Empty state toggle (prototype only) ─── */
+function setEmptyStateMode(mode) {
+  emptyStateMode = mode;
+  render();
+}
 
 /* ─── Instance search / filter handlers ─── */
 function setInstSearch(val) {
@@ -1273,6 +1313,7 @@ function setFilter(f, el) {
   filter = f;
   document.querySelectorAll('.gtab').forEach(x => x.classList.remove('active'));
   el.classList.add('active');
+  document.querySelector('.grid-wrap').classList.toggle('hide-status-col', f !== 'all');
   renderInstances();
 }
 /* ─── Group filter dropdown ─── */
@@ -1401,7 +1442,10 @@ function openFeeDefModal() {
   document.getElementById('fdName').value = '';
   document.getElementById('fdName').disabled = false;
   document.getElementById('fdDesc').value = '';
-  resetSelect('fdFeeType', '— Select —');
+  // Default Fee Type to AP
+  document.getElementById('fdFeeType').value = 'AP';
+  const ftLbl = document.getElementById('fdFeeType-lbl');
+  ftLbl.textContent = 'AP'; ftLbl.classList.remove('select-placeholder');
   resetSelect('fdAppType', '— Select —');
   // Unlock Fee Type and App Type
   ['fdFeeType', 'fdAppType'].forEach(id => {
@@ -1765,34 +1809,34 @@ render();
 
 <!-- ─── Add Fee Definition Modal ─── -->
 <div class="modal-overlay" id="feeDefModalOverlay" onclick="closeFeeDefOutside(event)">
-  <div class="modal-container" style="width:540px;">
+  <div class="modal-container" style="width:500px;">
     <div class="modal-header">
       <h2 id="feeDefModalTitle">Add Fee Definition</h2>
       <button class="modal-close" onclick="closeFeeDefModal()"><span class="material-icons">close</span></button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="gap:24px;">
 
-      <div id="fdEditBanner" style="display:none;background:#E3F2FD;border:1px solid #90CAF9;border-radius:4px;padding:8px 12px;font-size:13px;color:#1565C0;margin-bottom:16px;">
+      <div id="fdEditBanner" style="display:none;background:#E3F2FD;border:1px solid #90CAF9;border-radius:4px;padding:8px 12px;font-size:13px;color:#1565C0;">
         <span class="material-icons" style="font-size:16px;vertical-align:-3px;margin-right:6px;">info</span>Only description can be edited.
       </div>
 
       <div class="field">
         <label>Name <span class="req">*</span></label>
-        <input type="text" id="fdName" placeholder="e.g. Agency Staffing Fee" />
+        <input type="text" id="fdName" placeholder="" />
       </div>
 
       <div class="field">
         <label>Description</label>
-        <textarea id="fdDesc" rows="3" placeholder="Describe when and how this fee applies…" style="border:1px solid #BDBDBD;border-radius:4px;padding:8px 12px;font-family:Roboto,sans-serif;font-size:14px;color:#212121;background:#fff;outline:none;resize:vertical;line-height:1.5;transition:border-color .15s;"></textarea>
+        <input type="text" id="fdDesc" placeholder="" />
       </div>
 
-      <div class="field-row">
+      <div class="field-row" style="gap:24px;">
         <div class="field">
           <label>Fee Type <span class="req">*</span></label>
           <div class="select-wrapper">
             <div class="select-control">
               <div class="select-input" onclick="toggleMenu(this)">
-                <span id="fdFeeType-lbl" class="select-placeholder">— Select —</span>
+                <span id="fdFeeType-lbl">AP</span>
                 <span class="material-icons select-icon">arrow_drop_down</span>
               </div>
               <div class="select-menu">
@@ -1803,7 +1847,7 @@ render();
               </div>
             </div>
           </div>
-          <input type="hidden" id="fdFeeType" value="">
+          <input type="hidden" id="fdFeeType" value="AP">
         </div>
         <div class="field">
           <label>Application Type <span class="req">*</span></label>
@@ -1824,13 +1868,16 @@ render();
       </div>
 
       <div class="field">
-        <label>Group</label>
+        <label>Choose or Create a Group <span class="req">*</span></label>
         <div class="autocomplete-wrap" id="fdGroupWrap">
           <div style="position:relative;">
-            <input type="text" id="fdGroupInput" class="ac-input" placeholder="Search or create a group…" autocomplete="off"
+            <input type="text" id="fdGroupInput" class="ac-input" placeholder="Multi-select" autocomplete="off"
               oninput="renderGroupAc(this.value)"
               onfocus="openGroupAc()" />
-            <span class="material-icons ac-arrow">arrow_drop_down</span>
+            <div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:2px;pointer-events:none;">
+              <span class="material-icons" style="font-size:18px;color:#757575;">search</span>
+              <span class="material-icons" style="font-size:18px;color:#757575;">arrow_drop_down</span>
+            </div>
           </div>
           <div class="ac-dropdown" id="fdGroupDropdown"></div>
         </div>
@@ -1839,17 +1886,23 @@ render();
 
       <input type="hidden" id="fdRequired" value="required">
 
-      <span style="font-size:12px;color:#9E9E9E;line-height:1.5;">Fee Type and Application Type cannot be changed after creation.</span>
-
-      <div id="fdTogglesSection" style="display:flex;flex-direction:column;width:100%;border:1px solid #E0E0E0;border-radius:4px;overflow:hidden;">
-        <div class="switch-row" onclick="toggleFdRequired(document.getElementById('fdRequiredToggle'))" style="cursor:pointer;padding:8px 12px;">
-          <span class="switch-row-label" id="fdRequiredLbl">Required</span>
-          <div class="toggle on" id="fdRequiredToggle"></div>
+      <div id="fdTogglesSection" style="display:flex;flex-direction:column;width:100%;gap:16px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;cursor:pointer;" onclick="toggleFdRequired(document.getElementById('fdRequiredToggle'))">
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:14px;font-weight:500;color:#212121;" id="fdRequiredLbl">Required</span>
+            <span style="font-size:12px;color:#757575;line-height:1.4;">Fee will always be applied to the timecard</span>
+          </div>
+          <div class="toggle on" id="fdRequiredToggle" style="flex-shrink:0;"></div>
         </div>
-        <div id="fdActiveDivider" style="height:1px;background:#E0E0E0;"></div>
-        <div id="fdActiveRow" class="switch-row" onclick="toggleFdActive(document.getElementById('fdActiveToggle'))" style="cursor:pointer;padding:8px 12px;">
-          <span class="switch-row-label" id="fdActiveLbl">Active</span>
-          <div class="toggle on" id="fdActiveToggle"></div>
+        <div style="height:1px;background:#E0E0E0;" id="fdActiveDivider"></div>
+        <div id="fdActiveRow" style="display:none;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;cursor:pointer;" onclick="toggleFdActive(document.getElementById('fdActiveToggle'))">
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <span style="font-size:14px;font-weight:500;color:#212121;" id="fdActiveLbl">Active</span>
+              <span style="font-size:12px;color:#757575;line-height:1.4;">Definition is available for creating instances</span>
+            </div>
+            <div class="toggle on" id="fdActiveToggle" style="flex-shrink:0;"></div>
+          </div>
         </div>
       </div>
 
@@ -2053,63 +2106,48 @@ render();
         <div class="metric-group">
           <!-- Created -->
           <div class="metric-card" id="bCardCreated" onclick="toggleBulkFilter('clean')">
-            <div class="mc-label-row">
-              <div class="mc-label-left">
-                <span class="mc-label-text">Created</span>
-              </div>
-            </div>
             <div class="mc-metrics">
               <div class="mc-row">
                 <div class="mc-col">
                   <span class="mc-value mc-value--lg" id="bMetricCreated" style="color:#2e7d32">—</span>
-                  <span class="mc-sub-label">Instances</span>
+                  <span class="mc-sub-label">Instances to be created</span>
                 </div>
               </div>
               <div class="mc-icons-footer">
                 <div class="mc-icon-segment">
-                  <span class="material-icons mc-footer-icon" style="color:#2e7d32">check_circle</span>
+                  <span class="material-icons-outlined mc-footer-icon" style="color:#2e7d32">check_circle</span>
                 </div>
               </div>
             </div>
           </div>
           <!-- Existing Modified -->
           <div class="metric-card" id="bCardModified" onclick="toggleBulkFilter('adjusted')">
-            <div class="mc-label-row">
-              <div class="mc-label-left">
-                <span class="mc-label-text">Adjusted</span>
-              </div>
-            </div>
             <div class="mc-metrics">
               <div class="mc-row">
                 <div class="mc-col">
                   <span class="mc-value mc-value--lg" id="bMetricModified" style="color:#E17109">—</span>
-                  <span class="mc-sub-label">End date adjustments</span>
+                  <span class="mc-sub-label">Instances with end date adjustments</span>
                 </div>
               </div>
               <div class="mc-icons-footer">
                 <div class="mc-icon-segment">
-                  <span class="material-icons mc-footer-icon" style="color:#E17109">warning_amber</span>
+                  <span class="material-icons-outlined mc-footer-icon" style="color:#E17109">warning_amber</span>
                 </div>
               </div>
             </div>
           </div>
           <!-- Blocked -->
           <div class="metric-card" id="bCardBlocked" onclick="toggleBulkFilter('blocked')">
-            <div class="mc-label-row">
-              <div class="mc-label-left">
-                <span class="mc-label-text">Blocked</span>
-              </div>
-            </div>
             <div class="mc-metrics">
               <div class="mc-row">
                 <div class="mc-col">
                   <span class="mc-value mc-value--lg" id="bMetricBlocked" style="color:#DB4537">—</span>
-                  <span class="mc-sub-label">Cannot be created</span>
+                  <span class="mc-sub-label">Instances can't be created</span>
                 </div>
               </div>
               <div class="mc-icons-footer">
                 <div class="mc-icon-segment">
-                  <span class="material-icons mc-footer-icon" style="color:#DB4537">error</span>
+                  <span class="material-icons-outlined mc-footer-icon" style="color:#DB4537">error_outline</span>
                 </div>
               </div>
             </div>
@@ -2455,8 +2493,8 @@ function updateBulkBanner() {
     banner.style.cssText = base + 'background:#FBEAED;color:#DB4537;';
     banner.innerHTML = `
       <span class="material-icons" style="font-size:24px;flex-shrink:0;">error_outline</span>
-      <span>These instances could not be created due to future conflicting instances.</span>
-      <a onclick="downloadBlockedInstances()" style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;color:#DB4537;text-decoration:underline;cursor:pointer;flex-shrink:0;white-space:nowrap;"><span class="material-icons" style="font-size:14px;">download</span>Download List</a>`;
+      <span>These instances could not be created due to future conflicting instances. Download this list now — it will not be available after you leave this screen.</span>
+      <a onclick="downloadBlockedInstances()" style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;color:#DB4537;text-decoration:none;cursor:pointer;flex-shrink:0;white-space:nowrap;"><span class="material-icons" style="font-size:14px;">download</span>Download List</a>`;
   }
 }
 
@@ -2489,24 +2527,23 @@ function updateBulkTable() {
         }).join('')
       : `<tr><td colspan="7" style="text-align:center;color:#9E9E9E;padding:24px 0;">No existing instances will be modified</td></tr>`;
   } else if (bulkFilter === 'blocked') {
-    thead.innerHTML = `<tr><th>Segment</th><th>Client</th><th>Agency</th><th>Fee %</th><th>Reason</th></tr>`;
+    thead.innerHTML = `<tr><th>Segment</th><th>Client</th><th>Agency</th><th>Fee %</th><th>Start Date</th><th>End Date</th><th>Reason</th></tr>`;
     tbody.innerHTML = filtered.length
       ? filtered.map(i => `<tr style="opacity:0.75;">
           <td>${i.seg}</td>
           <td class="muted">${i.client}</td>
           <td class="muted">${i.agency}</td>
           <td class="mono">${i.origFee || dash}</td>
-          <td>
+          <td class="muted">${i.start || dash}</td>
+          <td class="muted">${i.end && i.end !== 'No end date' ? i.end : '<span style="color:#9E9E9E">Open</span>'}</td>
+          <td style="overflow:visible;">
             <div class="reason-cell">
               <span class="reason-text muted">${i.detail}</span>
-              <div class="reason-info-wrap">
-                <span class="material-icons">info_outline</span>
-                <div class="reason-popover">${i.detail}</div>
-              </div>
+              <span class="material-icons reason-info-trigger" style="font-size:14px;color:#9E9E9E;cursor:pointer;flex-shrink:0;" onmouseenter="showReasonTooltip(event, '${i.detail.replace(/'/g,"&#39;")}')" onmouseleave="hideReasonTooltip()">info_outline</span>
             </div>
           </td>
         </tr>`).join('')
-      : `<tr><td colspan="5" style="text-align:center;color:#9E9E9E;padding:24px 0;">No blocked instances</td></tr>`;
+      : `<tr><td colspan="7" style="text-align:center;color:#9E9E9E;padding:24px 0;">No blocked instances</td></tr>`;
   }
 }
 
@@ -2517,10 +2554,27 @@ function updateBulkSaveBtn() {
   btn.disabled    = n === 0;
 }
 
+/* ─── Reason tooltip (fixed-position, escapes overflow) ─── */
+let _reasonTip = null;
+function showReasonTooltip(e, text) {
+  hideReasonTooltip();
+  const tip = document.createElement('div');
+  tip.className = 'reason-tooltip';
+  tip.textContent = text;
+  document.body.appendChild(tip);
+  const rect = e.target.getBoundingClientRect();
+  tip.style.left = Math.min(rect.left, window.innerWidth - 296) + 'px';
+  tip.style.top  = (rect.top - tip.offsetHeight - 6) + 'px';
+  _reasonTip = tip;
+}
+function hideReasonTooltip() {
+  if (_reasonTip) { _reasonTip.remove(); _reasonTip = null; }
+}
+
 function downloadBlockedInstances() {
   const rows = bulkInstances.filter(i => i.status === 'blocked');
   if (!rows.length) return;
-  const csv = ['Segment,Client,Agency,Reason', ...rows.map(i => `"${i.seg}","${i.client}","${i.agency}","${i.detail}"`)].join('\n');
+  const csv = ['Segment,Client,Agency,Fee %,Start Date,End Date,Reason', ...rows.map(i => `"${i.seg}","${i.client}","${i.agency}","${i.origFee || ''}","${i.start || ''}","${i.end || ''}","${i.detail}"`)].join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
   a.download = 'blocked-instances.csv';

@@ -668,7 +668,7 @@ body { font-family: var(--font-family); background-color: var(--color-background
           <tr>
             <th class="col-feedef">Fee Definition<span class="material-icons sort-icon">unfold_more</span></th>
             <th>Fee %<span class="material-icons sort-icon">unfold_more</span></th>
-            <th>Segments<span class="material-icons sort-icon">unfold_more</span></th>
+            <th>Segment<span class="material-icons sort-icon">unfold_more</span></th>
             <th class="col-client">Client<span class="material-icons sort-icon">unfold_more</span></th>
             <th class="col-agency">Agency<span class="material-icons sort-icon">unfold_more</span></th>
             <th>Start Date<span class="material-icons sort-icon">unfold_more</span></th>
@@ -699,7 +699,6 @@ body { font-family: var(--font-family); background-color: var(--color-background
         <tbody id="instanceBody"></tbody>
       </table>
       <div class="empty-wrap" id="emptyState" style="display:none;">
-        <span class="material-icons">inbox</span>
         <div class="empty-title" id="emptyTitle">No instances</div>
         <div class="empty-sub" id="emptySub">Adjust the filter or add a new instance.</div>
       </div>
@@ -748,7 +747,7 @@ body { font-family: var(--font-family); background-color: var(--color-background
       </div>
 
       <div class="field" id="mSegments-field">
-        <label>Segments <span class="req">*</span></label>
+        <label>Segment <span class="req">*</span></label>
         <div class="select-wrapper">
           <div class="select-control">
             <div class="select-input" onclick="toggleMenu(this)">
@@ -1070,7 +1069,6 @@ function renderCards() {
   if (emptyStateMode === 'no-definitions') {
     document.getElementById('feeCards').innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;color:#757575;gap:8px;flex:1;">
-        <span class="material-icons" style="font-size:40px;color:#E0E0E0;">playlist_add</span>
         <div style="font-size:14px;font-weight:500;color:#212121;">No fee definitions</div>
         <div style="font-size:13px;line-height:1.5;">Click <strong>+</strong> to create your first fee definition.</div>
       </div>`;
@@ -1101,11 +1099,11 @@ function renderCards() {
           <button class="dc-more-btn" onclick="event.stopPropagation();toggleDcMenu('${f.id}')"><span class="material-icons">more_vert</span></button>
           <div class="dc-menu" id="dcMenu_${f.id}">
             <div class="dc-menu-item" onclick="event.stopPropagation();closeDcMenu();openFeeDefEditModal('${f.id}')"><span class="material-icons">edit</span>Edit</div>
-            <div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();openInactivateModal('${f.id}')"><span class="material-icons">block</span>Disable Definition</div>
+            <div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();openInactivateModal('${f.id}')"><span class="material-icons">block</span>Disable</div>
             <div class="dc-menu-divider"></div>
             ${(instances[f.id] || []).length === 0
-              ? `<div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();deleteDefinition('${f.id}')"><span class="material-icons">delete_outline</span>Delete Definition</div>`
-              : `<div class="dc-menu-item disabled" title="Cannot delete — this definition has existing instances"><span class="material-icons">delete_outline</span>Delete Definition</div>`}
+              ? `<div class="dc-menu-item danger" onclick="event.stopPropagation();closeDcMenu();deleteDefinition('${f.id}')"><span class="material-icons">delete_outline</span>Delete</div>`
+              : `<div class="dc-menu-item disabled" title="Cannot delete — this definition has existing instances"><span class="material-icons">delete_outline</span>Delete</div>`}
           </div>
         </div>` : ''}
       </div>
@@ -1440,7 +1438,12 @@ function openEditModal(r) {
 }
 
 function closeModal()  { document.getElementById('modalOverlay').classList.remove('active'); }
-function closeOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+function closeOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) {
+    if (!confirm('Are you sure you want to close? Any unsaved changes will be lost.')) return;
+    closeModal();
+  }
+}
 
 /* ─── Fee Definition Modal ─── */
 function openFeeDefModal() {
@@ -2036,9 +2039,9 @@ render();
           </div>
           <div></div>
 
-          <!-- Segments -->
+          <!-- Segment -->
           <div class="field" style="grid-column:1/-1;">
-            <label>Segments <span class="req">*</span></label>
+            <label>Segment <span class="req">*</span></label>
             <div class="multi-sel-wrap">
               <div class="multi-sel-trigger" id="bSegTrigger" onclick="toggleMultiSel('bSegTrigger','bSegMenu')">
                 <span class="multi-sel-placeholder">— Select segments —</span>
@@ -2111,6 +2114,22 @@ render();
       <!-- Step 2: Preview & Confirm -->
       <div id="bStep2" style="display:none;flex:1;min-height:0;flex-direction:column;gap:0;padding-top:0;overflow:hidden;">
         <div class="metric-group">
+          <!-- Adjustments (first — review left-to-right) -->
+          <div class="metric-card" id="bCardModified" onclick="toggleBulkFilter('adjusted')">
+            <div class="mc-metrics">
+              <div class="mc-row">
+                <div class="mc-col">
+                  <span class="mc-value mc-value--lg" id="bMetricModified" style="color:#E17109">—</span>
+                  <span class="mc-sub-label">Instances with end date adjustments</span>
+                </div>
+              </div>
+              <div class="mc-icons-footer">
+                <div class="mc-icon-segment">
+                  <span class="material-icons-outlined mc-footer-icon" style="color:#E17109">warning_amber</span>
+                </div>
+              </div>
+            </div>
+          </div>
           <!-- Created -->
           <div class="metric-card" id="bCardCreated" onclick="toggleBulkFilter('clean')">
             <div class="mc-metrics">
@@ -2127,23 +2146,7 @@ render();
               </div>
             </div>
           </div>
-          <!-- Existing Modified -->
-          <div class="metric-card" id="bCardModified" onclick="toggleBulkFilter('adjusted')">
-            <div class="mc-metrics">
-              <div class="mc-row">
-                <div class="mc-col">
-                  <span class="mc-value mc-value--lg" id="bMetricModified" style="color:#E17109">—</span>
-                  <span class="mc-sub-label">Instances with end date adjustments</span>
-                </div>
-              </div>
-              <div class="mc-icons-footer">
-                <div class="mc-icon-segment">
-                  <span class="material-icons-outlined mc-footer-icon" style="color:#E17109">warning_amber</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Blocked -->
+          <!-- Cannot be created -->
           <div class="metric-card" id="bCardBlocked" onclick="toggleBulkFilter('blocked')">
             <div class="mc-metrics">
               <div class="mc-row">
@@ -2227,12 +2230,13 @@ function openCreateModal() {
   document.getElementById('bulkModalOverlay').classList.add('active');
 }
 
-function closeBulkModal() {
-  document.getElementById('bulkModalOverlay').classList.remove('active');
-}
+function closeBulkModal() { document.getElementById('bulkModalOverlay').classList.remove('active'); }
 
 function closeBulkOutside(e) {
-  if (e.target === document.getElementById('bulkModalOverlay')) closeBulkModal();
+  if (e.target === document.getElementById('bulkModalOverlay')) {
+    if (!confirm('Are you sure you want to close? Any unsaved changes will be lost.')) return;
+    closeBulkModal();
+  }
 }
 
 function showBulkStep(n) {
@@ -2543,11 +2547,8 @@ function updateBulkTable() {
           <td class="mono">${i.origFee || dash}</td>
           <td class="muted">${i.start || dash}</td>
           <td class="muted">${i.end && i.end !== 'No end date' ? i.end : '<span style="color:#9E9E9E">Open</span>'}</td>
-          <td style="overflow:visible;">
-            <div class="reason-cell">
-              <span class="reason-text muted">${i.detail}</span>
-              <span class="material-icons reason-info-trigger" style="font-size:14px;color:#9E9E9E;cursor:pointer;flex-shrink:0;" onmouseenter="showReasonTooltip(event, '${i.detail.replace(/'/g,"&#39;")}')" onmouseleave="hideReasonTooltip()">info_outline</span>
-            </div>
+          <td style="overflow:visible;text-align:center;">
+            <span class="material-icons reason-info-trigger" style="font-size:16px;color:#9E9E9E;cursor:pointer;" onmouseenter="showReasonTooltip(event, '${i.detail.replace(/'/g,"&#39;")}')" onmouseleave="hideReasonTooltip()">info_outline</span>
           </td>
         </tr>`).join('')
       : `<tr><td colspan="7" style="text-align:center;color:#9E9E9E;padding:24px 0;">No blocked instances</td></tr>`;
@@ -2634,6 +2635,19 @@ document.addEventListener('click', function(e) {
       const t = document.getElementById(m.dataset.trigger);
       if (t) t.classList.remove('open');
     });
+  }
+});
+
+/* Escape key closes active modal with confirmation */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const bulkOpen = document.getElementById('bulkModalOverlay').classList.contains('active');
+    const modalOpen = document.getElementById('modalOverlay').classList.contains('active');
+    if (bulkOpen || modalOpen) {
+      if (!confirm('Are you sure you want to close? Any unsaved changes will be lost.')) return;
+      if (bulkOpen) closeBulkModal();
+      else closeModal();
+    }
   }
 });
 </script>
